@@ -311,7 +311,7 @@ void FSYMBOL(bn_uint4096_div)(bn_uint4096_t quo, bn_uint4096_t rem,
 	bn_uint4096_t rquo, rrem, sh_b;
 	FSYMBOL(bn_uint4096_move)(rrem, a);
 	FSYMBOL(bn_uint4096_move)(sh_b, b);
-	FSYMBOL(bn_uint4096_move)(rem, a);
+	FSYMBOL(bn_uint4096_move)(rem, rrem);
 	FSYMBOL(bn_uint4096_zero)(quo);
 
 	if (FSYMBOL(bn_uint4096_cmp)(rrem, sh_b) < 0)

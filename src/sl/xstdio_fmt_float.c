@@ -1,0 +1,461 @@
+/* xstdio_fmt_float.c - standard input/output implementations */
+
+#include <libf/config.h>
+#include <libf/sl/xstddef.h>
+#include <libf/sl/xstdint.h>
+#include <libf/sl/xfloat.h>
+#include <libf/sl/xstdarg.h>
+#include <libf/sl/xstring.h>
+#include <libf/sl/xstrto.h>
+#include <libf/sl/xstrto_float.h>
+#include <libf/sl/xabs.h>
+#include <libf/sl/xstdio_float.h>
+
+
+/* @def: fmt_vprintf */
+#undef FG_LONG
+#define FG_LONG 0x01
+#undef FG_LONG_LONG
+#define FG_LONG_LONG 0x02
+#undef FG_SHORT
+#define FG_SHORT 0x04
+#undef FG_CHAR
+#define FG_CHAR 0x08
+#undef FG_LONG_DOUBLE
+#define FG_LONG_DOUBLE 0x10
+#undef FG_ALIGN_LEFT
+#define FG_ALIGN_LEFT 0x20
+#undef FG_ALIGN_RIGHT
+#define FG_ALIGN_RIGHT 0x40
+#undef FG_ALIGN_RIGHT_ZERO
+#define FG_ALIGN_RIGHT_ZERO 0x80
+#undef FG_BASE_PREFIX
+#define FG_BASE_PREFIX 0x100
+#undef FG_POSITIVE_NEGATIVE
+#define FG_POSITIVE_NEGATIVE 0x200
+
+#undef FLTO_PREMAX
+#define FLTO_PREMAX 324
+#undef FLTO_LENMAX
+#define FLTO_LENMAX 680
+/* end */
+
+/* @func: _fmt_vprintf (static) - output formatted value
+* @param1: struct fmt_vprintf_ctx * # fmt_vprintf context struct
+* @return: int32                    # 0: no error, <0: error
+*/
+static int32 _fmt_vprintf(struct fmt_vprintf_ctx *ctx) {
+	char buf[FLTO_LENMAX];
+	const char *bp_str = NULL;
+	int64 len = 0, len2 = 0,
+		pre_len = 0, ar_len = 0,
+		arz_len = 0, al_len = 0;
+	int32 neg = 0;
+
+#undef MIN
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+
+	switch (ctx->specifiers) {
+		case 'd': /* decimal */
+		case 'i':
+			neg = (ctx->va._i64L < 0) ? 1 : 0;
+			len = len2 = XSYMBOL(ulltostr_d)(0, buf,
+				XSYMBOL(llabs)(ctx->va._i64L));
+			buf[len] = '\0';
+
+			if (ctx->precise > 0)
+				pre_len = ctx->precise - len;
+			if (neg)
+				len++;
+			if (ctx->flags & FG_ALIGN_RIGHT)
+				ar_len = ctx->align - len - pre_len;
+			if (ctx->flags & FG_ALIGN_RIGHT_ZERO) {
+				arz_len = ctx->align - len;
+				if (ctx->precise > 0)
+					arz_len -= pre_len;
+			}
+			if (ctx->flags & FG_ALIGN_LEFT)
+				al_len = ctx->align - len - pre_len;
+
+			/* align right */
+			if (ctx->call_pad(' ', ar_len, ctx->arg))
+				return -2;
+			/* negative and positive */
+			if (neg) {
+				if (ctx->call_pad('-', 1, ctx->arg))
+					return -2;
+			} else if (ctx->flags & FG_POSITIVE_NEGATIVE) {
+				if (ctx->call_pad('+', 1, ctx->arg))
+					return -2;
+			}
+			/* align right zero */
+			if (ctx->call_pad('0', arz_len, ctx->arg))
+				return -2;
+			/* precise */
+			if (ctx->call_pad('0', pre_len, ctx->arg))
+				return -2;
+			/* output */
+			if (ctx->call_out(buf, len2, ctx->arg))
+				return -2;
+			/* align left */
+			if (ctx->call_pad(' ', al_len, ctx->arg))
+				return -2;
+
+			break;
+		case 'o': /* octal */
+		case 'u': /* decimal */
+		case 'x': /* hexadecimal */
+		case 'X':
+		case 'p': /* pointer */
+			if (ctx->flags & FG_BASE_PREFIX) {
+				switch (ctx->specifiers) {
+					case 'x':
+					case 'p':
+						bp_str = "0x";
+						break;
+					case 'X':
+						bp_str = "0X";
+						break;
+					case 'o':
+						bp_str = "0";
+						break;
+					default:
+						break;
+				}
+			}
+
+			if (ctx->specifiers == 'o') {
+				len = len2 = XSYMBOL(ulltostr_o)(0, buf,
+					ctx->va._u64L);
+			} else if (ctx->specifiers == 'u') {
+				len = len2 = XSYMBOL(ulltostr_d)(0, buf,
+					ctx->va._u64L);
+			} else if (ctx->specifiers == 'u') {
+				len = len2 = XSYMBOL(ulltostr_X)(0, buf,
+					ctx->va._u64L);
+			} else {
+				len = len2 = XSYMBOL(ulltostr_x)(0, buf,
+					ctx->va._u64L);
+			}
+			buf[len] = '\0';
+
+			if (ctx->precise > 0)
+				pre_len = ctx->precise - len;
+			if (ctx->flags & FG_BASE_PREFIX) {
+				if (ctx->specifiers == 'o') {
+					len++;
+				} else if (ctx->specifiers != 'u') {
+					len += 2;
+				}
+			}
+			if (ctx->flags & FG_ALIGN_RIGHT)
+				ar_len = ctx->align - len - pre_len;
+			if (ctx->flags & FG_ALIGN_RIGHT_ZERO) {
+				arz_len = ctx->align - len;
+				if (ctx->precise > 0)
+					arz_len -= pre_len;
+			}
+			if (ctx->flags & FG_ALIGN_LEFT)
+				al_len = ctx->align - len - pre_len;
+
+			/* align right */
+			if (ctx->call_pad(' ', ar_len, ctx->arg))
+				return -2;
+			/* base prefix */
+			if (bp_str && ctx->call_out(bp_str,
+					XSYMBOL(strlen)(bp_str),
+					ctx->arg))
+				return -2;
+			/* align right zero */
+			if (ctx->call_pad('0', arz_len, ctx->arg))
+				return -2;
+			/* precise */
+			if (ctx->call_pad('0', pre_len, ctx->arg))
+				return -2;
+			/* output */
+			if (ctx->call_out(buf, len2, ctx->arg))
+				return -2;
+			/* align left */
+			if (ctx->call_pad(' ', al_len, ctx->arg))
+				return -2;
+
+			break;
+		case 'c': /* character */
+		case 's': /* string */
+			if (ctx->specifiers == 'c') {
+				buf[0] = ctx->va._char;
+				buf[1] = '\0';
+				bp_str = buf;
+				len2 = ++len;
+			} else if (ctx->va._str) {
+				bp_str = ctx->va._str;
+				len = len2 = XSYMBOL(strlen)(bp_str);
+			} else {
+				bp_str = "(null)";
+				len = len2 = 6; /* (null) */
+			}
+
+			if (ctx->flags & FG_ALIGN_RIGHT)
+				ar_len = ctx->align - len;
+			if (ctx->flags & FG_ALIGN_RIGHT_ZERO) {
+				arz_len = ctx->align - len;
+			}
+			if (ctx->flags & FG_ALIGN_LEFT)
+				al_len = ctx->align - len;
+
+			/* align right */
+			if (ctx->call_pad(' ', ar_len, ctx->arg))
+				return -2;
+			/* align right zero */
+			if (ctx->call_pad('0', arz_len, ctx->arg))
+				return -2;
+			/* output */
+			if (ctx->call_out(bp_str, len2, ctx->arg))
+				return -2;
+			/* align left */
+			if (ctx->call_pad(' ', al_len, ctx->arg))
+				return -2;
+
+			break;
+		case 'e': /* floating-point */
+			break;
+		case 'E':
+			break;
+		case 'f':
+			neg = (ctx->va._i64L >> 63) ? 1 : 0;
+			len = len2 = XSYMBOL(fltostr_num)(0, buf, ctx->va._f64,
+				MIN(ctx->precise, FLTO_PREMAX));
+			buf[len] = '\0';
+
+			if (ctx->precise > FLTO_PREMAX)
+				pre_len = ctx->precise - FLTO_PREMAX;
+			if (neg)
+				len++;
+			if (ctx->flags & FG_ALIGN_RIGHT)
+				ar_len = ctx->align - len - pre_len;
+			if (ctx->flags & FG_ALIGN_RIGHT_ZERO) {
+				arz_len = ctx->align - len;
+				if (ctx->precise > 0)
+					arz_len -= pre_len;
+			}
+			if (ctx->flags & FG_ALIGN_LEFT)
+				al_len = ctx->align - len - pre_len;
+
+			/* align right */
+			if (ctx->call_pad(' ', ar_len, ctx->arg))
+				return -2;
+			/* negative and positive */
+			if (neg) {
+				if (ctx->call_pad('-', 1, ctx->arg))
+					return -2;
+			} else if (ctx->flags & FG_POSITIVE_NEGATIVE) {
+				if (ctx->call_pad('+', 1, ctx->arg))
+					return -2;
+			}
+			/* align right zero */
+			if (ctx->call_pad('0', arz_len, ctx->arg))
+				return -2;
+			/* output */
+			if (ctx->call_out(buf, len2, ctx->arg))
+				return -2;
+			/* precise */
+			if (ctx->call_pad('0', pre_len, ctx->arg))
+				return -2;
+			/* align left */
+			if (ctx->call_pad(' ', al_len, ctx->arg))
+				return -2;
+
+			break;
+		case 'F':
+			break;
+		case 'g':
+			break;
+		case 'G':
+			break;
+		case 'a':
+			break;
+		case 'A':
+			break;
+		default:
+			return -1;
+	}
+
+	return 0;
+} /* end */
+
+/* @func: fmt_vprintf - formatted value parse and convert string
+* @param1: struct fmt_vprintf_ctx * # fmt_vprintf context struct
+* @param2: const char *             # formatted string
+* @param3: va_list                  # variable argument list
+* @return: int32                    # 0: no error, <0: error
+*/
+int32 XSYMBOL(fmt_vprintf)(struct fmt_vprintf_ctx *ctx,
+		const char *fmt, va_list ap) {
+	for (; *fmt != '\0'; fmt++) {
+		if (*fmt == '%') {
+			fmt++;
+			if (*fmt == '%') {
+				if (ctx->call_pad(*fmt, 1, ctx->arg))
+					return -2;
+				continue;
+			}
+		} else {
+			if (ctx->call_pad(*fmt, 1, ctx->arg))
+				return -2;
+			continue;
+		}
+		ctx->align = 0;
+		ctx->precise = 0;
+		ctx->flags = 0;
+
+		/* show positive and negative */
+		if (*fmt == '+') {
+			ctx->flags |= FG_POSITIVE_NEGATIVE;
+			fmt++;
+		}
+
+		/* base prefix */
+		if (*fmt == '#') {
+			ctx->flags |= FG_BASE_PREFIX;
+			fmt++;
+		}
+
+		/* align left and right */
+		if (*fmt == '-' || (*fmt >= '0' && *fmt <= '9')) {
+			if (*fmt == '-') { /* align left */
+				ctx->flags |= FG_ALIGN_LEFT;
+				fmt++;
+			} else if (*fmt == '0') { /* zero padding */
+				ctx->flags |= FG_ALIGN_RIGHT_ZERO;
+				fmt++;
+			} else { /* align right */
+				ctx->flags |= FG_ALIGN_RIGHT;
+			}
+
+			if (*fmt == '*') { /* dynamic */
+				ctx->align = va_arg(ap, int64);
+				fmt++;
+			} else {
+				for (; *fmt == '0'; fmt++);
+				for (int32 i = 0; *fmt != '\0' && i < 19;
+						fmt++, i++) {
+					if (!(*fmt >= '0' && *fmt <= '9'))
+						break;
+					ctx->align = (ctx->align * 10)
+						+ (*fmt - '0');
+				}
+			}
+		}
+
+		/* precise */
+		if (*fmt == '.') {
+			fmt++;
+			if (*fmt == '*') { /* dynamic */
+				ctx->precise = va_arg(ap, int64);
+				fmt++;
+			} else {
+				for (; *fmt == '0'; fmt++);
+				for (int32 i = 0; *fmt != '\0' && i < 19;
+						fmt++, i++) {
+					if (!(*fmt >= '0' && *fmt <= '9'))
+						break;
+					ctx->precise = (ctx->precise * 10)
+						+ (*fmt - '0');
+				}
+			}
+		}
+
+		/* length modifier */
+		if (*fmt == 'L') { /* long double */
+			fmt++;
+			ctx->flags |= FG_LONG_DOUBLE;
+		} else if (*fmt == 'l') {
+			fmt++;
+			if (*fmt == 'l') { /* long long */
+				ctx->flags |= FG_LONG_LONG;
+			} else { /* long */
+				fmt--;
+				ctx->flags |= FG_LONG;
+			}
+			fmt++;
+		} else if (*fmt == 'h') {
+			fmt++;
+			if (*fmt == 'h') { /* char */
+				ctx->flags |= FG_CHAR;
+			} else { /* short */
+				fmt--;
+				ctx->flags |= FG_SHORT;
+			}
+			fmt++;
+		} else if (*fmt == 'z') { /* size_t */
+			fmt++;
+			ctx->flags |= FG_LONG;
+		} else if (*fmt == 't') { /* ptrdiff_t */
+			fmt++;
+			ctx->flags |= FG_LONG;
+		}
+
+		/* conversion specifiers */
+		ctx->specifiers = *fmt;
+		switch (*fmt) {
+			case 'n':
+				return -1;
+			case 'd': /* decimal */
+			case 'i':
+				if (ctx->flags & FG_LONG) {
+					ctx->va._i64L = va_arg(ap, int64);
+				} else if (ctx->flags & FG_LONG_LONG) {
+					ctx->va._i64L = va_arg(ap, int64L);
+				} else if (ctx->flags & FG_SHORT) {
+					ctx->va._i64L = (int16)va_arg(ap, int32);
+				} else if (ctx->flags & FG_CHAR) {
+					ctx->va._i64L = (int8)va_arg(ap, int32);
+				} else {
+					ctx->va._i64L = va_arg(ap, int32);
+				}
+				break;
+			case 'o': /* octal */
+			case 'u': /* decimal */
+			case 'x': /* hexadecimal */
+			case 'X':
+			case 'p': /* pointer */
+				if (ctx->flags & FG_LONG || *fmt == 'p') {
+					ctx->va._u64L = va_arg(ap, uint64);
+				} else if (ctx->flags & FG_LONG_LONG) {
+					ctx->va._u64L = va_arg(ap, uint64L);
+				} else if (ctx->flags & FG_SHORT) {
+					ctx->va._u64L = (uint16)va_arg(ap, uint32);
+				} else if (ctx->flags & FG_CHAR) {
+					ctx->va._u64L = (uint8)va_arg(ap, uint32);
+				} else {
+					ctx->va._u64L = va_arg(ap, uint32);
+				}
+				break;
+			case 'c': /* character */
+				ctx->va._char = (char)va_arg(ap, uint32);
+				break;
+			case 's': /* string */
+				ctx->va._str = va_arg(ap, char *);
+				break;
+			case 'e': /* floating-point */
+			case 'E':
+			case 'f':
+			case 'F':
+			case 'g':
+			case 'G':
+			case 'a':
+			case 'A':
+				if (!ctx->precise)
+					ctx->precise = 6;
+				ctx->va._f64 = va_arg(ap, float64);
+				break;
+			default:
+				return -1;
+		}
+
+		if (_fmt_vprintf(ctx))
+			return -2;
+	}
+
+	return 0;
+} /* end */

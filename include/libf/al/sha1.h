@@ -34,12 +34,11 @@ extern "C" {
 #endif
 
 /* sha1.c */
-void FSYMBOL(sha1_init)(struct sha1_ctx *ctx);
-void FSYMBOL(sha1_process)(struct sha1_ctx *ctx, const uint8 *s,
+extern void FSYMBOL(sha1_init)(struct sha1_ctx *ctx);
+extern void FSYMBOL(sha1_process)(struct sha1_ctx *ctx, const uint8 *s,
 		uint64 len);
-void FSYMBOL(sha1_finish)(struct sha1_ctx *ctx, uint64L len);
-void FSYMBOL(sha1)(struct sha1_ctx *ctx, const uint8 *s,
-		uint64 len);
+extern void FSYMBOL(sha1_finish)(struct sha1_ctx *ctx, uint64L len);
+extern void FSYMBOL(sha1)(struct sha1_ctx *ctx, const uint8 *s, uint64 len);
 
 #ifdef __cplusplus
 }

@@ -51,12 +51,12 @@ extern "C" {
 #endif
 
 /* sha512.c */
-void FSYMBOL(sha512_init)(struct sha512_ctx *ctx);
-void FSYMBOL(sha384_init)(struct sha512_ctx *ctx);
-void FSYMBOL(sha512_process)(struct sha512_ctx *ctx, const uint8 *s,
+extern void FSYMBOL(sha512_init)(struct sha512_ctx *ctx);
+extern void FSYMBOL(sha384_init)(struct sha512_ctx *ctx);
+extern void FSYMBOL(sha512_process)(struct sha512_ctx *ctx, const uint8 *s,
 		uint64 len);
-void FSYMBOL(sha512_finish)(struct sha512_ctx *ctx, uint64L len);
-void FSYMBOL(sha512)(struct sha512_ctx *ctx, const uint8 *s,
+extern void FSYMBOL(sha512_finish)(struct sha512_ctx *ctx, uint64L len);
+extern void FSYMBOL(sha512)(struct sha512_ctx *ctx, const uint8 *s,
 		uint64 len);
 
 #ifdef __cplusplus

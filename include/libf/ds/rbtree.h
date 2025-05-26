@@ -34,21 +34,21 @@ extern "C" {
 #endif
 
 /* rbtree.c */
-void FSYMBOL(rb_change_child)(struct rb_root *root, struct rb_node *parent,
+extern void FSYMBOL(rb_change_child)(struct rb_root *root, struct rb_node *parent,
 		struct rb_node *old, struct rb_node *_new);
-void FSYMBOL(rb_left_rotate)(struct rb_root *root, struct rb_node *parent);
-void FSYMBOL(rb_right_rotate)(struct rb_root *root, struct rb_node *parent);
-void FSYMBOL(rb_insert_fix)(struct rb_root *root, struct rb_node *node);
-void FSYMBOL(rb_erase_fix)(struct rb_root *root, struct rb_node *node);
+extern void FSYMBOL(rb_left_rotate)(struct rb_root *root, struct rb_node *parent);
+extern void FSYMBOL(rb_right_rotate)(struct rb_root *root, struct rb_node *parent);
+extern void FSYMBOL(rb_insert_fix)(struct rb_root *root, struct rb_node *node);
+extern void FSYMBOL(rb_erase_fix)(struct rb_root *root, struct rb_node *node);
 
 /* rbtree_wrap.c */
-struct rb_node *FSYMBOL(rb_insert_wrap)(struct rb_root *root,
+extern struct rb_node *FSYMBOL(rb_insert_wrap)(struct rb_root *root,
 		struct rb_node *_new, int32 (*cmp)(void *, void *));
-struct rb_node *FSYMBOL(rb_search_wrap)(struct rb_root *root,
+extern struct rb_node *FSYMBOL(rb_search_wrap)(struct rb_root *root,
 		void *arg, int32 (*cmp)(void *, void *));
-struct rb_node *FSYMBOL(rb_erase_wrap)(struct rb_root *root,
+extern struct rb_node *FSYMBOL(rb_erase_wrap)(struct rb_root *root,
 		struct rb_node *old);
-struct rb_node *FSYMBOL(rb_erase2_wrap)(struct rb_root *root,
+extern struct rb_node *FSYMBOL(rb_erase2_wrap)(struct rb_root *root,
 		void *arg, int32 (*cmp)(void *, void *));
 
 #ifdef __cplusplus

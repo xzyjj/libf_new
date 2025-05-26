@@ -34,23 +34,23 @@ extern "C" {
 #endif
 
 /* avltree.c */
-void FSYMBOL(avl_change_child)(struct avl_root *root, struct avl_node *parent,
+extern void FSYMBOL(avl_change_child)(struct avl_root *root, struct avl_node *parent,
 		struct avl_node *old, struct avl_node *_new);
-void FSYMBOL(avl_update_height)(struct avl_node *node);
-int32 FSYMBOL(avl_balance_factor)(struct avl_node *node);
-void FSYMBOL(avl_left_rotate)(struct avl_root *root, struct avl_node *parent);
-void FSYMBOL(avl_right_rotate)(struct avl_root *root, struct avl_node *parent);
-void FSYMBOL(avl_balance)(struct avl_root *root, struct avl_node *node);
-void FSYMBOL(avl_erase_fix)(struct avl_root *root, struct avl_node *node);
+extern void FSYMBOL(avl_update_height)(struct avl_node *node);
+extern int32 FSYMBOL(avl_balance_factor)(struct avl_node *node);
+extern void FSYMBOL(avl_left_rotate)(struct avl_root *root, struct avl_node *parent);
+extern void FSYMBOL(avl_right_rotate)(struct avl_root *root, struct avl_node *parent);
+extern void FSYMBOL(avl_balance)(struct avl_root *root, struct avl_node *node);
+extern void FSYMBOL(avl_erase_fix)(struct avl_root *root, struct avl_node *node);
 
 /* avltree_wrap.c */
-struct avl_node *FSYMBOL(avl_insert_wrap)(struct avl_root *root,
+extern struct avl_node *FSYMBOL(avl_insert_wrap)(struct avl_root *root,
 		struct avl_node *_new, int32 (*cmp)(void *, void *));
-struct avl_node *FSYMBOL(avl_search_wrap)(struct avl_root *root,
+extern struct avl_node *FSYMBOL(avl_search_wrap)(struct avl_root *root,
 		void *arg, int32 (*cmp)(void *, void *));
-struct avl_node *FSYMBOL(avl_erase_wrap)(struct avl_root *root,
+extern struct avl_node *FSYMBOL(avl_erase_wrap)(struct avl_root *root,
 		struct avl_node *old);
-struct avl_node *FSYMBOL(avl_erase2_wrap)(struct avl_root *root,
+extern struct avl_node *FSYMBOL(avl_erase2_wrap)(struct avl_root *root,
 		void *arg, int32 (*cmp)(void *, void *));
 
 #ifdef __cplusplus

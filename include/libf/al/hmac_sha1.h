@@ -32,9 +32,9 @@ extern "C" {
 #endif
 
 /* hmac_sha1.c */
-void FSYMBOL(hmac_sha1_init)(struct hmac_sha1_ctx *ctx, const uint8 *key,
+extern void FSYMBOL(hmac_sha1_init)(struct hmac_sha1_ctx *ctx, const uint8 *key,
 		uint32 key_len);
-void FSYMBOL(hmac_sha1)(struct hmac_sha1_ctx *ctx, const uint8 *s,
+extern void FSYMBOL(hmac_sha1)(struct hmac_sha1_ctx *ctx, const uint8 *s,
 		uint32 len);
 
 #ifdef __cplusplus

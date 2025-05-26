@@ -49,12 +49,12 @@ extern "C" {
 #endif
 
 /* sha256.c */
-void FSYMBOL(sha256_init)(struct sha256_ctx *ctx);
-void FSYMBOL(sha224_init)(struct sha256_ctx *ctx);
-void FSYMBOL(sha256_process)(struct sha256_ctx *ctx, const uint8 *s,
+extern void FSYMBOL(sha256_init)(struct sha256_ctx *ctx);
+extern void FSYMBOL(sha224_init)(struct sha256_ctx *ctx);
+extern void FSYMBOL(sha256_process)(struct sha256_ctx *ctx, const uint8 *s,
 		uint64 len);
-void FSYMBOL(sha256_finish)(struct sha256_ctx *ctx, uint64L len);
-void FSYMBOL(sha256)(struct sha256_ctx *ctx, const uint8 *s,
+extern void FSYMBOL(sha256_finish)(struct sha256_ctx *ctx, uint64L len);
+extern void FSYMBOL(sha256)(struct sha256_ctx *ctx, const uint8 *s,
 		uint64 len);
 
 #ifdef __cplusplus

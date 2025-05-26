@@ -35,14 +35,14 @@ extern "C" {
 #endif
 
 /* des.c */
-void FSYMBOL(des_init)(struct des_ctx *ctx, const uint8 *key);
-void FSYMBOL(des_crypto)(struct des_ctx *ctx, uint8 *buf, int32 is_decrypt);
-int32 FSYMBOL(des_encrypt_process)(struct des_ctx *ctx,
+extern void FSYMBOL(des_init)(struct des_ctx *ctx, const uint8 *key);
+extern void FSYMBOL(des_crypto)(struct des_ctx *ctx, uint8 *buf, int32 is_decrypt);
+extern int32 FSYMBOL(des_encrypt_process)(struct des_ctx *ctx,
 		int32 (*call)(const uint8 *, void *), void *arg,
 		const uint8 *s, uint64 len);
-int32 FSYMBOL(des_encrypt_finish)(struct des_ctx *ctx,
+extern int32 FSYMBOL(des_encrypt_finish)(struct des_ctx *ctx,
 		int32 (*call)(const uint8 *, void *), void *arg);
-int32 FSYMBOL(des_decrypt_process)(struct des_ctx *ctx,
+extern int32 FSYMBOL(des_decrypt_process)(struct des_ctx *ctx,
 		int32 (*call)(const uint8 *, void *), void *arg,
 		const uint8 *s, uint64 len);
 

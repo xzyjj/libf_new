@@ -35,13 +35,13 @@ extern "C" {
 #endif
 
 /* bsttree.c */
-void FSYMBOL(bst_change_child)(struct bst_root *root, struct bst_node *parent,
+extern void FSYMBOL(bst_change_child)(struct bst_root *root, struct bst_node *parent,
 		struct bst_node *old, struct bst_node *_new);
-struct bst_node *FSYMBOL(bst_insert)(struct bst_root *root,
+extern struct bst_node *FSYMBOL(bst_insert)(struct bst_root *root,
 		struct bst_node *_new, int32 (*cmp)(void *, void *));
-struct bst_node *FSYMBOL(bst_search)(struct bst_root *root, void *arg,
+extern struct bst_node *FSYMBOL(bst_search)(struct bst_root *root, void *arg,
 		int32 (*cmp)(void *, void *));
-struct bst_node *FSYMBOL(bst_erase)(struct bst_root *root, void *arg,
+extern struct bst_node *FSYMBOL(bst_erase)(struct bst_root *root, void *arg,
 		int32 (*cmp)(void *, void *));
 
 #ifdef __cplusplus

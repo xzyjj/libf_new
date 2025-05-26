@@ -105,7 +105,7 @@ extern "C" {
 #endif
 
 /* json_parser.c */
-int32 FSYMBOL(json_parser)(struct json_ctx *ctx, const char *str);
+extern int32 FSYMBOL(json_parser)(struct json_ctx *ctx, const char *str);
 
 #ifdef __cplusplus
 }

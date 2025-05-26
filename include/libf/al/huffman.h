@@ -43,10 +43,10 @@ extern "C" {
 #endif
 
 /* huffman.c */
-int32 FSYMBOL(huf_insert)(struct huf_head *head, struct huf_node *node);
-struct huf_node *FSYMBOL(huf_build)(struct huf_head *head);
-void FSYMBOL(huf_u8freq)(struct huf_node *node, uint8 *s, uint32 len);
-struct huf_node *FSYMBOL(huf_u8build)(struct huf_head *head,
+extern int32 FSYMBOL(huf_insert)(struct huf_head *head, struct huf_node *node);
+extern struct huf_node *FSYMBOL(huf_build)(struct huf_head *head);
+extern void FSYMBOL(huf_u8freq)(struct huf_node *node, uint8 *s, uint32 len);
+extern struct huf_node *FSYMBOL(huf_u8build)(struct huf_head *head,
 		struct huf_node *node);
 
 #ifdef __cplusplus

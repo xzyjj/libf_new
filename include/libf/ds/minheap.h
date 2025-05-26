@@ -48,16 +48,16 @@ extern "C" {
 #endif
 
 /* minheap.c */
-int32 FSYMBOL(minheap_insert)(struct minheap_head *head, void *_new,
+extern int32 FSYMBOL(minheap_insert)(struct minheap_head *head, void *_new,
 		int32 (*cmp)(void *, void *));
-void FSYMBOL(minheap_build)(struct minheap_head *head,
+extern void FSYMBOL(minheap_build)(struct minheap_head *head,
 		int32 (*cmp)(void *, void *));
-int64 FSYMBOL(minheap_search)(struct minheap_head *head, void *p);
-int64 FSYMBOL(minheap_search2)(struct minheap_head *head, void *arg,
+extern int64 FSYMBOL(minheap_search)(struct minheap_head *head, void *p);
+extern int64 FSYMBOL(minheap_search2)(struct minheap_head *head, void *arg,
 		int32 (*cmp)(void *, void *));
-int32 FSYMBOL(minheap_erase)(struct minheap_head *head, uint64 ind,
+extern int32 FSYMBOL(minheap_erase)(struct minheap_head *head, uint64 ind,
 		int32 (*cmp)(void *, void *));
-void* FSYMBOL(minheap_extract)(struct minheap_head *head,
+extern void* FSYMBOL(minheap_extract)(struct minheap_head *head,
 		int32 (*cmp)(void *, void *));
 
 #ifdef __cplusplus

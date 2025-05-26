@@ -40,12 +40,12 @@ int32 FSYMBOL(bn_uint1024_cmp)(const bn_uint1024_t a, const bn_uint1024_t b) {
 	return 0;
 } /* end */
 
-/* @func: bn_uint4097_cmp - big number compare
+/* @func: bn_uint1025_cmp - big number compare
 * @param1: bn_uint1024_t # number (a)
 * @param2: bn_uint1024_t # number (b)
 * @return: int32         # 0: a==b, 1: a>b, -1: a<b
 */
-int32 FSYMBOL(bn_uint4097_cmp)(const bn_uint1024_t a, const bn_uint1024_t b) {
+int32 FSYMBOL(bn_uint1025_cmp)(const bn_uint1024_t a, const bn_uint1024_t b) {
 	for (int32 i = BN_1024_SIZE; i >= 0; i--) {
 		if (a[i] > b[i])
 			return 1;
@@ -90,11 +90,11 @@ void FSYMBOL(bn_uint1024_lsh)(bn_uint1024_t n) {
 	}
 } /* end */
 
-/* @func: bn_uint4097_lsh - shift big numbers left 1bit
+/* @func: bn_uint1025_lsh - shift big numbers left 1bit
 * @param1: bn_uint1024_t # number
 * @return: void
 */
-void FSYMBOL(bn_uint4097_lsh)(bn_uint1024_t n) {
+void FSYMBOL(bn_uint1025_lsh)(bn_uint1024_t n) {
 	uint32 carry = 0;
 	for (int32 i = 0; i < (BN_1024_SIZE + 1); i++) {
 		uint32 tmp = n[i] >> 31;
@@ -116,11 +116,11 @@ void FSYMBOL(bn_uint1024_rsh)(bn_uint1024_t n) {
 	}
 } /* end */
 
-/* @func: bn_uint4097_rsh - shift big numbers right 1bit
+/* @func: bn_uint1025_rsh - shift big numbers right 1bit
 * @param1: bn_uint1024_t # number
 * @return: void
 */
-void FSYMBOL(bn_uint4097_rsh)(bn_uint1024_t n) {
+void FSYMBOL(bn_uint1025_rsh)(bn_uint1024_t n) {
 	uint32 carry = 0;
 	for (int32 i = BN_1024_SIZE; i >= 0; i--) {
 		uint32 tmp = n[i] & 1;
@@ -390,16 +390,16 @@ void FSYMBOL(bn_uint1024_div)(bn_uint1024_t quo, bn_uint1024_t rem,
 	}
 
 	int32 sh = 0;
-	while (FSYMBOL(bn_uint4097_cmp)(rrem, sh_b) >= 0) {
-		FSYMBOL(bn_uint4097_lsh)(sh_b);
+	while (FSYMBOL(bn_uint1025_cmp)(rrem, sh_b) >= 0) {
+		FSYMBOL(bn_uint1025_lsh)(sh_b);
 		sh++;
 	}
 
 	FSYMBOL(bn_uint1024_zero)(rquo);
 	for (; sh > 0; sh--) {
-		FSYMBOL(bn_uint4097_rsh)(sh_b);
-		FSYMBOL(bn_uint4097_lsh)(rquo);
-		if (FSYMBOL(bn_uint4097_cmp)(rrem, sh_b) >= 0) {
+		FSYMBOL(bn_uint1025_rsh)(sh_b);
+		FSYMBOL(bn_uint1025_lsh)(rquo);
+		if (FSYMBOL(bn_uint1025_cmp)(rrem, sh_b) >= 0) {
 			FSYMBOL(bn_uint1024_sub)(rrem, rrem, sh_b);
 			rquo[0] |= 1;
 		}
@@ -499,6 +499,52 @@ void FSYMBOL(bn_uint1024_numtostr)(char *buf, const bn_uint1024_t n) {
 		FSYMBOL(bn_uint1024_div)(quo, rem, quo, b);
 		int32 k = pos;
 		pos = _out_decimal(pos, buf, rem[0]);
+		for (int32 i = k, j = pos - 1; i < j; i++, j--) {
+			char t = buf[i];
+			buf[i] = buf[j];
+			buf[j] = t;
+		}
+	} while (FSYMBOL(bn_uint1024_cmp_1)(quo, 0));
+	buf[pos] = '\0';
+
+	for (int32 i = 0, j = pos - 1; i < j; i++, j--) {
+		char t = buf[i];
+		buf[i] = buf[j];
+		buf[j] = t;
+	}
+} /* end */
+
+/* @func: _out_hex (static) - unsigned int to hexadecimal
+* @param1: int32   # size offset
+* @param2: char *  # buffer pointer
+* @param3: uint64L # unsigned int value
+* @return: int32   # string length (+offset)
+*/
+static int32 _out_hex(int32 n, char *p, uint64L v) {
+	if (v >= 16)
+		n = _out_hex(n, p, v / 16);
+	v %= 16;
+	p[n] = (v <= 9) ? (v + '0') : (v + 'a' - 10);
+
+	return ++n;
+} /* end */
+
+/* @func: bn_uint1024_numtostr_hex - big number to string (hexadecimal)
+* @param1: char *              # string buffer
+* @param2: const bn_uint1024_t # number
+* @return: void
+*/
+void FSYMBOL(bn_uint1024_numtostr_hex)(char *buf, const bn_uint1024_t n) {
+	bn_uint1024_t quo, rem, b;
+	FSYMBOL(bn_uint1024_move)(quo, n);
+	FSYMBOL(bn_uint1024_zero)(b);
+	b[0] = 16;
+
+	int32 pos = 0;
+	do {
+		FSYMBOL(bn_uint1024_div)(quo, rem, quo, b);
+		int32 k = pos;
+		pos = _out_hex(pos, buf, rem[0]);
 		for (int32 i = k, j = pos - 1; i < j; i++, j--) {
 			char t = buf[i];
 			buf[i] = buf[j];

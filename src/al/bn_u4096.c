@@ -513,3 +513,49 @@ void FSYMBOL(bn_uint4096_numtostr)(char *buf, const bn_uint4096_t n) {
 		buf[j] = t;
 	}
 } /* end */
+
+/* @func: _out_hex (static) - unsigned int to hexadecimal
+* @param1: int32   # size offset
+* @param2: char *  # buffer pointer
+* @param3: uint64L # unsigned int value
+* @return: int32   # string length (+offset)
+*/
+static int32 _out_hex(int32 n, char *p, uint64L v) {
+	if (v >= 16)
+		n = _out_hex(n, p, v / 16);
+	v %= 16;
+	p[n] = (v <= 9) ? (v + '0') : (v + 'a' - 10);
+
+	return ++n;
+} /* end */
+
+/* @func: bn_uint4096_numtostr_hex - big number to string (hexadecimal)
+* @param1: char *              # string buffer
+* @param2: const bn_uint4096_t # number
+* @return: void
+*/
+void FSYMBOL(bn_uint4096_numtostr_hex)(char *buf, const bn_uint4096_t n) {
+	bn_uint4096_t quo, rem, b;
+	FSYMBOL(bn_uint4096_move)(quo, n);
+	FSYMBOL(bn_uint4096_zero)(b);
+	b[0] = 16;
+
+	int32 pos = 0;
+	do {
+		FSYMBOL(bn_uint4096_div)(quo, rem, quo, b);
+		int32 k = pos;
+		pos = _out_hex(pos, buf, rem[0]);
+		for (int32 i = k, j = pos - 1; i < j; i++, j--) {
+			char t = buf[i];
+			buf[i] = buf[j];
+			buf[j] = t;
+		}
+	} while (FSYMBOL(bn_uint4096_cmp_1)(quo, 0));
+	buf[pos] = '\0';
+
+	for (int32 i = 0, j = pos - 1; i < j; i++, j--) {
+		char t = buf[i];
+		buf[i] = buf[j];
+		buf[j] = t;
+	}
+} /* end */

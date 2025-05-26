@@ -122,7 +122,7 @@ extern "C" {
 #endif
 
 /* xml_parser.c */
-int32 FSYMBOL(xml_parser)(struct xml_ctx *ctx, const char *s);
+extern int32 FSYMBOL(xml_parser)(struct xml_ctx *ctx, const char *s);
 
 #ifdef __cplusplus
 }

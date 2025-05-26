@@ -17,7 +17,7 @@ for i in "$@"; do
 
 	sed -n '/^\/\* @func: /,/ {$/p' "$i" \
 	|sed '/^\/\* @func:.*(.*static.*).*-/,/ {$/d;/^\/\*/,/\*\/$/d' \
-	|sed 's/ {$/;/;/XSYMBOL(/s/^/extern /' \
+	|sed 's/ {$/;/;/\(XSYMBOL(\)\|\(FSYMBOL(\)/s/^/extern /' \
 	|sed 's/\bnew\b/_new/g'
 done
 

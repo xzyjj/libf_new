@@ -69,12 +69,12 @@ int32 FSYMBOL(bn_int1024_cmp)(const bn_int1024_t a, const bn_int1024_t b) {
 	return 0;
 } /* end */
 
-/* @func: bn_int4097_cmp - big number compare
+/* @func: bn_int1025_cmp - big number compare
 * @param1: bn_int1024_t # number (a)
 * @param2: bn_int1024_t # number (b)
 * @return: int32        # 0: a==b, 1: a>b, -1: a<b
 */
-int32 FSYMBOL(bn_int4097_cmp)(const bn_int1024_t a, const bn_int1024_t b) {
+int32 FSYMBOL(bn_int1025_cmp)(const bn_int1024_t a, const bn_int1024_t b) {
 	if (a[BN_1024_SIG] > b[BN_1024_SIG])
 		return -1;
 	if (a[BN_1024_SIG] < b[BN_1024_SIG])
@@ -122,12 +122,12 @@ void FSYMBOL(bn_int1024_lsh)(bn_int1024_t n) {
 	FSYMBOL(bn_uint1024_lsh)(n);
 } /* end */
 
-/* @func: bn_int4097_lsh - shift big numbers left 1bit
+/* @func: bn_int1025_lsh - shift big numbers left 1bit
 * @param1: bn_int1024_t # number
 * @return: void
 */
-void FSYMBOL(bn_int4097_lsh)(bn_int1024_t n) {
-	FSYMBOL(bn_uint4097_lsh)(n);
+void FSYMBOL(bn_int1025_lsh)(bn_int1024_t n) {
+	FSYMBOL(bn_uint1025_lsh)(n);
 } /* end */
 
 /* @func: bn_int1024_rsh - shift big numbers right 1bit
@@ -138,12 +138,12 @@ void FSYMBOL(bn_int1024_rsh)(bn_int1024_t n) {
 	FSYMBOL(bn_uint1024_rsh)(n);
 } /* end */
 
-/* @func: bn_int4097_rsh - shift big numbers right 1bit
+/* @func: bn_int1025_rsh - shift big numbers right 1bit
 * @param1: bn_int1024_t # number
 * @return: void
 */
-void FSYMBOL(bn_int4097_rsh)(bn_int1024_t n) {
-	FSYMBOL(bn_uint4097_rsh)(n);
+void FSYMBOL(bn_int1025_rsh)(bn_int1024_t n) {
+	FSYMBOL(bn_uint1025_rsh)(n);
 } /* end */
 
 /* @func: bn_int1024_and - big number and operation
@@ -320,4 +320,16 @@ void FSYMBOL(bn_int1024_numtostr)(char *buf, const bn_int1024_t n) {
 		*buf++ = '-';
 
 	FSYMBOL(bn_uint1024_numtostr)(buf, n);
+} /* end */
+
+/* @func: bn_int1024_numtostr_hex - big number to string (hexadecimal)
+* @param2: char *             # string buffer
+* @param1: const bn_int1024_t # number
+* @return: void
+*/
+void FSYMBOL(bn_int1024_numtostr_hex)(char *buf, const bn_int1024_t n) {
+	if (n[BN_1024_SIG])
+		*buf++ = '-';
+
+	FSYMBOL(bn_uint1024_numtostr_hex)(buf, n);
 } /* end */

@@ -321,3 +321,15 @@ void FSYMBOL(bn_int512_numtostr)(char *buf, const bn_int512_t n) {
 	
 	FSYMBOL(bn_uint512_numtostr)(buf, n);
 } /* end */
+
+/* @func: bn_int512_numtostr_hex - big number to string (hexadecimal)
+* @param2: char *            # string buffer
+* @param1: const bn_int512_t # number
+* @return: void
+*/
+void FSYMBOL(bn_int512_numtostr_hex)(char *buf, const bn_int512_t n) {
+	if (n[BN_512_SIG])
+		*buf++ = '-';
+
+	FSYMBOL(bn_uint512_numtostr_hex)(buf, n);
+} /* end */

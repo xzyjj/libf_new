@@ -22,13 +22,13 @@ extern "C" {
 #endif
 
 /* x25519.c */
-int32 FSYMBOL(x25519_mod_inverse)(const bn_int1024_t a, const bn_int1024_t m,
+extern int32 FSYMBOL(x25519_mod_inverse)(const bn_int1024_t a, const bn_int1024_t m,
 		bn_int1024_t r);
-void FSYMBOL(x25519_scalarmult)(const bn_int1024_t k, const bn_int1024_t b,
-		const bn_int1024_t p, const bn_int1024_t a, bn_int1024_t t);
-void FSYMBOL(x25519_shared_key)(const bn_int1024_t pri, const bn_int1024_t pub,
+extern void FSYMBOL(x25519_scalarmult)(const bn_int1024_t k, const bn_int1024_t b,
+		const bn_int1024_t p, const bn_int1024_t a, bn_int1024_t r);
+extern void FSYMBOL(x25519_shared_key)(const bn_int1024_t pri, const bn_int1024_t pub,
 		const bn_int1024_t p, const bn_int1024_t a, bn_int1024_t key);
-void FSYMBOL(x25519_clamp_key)(bn_int1024_t k);
+extern void FSYMBOL(x25519_clamp_key)(bn_int1024_t k);
 
 #ifdef __cplusplus
 }

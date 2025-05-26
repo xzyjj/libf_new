@@ -31,12 +31,12 @@
 extern "C" {
 #endif
 
-/* crc32.c */	
-const uint32 *FSYMBOL(crc32_table)(int32 type);
-uint32 FSYMBOL(crc32_msb)(const uint32 *t, uint32 c, const char *s, uint32 len);
-uint32 FSYMBOL(crc32_lsb)(const uint32 *t, uint32 c, const char *s, uint32 len);
-uint32 FSYMBOL(crc32_cksum_size_msb)(const uint32 *t, uint32 c, uint32 len);
-uint32 FSYMBOL(crc32)(const char *s, uint32 len, int32 type);
+/* crc32.c */
+extern const uint32 *FSYMBOL(crc32_table)(int32 type);
+extern uint32 FSYMBOL(crc32_msb)(const uint32 *t, uint32 c, const char *s, uint32 len);
+extern uint32 FSYMBOL(crc32_lsb)(const uint32 *t, uint32 c, const char *s, uint32 len);
+extern uint32 FSYMBOL(crc32_cksum_size_msb)(const uint32 *t, uint32 c, uint32 len);
+extern uint32 FSYMBOL(crc32)(const char *s, uint32 len, int32 type);
 
 #ifdef __cplusplus
 }

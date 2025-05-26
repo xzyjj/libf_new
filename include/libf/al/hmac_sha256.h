@@ -42,13 +42,13 @@ extern "C" {
 #endif
 
 /* hmac_sha256.c */
-void FSYMBOL(hmac_sha256_init)(struct hmac_sha256_ctx *ctx, const uint8 *key,
+extern void FSYMBOL(hmac_sha256_init)(struct hmac_sha256_ctx *ctx, const uint8 *key,
 		uint32 key_len);
-void FSYMBOL(hmac_sha256)(struct hmac_sha256_ctx *ctx, const uint8 *s,
+extern void FSYMBOL(hmac_sha256)(struct hmac_sha256_ctx *ctx, const uint8 *s,
 		uint32 len);
-void FSYMBOL(hmac_sha224_init)(struct hmac_sha256_ctx *ctx, const uint8 *key,
+extern void FSYMBOL(hmac_sha224_init)(struct hmac_sha256_ctx *ctx, const uint8 *key,
 		uint32 key_len);
-void FSYMBOL(hmac_sha224)(struct hmac_sha256_ctx *ctx, const uint8 *s,
+extern void FSYMBOL(hmac_sha224)(struct hmac_sha256_ctx *ctx, const uint8 *s,
 		uint32 len);
 
 #ifdef __cplusplus

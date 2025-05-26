@@ -36,17 +36,17 @@ extern "C" {
 #endif
 
 /* list.c */
-struct list *FSYMBOL(list_add)(struct list_head *head,
+extern struct list *FSYMBOL(list_add)(struct list_head *head,
 		struct list *_new);
-struct list *FSYMBOL(list_add_tail)(struct list_head *head,
+extern struct list *FSYMBOL(list_add_tail)(struct list_head *head,
 		struct list *_new);
-struct list *FSYMBOL(list_del)(struct list_head *head,
+extern struct list *FSYMBOL(list_del)(struct list_head *head,
 		struct list *old);
-struct list *FSYMBOL(list_insert)(struct list_head *head,
+extern struct list *FSYMBOL(list_insert)(struct list_head *head,
 		struct list *node, struct list *_new);
-struct list *FSYMBOL(list_insert_tail)(struct list_head *head,
+extern struct list *FSYMBOL(list_insert_tail)(struct list_head *head,
 		struct list *node, struct list *_new);
-void FSYMBOL(list_swap)(struct list_head *head,
+extern void FSYMBOL(list_swap)(struct list_head *head,
 		struct list *old, struct list *_new);
 
 #ifdef __cplusplus

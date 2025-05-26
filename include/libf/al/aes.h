@@ -55,15 +55,15 @@ extern "C" {
 #endif
 
 /* aes.c */
-int32 FSYMBOL(aes_init)(struct aes_ctx *ctx, const uint8 *key, int32 type);
-void FSYMBOL(aes_encrypt)(struct aes_ctx *ctx, uint8 *state);
-void FSYMBOL(aes_decrypt)(struct aes_ctx *ctx, uint8 *state);
-int32 FSYMBOL(aes_encrypt_process)(struct aes_ctx *ctx,
+extern int32 FSYMBOL(aes_init)(struct aes_ctx *ctx, const uint8 *key, int32 type);
+extern void FSYMBOL(aes_encrypt)(struct aes_ctx *ctx, uint8 *state);
+extern void FSYMBOL(aes_decrypt)(struct aes_ctx *ctx, uint8 *state);
+extern int32 FSYMBOL(aes_encrypt_process)(struct aes_ctx *ctx,
 		int32 (*call)(const uint8 *, void *), void *arg,
 		const uint8 *s, uint64 len);
-int32 FSYMBOL(aes_encrypt_finish)(struct aes_ctx *ctx,
+extern int32 FSYMBOL(aes_encrypt_finish)(struct aes_ctx *ctx,
 		int32 (*call)(const uint8 *, void *), void *arg);
-int32 FSYMBOL(aes_decrypt_process)(struct aes_ctx *ctx,
+extern int32 FSYMBOL(aes_decrypt_process)(struct aes_ctx *ctx,
 		int32 (*call)(const uint8 *, void *), void *arg,
 		const uint8 *s, uint64 len);
 

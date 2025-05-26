@@ -42,13 +42,13 @@ extern "C" {
 #endif
 
 /* hmac_sha512.c */
-void FSYMBOL(hmac_sha512_init)(struct hmac_sha512_ctx *ctx, const uint8 *key,
+extern void FSYMBOL(hmac_sha512_init)(struct hmac_sha512_ctx *ctx, const uint8 *key,
 		uint32 key_len);
-void FSYMBOL(hmac_sha512)(struct hmac_sha512_ctx *ctx, const uint8 *s,
+extern void FSYMBOL(hmac_sha512)(struct hmac_sha512_ctx *ctx, const uint8 *s,
 		uint32 len);
-void FSYMBOL(hmac_sha384_init)(struct hmac_sha512_ctx *ctx, const uint8 *key,
+extern void FSYMBOL(hmac_sha384_init)(struct hmac_sha512_ctx *ctx, const uint8 *key,
 		uint32 key_len);
-void FSYMBOL(hmac_sha384)(struct hmac_sha512_ctx *ctx, const uint8 *s,
+extern void FSYMBOL(hmac_sha384)(struct hmac_sha512_ctx *ctx, const uint8 *s,
 		uint32 len);
 
 #ifdef __cplusplus

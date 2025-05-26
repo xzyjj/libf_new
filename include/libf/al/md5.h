@@ -34,11 +34,11 @@ extern "C" {
 #endif
 
 /* md5.c */
-void FSYMBOL(md5_init)(struct md5_ctx *ctx);
-void FSYMBOL(md5_process)(struct md5_ctx *ctx, const uint8 *s,
+extern void FSYMBOL(md5_init)(struct md5_ctx *ctx);
+extern void FSYMBOL(md5_process)(struct md5_ctx *ctx, const uint8 *s,
 		uint64 len);
-void FSYMBOL(md5_finish)(struct md5_ctx *ctx, uint64L len);
-void FSYMBOL(md5)(struct md5_ctx *ctx, const uint8 *s, uint64 len);
+extern void FSYMBOL(md5_finish)(struct md5_ctx *ctx, uint64L len);
+extern void FSYMBOL(md5)(struct md5_ctx *ctx, const uint8 *s, uint64 len);
 
 #ifdef __cplusplus
 }

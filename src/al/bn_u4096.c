@@ -129,6 +129,73 @@ void FSYMBOL(bn_uint4097_rsh)(bn_uint4096_t n) {
 	}
 } /* end */
 
+/* @func: bn_uint4096_and - big number and operation
+* @param1: bn_uint4096_t       # result
+* @param2: const bn_uint4096_t # number
+* @param3: const bn_uint4096_t # number
+* @return: void
+*/
+void FSYMBOL(bn_uint4096_and)(bn_uint4096_t r, bn_uint4096_t a, bn_uint4096_t b) {
+	bn_uint4096_t rr;
+	FSYMBOL(bn_uint4096_zero)(rr);
+
+	for (int32 i = 0; i < BN_4096_SIZE; i++) {
+		rr[i] = a[i] & b[i];
+	}
+
+	FSYMBOL(bn_uint4096_move)(r, rr);
+} /* end */
+
+/* @func: bn_uint4096_or - big number or operation
+* @param1: bn_uint4096_t       # result
+* @param2: const bn_uint4096_t # number
+* @param3: const bn_uint4096_t # number
+* @return: void
+*/
+void FSYMBOL(bn_uint4096_or)(bn_uint4096_t r, bn_uint4096_t a, bn_uint4096_t b) {
+	bn_uint4096_t rr;
+	FSYMBOL(bn_uint4096_zero)(rr);
+
+	for (int32 i = 0; i < BN_4096_SIZE; i++) {
+		rr[i] = a[i] | b[i];
+	}
+
+	FSYMBOL(bn_uint4096_move)(r, rr);
+} /* end */
+
+/* @func: bn_uint4096_xor - big number xor operation
+* @param1: bn_uint4096_t       # result
+* @param2: const bn_uint4096_t # number
+* @param3: const bn_uint4096_t # number
+* @return: void
+*/
+void FSYMBOL(bn_uint4096_xor)(bn_uint4096_t r, bn_uint4096_t a, bn_uint4096_t b) {
+	bn_uint4096_t rr;
+	FSYMBOL(bn_uint4096_zero)(rr);
+
+	for (int32 i = 0; i < BN_4096_SIZE; i++) {
+		rr[i] = a[i] ^ b[i];
+	}
+
+	FSYMBOL(bn_uint4096_move)(r, rr);
+} /* end */
+
+/* @func: bn_uint4096_not - big number not operation
+* @param1: bn_uint4096_t       # result
+* @param2: const bn_uint4096_t # number
+* @return: void
+*/
+void FSYMBOL(bn_uint4096_not)(bn_uint4096_t r, bn_uint4096_t n) {
+	bn_uint4096_t rr;
+	FSYMBOL(bn_uint4096_zero)(rr);
+
+	for (int32 i = 0; i < BN_4096_SIZE; i++) {
+		rr[i] = ~n[i];
+	}
+
+	FSYMBOL(bn_uint4096_move)(r, rr);
+} /* end */
+
 /* @func: bn_uint4096_add - big number addition
 * @param1: bn_uint4096_t       # sum
 * @param2: const bn_uint4096_t # addend
@@ -417,11 +484,11 @@ static int32 _out_decimal(int32 n, char *p, uint32 v) {
 } /* end */
 
 /* @func: bn_uint4096_numtostr - big number to string
-* @param1: const bn_uint4096_t # number
-* @param2: char *              # string buffer
+* @param1: char *              # string buffer
+* @param2: const bn_uint4096_t # number
 * @return: void
 */
-void FSYMBOL(bn_uint4096_numtostr)(const bn_uint4096_t n, char *buf) {
+void FSYMBOL(bn_uint4096_numtostr)(char *buf, const bn_uint4096_t n) {
 	bn_uint4096_t quo, rem, b;
 	FSYMBOL(bn_uint4096_move)(quo, n);
 	FSYMBOL(bn_uint4096_zero)(b);

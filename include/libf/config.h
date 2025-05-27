@@ -54,16 +54,16 @@
 #define LIBF_MARCH_TYPE_MIPS_64 8
 /* ia64 64bit */
 #undef LIBF_MARCH_TYPE_IA64_64
-#define LIBF_MARCH_TYPE_IA64_64 10
+#define LIBF_MARCH_TYPE_IA64_64 9
 /* ppc 64bit */
 #undef LIBF_MARCH_TYPE_PPC_64
-#define LIBF_MARCH_TYPE_PPC_64 11
+#define LIBF_MARCH_TYPE_PPC_64 10
 /* s390 64bit */
 #undef LIBF_MARCH_TYPE_S390_64
-#define LIBF_MARCH_TYPE_S390_64 12
+#define LIBF_MARCH_TYPE_S390_64 11
 /* loongarch 64bit */
 #undef LIBF_MARCH_TYPE_LOONGARCH_64
-#define LIBF_MARCH_TYPE_LOONGARCH_64 9
+#define LIBF_MARCH_TYPE_LOONGARCH_64 12
 
 /* machine architecture type */
 #undef LIBF_MARCH_TYPE

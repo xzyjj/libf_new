@@ -61,9 +61,9 @@ int32 FSYMBOL(bn_int1024_cmp)(const bn_int1024_t a, const bn_int1024_t b) {
 
 	for (int32 i = BN_1024_SIZE - 1; i >= 0; i--) {
 		if (a[i] > b[i])
-			return 1;
+			return a[BN_1024_SIG] ? -1 : 1;
 		if (a[i] < b[i])
-			return -1;
+			return a[BN_1024_SIG] ? 1 : -1;
 	}
 
 	return 0;
@@ -82,9 +82,9 @@ int32 FSYMBOL(bn_int1025_cmp)(const bn_int1024_t a, const bn_int1024_t b) {
 
 	for (int32 i = BN_1024_SIZE; i >= 0; i--) {
 		if (a[i] > b[i])
-			return 1;
+			return a[BN_1024_SIG] ? -1 : 1;
 		if (a[i] < b[i])
-			return -1;
+			return a[BN_1024_SIG] ? 1 : -1;
 	}
 
 	return 0;

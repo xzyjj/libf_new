@@ -24,7 +24,7 @@ extern "C" {
 /* x25519.c */
 extern int32 FSYMBOL(x25519_mod_inverse)(const bn_int1024_t a, const bn_int1024_t m,
 		bn_int1024_t r);
-extern void FSYMBOL(x25519_scalarmult)(const bn_int1024_t k, const bn_int1024_t b,
+extern void FSYMBOL(x25519_scalar_mul)(const bn_int1024_t k, const bn_int1024_t b,
 		const bn_int1024_t p, const bn_int1024_t a, bn_int1024_t r);
 extern void FSYMBOL(x25519_shared_key)(const bn_int1024_t pri, const bn_int1024_t pub,
 		const bn_int1024_t p, const bn_int1024_t a, bn_int1024_t key);

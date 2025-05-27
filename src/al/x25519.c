@@ -62,7 +62,7 @@ int32 FSYMBOL(x25519_mod_inverse)(const bn_int1024_t a, const bn_int1024_t m,
 	return 0;
 } /* end */
 
-/* @func: x25519_scalarmult - montgomery ladder scalar multiplication
+/* @func: x25519_scalar_mul - montgomery ladder scalar multiplication
 * @param1: const bn_int1024_t # private key
 * @param2: const bn_int1024_t # base point
 * @param3: const bn_int1024_t # prime modulus
@@ -70,7 +70,7 @@ int32 FSYMBOL(x25519_mod_inverse)(const bn_int1024_t a, const bn_int1024_t m,
 * @param5: bn_int1024_t       # scalar
 * @return: void
 */
-void FSYMBOL(x25519_scalarmult)(const bn_int1024_t k, const bn_int1024_t b,
+void FSYMBOL(x25519_scalar_mul)(const bn_int1024_t k, const bn_int1024_t b,
 		const bn_int1024_t p, const bn_int1024_t a, bn_int1024_t r) {
 	bn_int1024_t x1, x2, z2, x3, z3;
 	FSYMBOL(bn_int1024_move)(x1, b);
@@ -178,7 +178,7 @@ void FSYMBOL(x25519_scalarmult)(const bn_int1024_t k, const bn_int1024_t b,
 */
 void FSYMBOL(x25519_shared_key)(const bn_int1024_t pri, const bn_int1024_t pub,
 		const bn_int1024_t p, const bn_int1024_t a, bn_int1024_t key) {
-	FSYMBOL(x25519_scalarmult)(pri, pub, p, a, key);
+	FSYMBOL(x25519_scalar_mul)(pri, pub, p, a, key);
 } /* end */
 
 /* @func: x25519_clamp_key - private key clamping

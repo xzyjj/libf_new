@@ -1,11 +1,20 @@
 #include <stdio.h>
 #include <libf/al/bn_1024.h>
+#include <libf/al/base64.h>
 #include <libf/al/x25519.h>
 
 
 void print(char *s, bn_int1024_t v) {
 	char buf[1 << 16];
 	FSYMBOL(bn_int1024_numtostr)(buf, v);
+	printf("%s%s\n", s, buf);
+}
+
+void print_b64(char *s, bn_int1024_t v) {
+	char buf[1 << 16];
+	uint32 n = sizeof(buf);
+	FSYMBOL(base64_enc)((char *)v, 32, buf, &n);
+	buf[sizeof(buf) - n] = '\0';
 	printf("%s%s\n", s, buf);
 }
 
@@ -16,8 +25,11 @@ int main(void) {
 	FSYMBOL(bn_int1024_strtonum)(b, X25519_B, NULL, 10);
 
 	print("P: ", p);
+	print_b64("P: ", p);
 	print("A: ", a);
+	print_b64("A: ", a);
 	print("B: ", b);
+	print_b64("B: ", b);
 
 	bn_int1024_t a_in, a_out, b_in, b_out, a_key, b_key;
 	FSYMBOL(bn_int1024_zero)(a_in);	
@@ -32,20 +44,26 @@ int main(void) {
 
 	FSYMBOL(x25519_clamp_key)(a_in);
 	FSYMBOL(x25519_clamp_key)(b_in);
-	FSYMBOL(x25519_scalarmult)(a_in, b, p, a, a_out);
-	FSYMBOL(x25519_scalarmult)(b_in, b, p, a, b_out);
+	FSYMBOL(x25519_scalar_mul)(a_in, b, p, a, a_out);
+	FSYMBOL(x25519_scalar_mul)(b_in, b, p, a, b_out);
 
 	FSYMBOL(x25519_shared_key)(a_in, b_out, p, a, a_key);
 	FSYMBOL(x25519_shared_key)(b_in, a_out, p, a, b_key);
 
 	print("a_in: ", a_in);
+	print_b64("a_in: ", a_in);
 	print("a_out: ", a_out);
+	print_b64("a_out: ", a_out);
 
 	print("b_in: ", b_in);
+	print_b64("b_in: ", b_in);
 	print("b_out: ", b_out);
+	print_b64("b_out: ", b_out);
 
 	print("a_key: ", a_key);
+	print_b64("a_key: ", a_key);
 	print("b_key: ", b_key);
+	print_b64("b_key: ", b_key);
 
 	return 0;
 }

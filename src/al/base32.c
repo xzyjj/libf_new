@@ -39,7 +39,7 @@ static const uint8 b32d[256] = {
 * @param1: const char * # input buffer
 * @param2: uint32       # input buffer length
 * @param3: char *       # output buffer
-* @param4: uint32 *     # output buffer length
+* @param4: uint32 *     # remaining length of output buffer
 * @return: void
 */
 void FSYMBOL(base32_enc)(const char *s, uint32 slen, char *t, uint32 *tlen) {
@@ -161,7 +161,7 @@ static int32 _base32_dec_8(const char *s, char *t, uint32 tlen) {
 * @param1: const char * # input buffer
 * @param2: uint32       # input buffer length
 * @param3: char *       # output buffer
-* @param4: uint32 *     # output buffer length
+* @param4: uint32 *     # remaining length of output buffer
 * @return: int32        # 0: no error, >0: input error location, \
 *                         -1: output buffer full, \
 *                         -2: base32 null character error

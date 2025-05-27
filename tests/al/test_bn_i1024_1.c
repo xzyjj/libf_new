@@ -107,5 +107,23 @@ int main(void) {
 	print("divmod-quo: ", quo);
 	print("divmod-rem: ", rem);
 
+	FSYMBOL(bn_int1024_strtonum)(a, "-10", NULL, 10);
+	FSYMBOL(bn_int1024_strtonum)(b, "-7", NULL, 10);
+	print("a: ", a);
+	print("b: ", b);
+	printf("cmp: %d\n", FSYMBOL(bn_int1024_cmp)(a, b));
+
+	FSYMBOL(bn_int1024_strtonum)(a, "10", NULL, 10);
+	FSYMBOL(bn_int1024_strtonum)(b, "7", NULL, 10);
+	print("a: ", a);
+	print("b: ", b);
+	printf("cmp: %d\n", FSYMBOL(bn_int1024_cmp)(a, b));
+
+	FSYMBOL(bn_int1024_strtonum)(a, "-10", NULL, 10);
+	FSYMBOL(bn_int1024_strtonum)(b, "7", NULL, 10);
+	print("a: ", a);
+	print("b: ", b);
+	printf("cmp: %d\n", FSYMBOL(bn_int1024_cmp)(a, b));
+
 	return 0;
 }

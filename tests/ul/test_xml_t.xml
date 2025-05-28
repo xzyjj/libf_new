@@ -1,0 +1,25 @@
+<?xxx xxx="xxx"?>
+<? xxx xxx="xxx" ?>
+<?xml version="1.0" encode="utf-8" ?>
+<!DOCTYPE>
+<!DOCTYPE name>
+<!DOCTYPE name name>
+<!DOCTYPE name name "string">
+<!-- Comments -->
+<element attribute="xxx">String <!-- Comments --> </element>
+< element >
+  String
+  < element-2 attribute="xxx"> String < /element-2>String
+</element>
+<element attribute="xxx" />
+<![CDATA[......]]>
+
+
+<document>
+  <description>
+    <![CDATA[
+      This is some <bold>text</bold> with special characters: < > & ' "
+      And multiple lines too!
+    ]]>
+  </description>
+</document>

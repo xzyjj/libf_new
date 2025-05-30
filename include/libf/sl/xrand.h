@@ -8,6 +8,7 @@
 
 
 /* @def: random */
+#undef random_ctx
 struct random_ctx {
 	int32 type;
 	int32 *state;

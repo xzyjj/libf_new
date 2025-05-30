@@ -71,7 +71,7 @@ XSYMBOL(atomic_cas):
 	sc.w.aqrl a3, a2, (a0)	//   sc($a3, new, var);
 	bnez a3, .L1		// } while ($a3);
 	mv a3, a1		// $a3 = old;
-.L2:				// ret: 
+.L2:				// ret:
 	mv a0, a3		// ret = $a3;
 	fence rw, rw		// # memory access order
 	ret

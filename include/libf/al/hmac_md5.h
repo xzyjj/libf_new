@@ -15,6 +15,7 @@
 #undef HAMC_MD5_LEN
 #define HAMC_MD5_LEN MD5_LEN
 
+#undef hmac_md5_ctx
 struct hmac_md5_ctx {
 	uint8 ipad[HAMC_MD5_BLOCKSIZE];
 	uint8 opad[HAMC_MD5_BLOCKSIZE];

@@ -11,17 +11,20 @@
 
 /* @def: umalloc
 * 32/64bit are 8/16byte aligend */
+#undef umalloc_chunk
 struct umalloc_chunk {
 	uint32 prev_size;
 	uint32 size_flags;
 };
 
+#undef umalloc_chunk_node
 struct umalloc_chunk_node {
 	struct list list;
 	uint64 size;
 	struct umalloc_chunk chunk;
 };
 
+#undef umalloc_ctx
 struct umalloc_ctx {
 	struct list_head chunk;
 	struct umalloc_chunk *idle;

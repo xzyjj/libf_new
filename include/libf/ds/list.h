@@ -9,10 +9,12 @@
 
 
 /* @def: list */
+#undef list
 struct list {
 	struct list *prev, *next;
 };
 
+#undef list_head
 struct list_head {
 	struct list *node;
 };

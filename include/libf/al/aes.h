@@ -37,6 +37,7 @@
 #undef AES_KEYEXPLEN
 #define AES_KEYEXPLEN (AES_BLOCKSIZE * (AES_256_ROUNDS + 1))
 
+#undef aes_ctx
 struct aes_ctx {
 	uint8 keyexp[AES_KEYEXPLEN];
 	uint8 buf[AES_BLOCKSIZE];

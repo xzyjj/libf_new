@@ -55,7 +55,7 @@
 #define JSON_ERR_ARRAY_START 12
 #undef JSON_ERR_ARRAY_END
 #define JSON_ERR_ARRAY_END 13
-#undef JSON_ERR_ARRAY_STRING 
+#undef JSON_ERR_ARRAY_STRING
 #define JSON_ERR_ARRAY_STRING 14
 #undef JSON_ERR_ARRAY_NUMBER
 #define JSON_ERR_ARRAY_NUMBER 15
@@ -69,6 +69,7 @@
 #undef JSON_ERR_INVALID
 #define JSON_ERR_INVALID 19
 
+#undef json_ctx
 struct json_ctx {
 	const char *str;
 	int32 len;

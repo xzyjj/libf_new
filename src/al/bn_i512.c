@@ -318,7 +318,7 @@ void FSYMBOL(bn_int512_strtonum)(bn_int512_t t, const char *s, char **e,
 void FSYMBOL(bn_int512_numtostr)(char *buf, const bn_int512_t n) {
 	if (n[BN_512_SIG])
 		*buf++ = '-';
-	
+
 	FSYMBOL(bn_uint512_numtostr)(buf, n);
 } /* end */
 

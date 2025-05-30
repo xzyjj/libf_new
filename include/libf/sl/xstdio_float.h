@@ -10,6 +10,7 @@
 
 
 /* @def: fmt_vprintf */
+#undef fmt_vprintf_ctx
 struct fmt_vprintf_ctx {
 	int64 align;
 	int64 precise;

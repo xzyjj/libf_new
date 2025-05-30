@@ -9,6 +9,7 @@
 
 
 /* @def: getopt */
+#undef getopt_ctx
 struct getopt_ctx {
 	int32 argc;
 	char *const *argv;
@@ -43,6 +44,7 @@ struct getopt_ctx {
 /* end */
 
 /* @def: getopt_long */
+#undef getopt_long_ctx
 struct getopt_long_ctx {
 	int32 argc;
 	char *const *argv;
@@ -60,6 +62,7 @@ struct getopt_long_ctx {
 #undef OPTIONAL_ARGUMENT
 #define OPTIONAL_ARGUMENT 2
 
+#undef getopt_long_option
 struct getopt_long_option {
 	const char *name;
 	int32 flag;

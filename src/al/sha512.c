@@ -181,8 +181,7 @@ void FSYMBOL(sha512_finish)(struct sha512_ctx *ctx, uint64L len) {
 * @param3: uint64              # input length
 * @return: void
 */
-void FSYMBOL(sha512)(struct sha512_ctx *ctx, const uint8 *s,
-		uint64 len) {
+void FSYMBOL(sha512)(struct sha512_ctx *ctx, const uint8 *s, uint64 len) {
 	ctx->count = 0;
 	FSYMBOL(sha512_process)(ctx, s, len);
 	FSYMBOL(sha512_finish)(ctx, len);

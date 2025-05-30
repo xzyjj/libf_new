@@ -9,11 +9,13 @@
 
 
 /* @def: avltree */
+#undef avl_node
 struct avl_node {
 	int32 bf;
 	struct avl_node *parent, *left, *right;
 };
 
+#undef avl_root
 struct avl_root {
 	struct avl_node *node;
 };

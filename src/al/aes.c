@@ -286,10 +286,10 @@ static void _aes_keyexp(struct aes_ctx *ctx, const uint8 *key) {
 	XSYMBOL(memcpy)(ctx->keyexp, key, ctx->keylen);
 
 	uint8 tmp[4];
-	for (int32 i = ctx->keylen, k = 0;
+	for (int32 i = ctx->keylen;
 			i < (AES_BLOCKSIZE * (ctx->rounds + 1));
 			i += 4) {
-		k = i - 4;
+		int32 k = i - 4;
 		tmp[0] = ctx->keyexp[k];
 		tmp[1] = ctx->keyexp[k + 1];
 		tmp[2] = ctx->keyexp[k + 2];

@@ -57,7 +57,7 @@ int main(void) {
 	print("b: ", b);
 	print("div-quo: ", quo);
 	print("div-rem: ", rem);
-	
+
 	FSYMBOL(bn_uint1024_strtonum)(a, "0x10000000000000000000", NULL, 16);
 	FSYMBOL(bn_uint1024_strtonum)(b, "0x120000000000000000", NULL, 16);
 

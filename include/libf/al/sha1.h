@@ -8,6 +8,7 @@
 
 
 /* @def: sha1 */
+#undef sha1_ctx
 struct sha1_ctx {
 	uint32 count;
 	uint32 state[5];

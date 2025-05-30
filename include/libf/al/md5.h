@@ -8,6 +8,7 @@
 
 
 /* @def: md5 */
+#undef md5_ctx
 struct md5_ctx {
 	uint32 count;
 	uint32 state[4];

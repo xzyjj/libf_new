@@ -20,6 +20,7 @@
 #undef HAMC_SHA384_LEN
 #define HAMC_SHA384_LEN SHA384_LEN
 
+#undef hmac_sha512_ctx
 struct hmac_sha512_ctx {
 	uint8 ipad[HAMC_SHA512_BLOCKSIZE];
 	uint8 opad[HAMC_SHA512_BLOCKSIZE];

@@ -9,10 +9,12 @@
 
 
 /* @def: bsttree */
+#undef bst_node
 struct bst_node {
 	struct bst_node *left, *right;
 };
 
+#undef bst_root
 struct bst_root {
 	struct bst_node *node;
 };

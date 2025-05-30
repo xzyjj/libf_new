@@ -10,12 +10,14 @@
 
 
 /* @def: huffman */
+#undef huf_node
 struct huf_node {
 	uint8 data[4];
 	uint32 freq;
 	struct huf_node *left, *right;
 };
 
+#undef huf_head
 struct huf_head {
 	struct minheap_head heap;
 	struct huf_node *parent;

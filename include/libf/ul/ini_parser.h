@@ -16,6 +16,7 @@
 #undef INI_VALUE_TYPE
 #define INI_VALUE_TYPE 3
 
+#undef ini_ctx
 struct ini_ctx {
 	const char *str;
 	int32 line;

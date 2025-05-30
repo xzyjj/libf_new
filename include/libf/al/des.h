@@ -18,6 +18,7 @@
 #undef DES_DECRYPT
 #define DES_DECRYPT 1
 
+#undef des_ctx
 struct des_ctx {
 	uint8 key_k[17][8];
 	uint8 key_c[17][4];

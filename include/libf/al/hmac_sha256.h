@@ -20,6 +20,7 @@
 #undef HAMC_SHA224_LEN
 #define HAMC_SHA224_LEN SHA224_LEN
 
+#undef hmac_sha256_ctx
 struct hmac_sha256_ctx {
 	uint8 ipad[HAMC_SHA256_BLOCKSIZE];
 	uint8 opad[HAMC_SHA256_BLOCKSIZE];

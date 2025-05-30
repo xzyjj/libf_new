@@ -86,6 +86,7 @@
 #undef XML_ERR_CDATA
 #define XML_ERR_CDATA 17
 
+#undef xml_ctx
 struct xml_ctx {
 	const char *str;
 	int32 len;

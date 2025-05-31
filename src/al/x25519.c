@@ -14,7 +14,7 @@
 * @param5: bn_int512_t       # return greatest common divisor
 * @return: void
 */
-void _x25519_extended_gcd(const bn_int512_t a, const bn_int512_t b,
+static void _x25519_extended_gcd(const bn_int512_t a, const bn_int512_t b,
 		bn_int512_t x, bn_int512_t y, bn_int512_t r) {
 	bn_int512_t _b, _x, _y, quo, rem;
 
@@ -44,7 +44,7 @@ void _x25519_extended_gcd(const bn_int512_t a, const bn_int512_t b,
 * @param1: const bn_int512_t # number
 * @param2: const bn_int512_t # modulus
 * @param3: bn_int512_t       # inverse modulus
-* @return: int32             # -1: fail, 0: success
+* @return: int32             # 0: success, -1: fail
 */
 int32 FSYMBOL(x25519_mod_inverse)(const bn_int512_t a, const bn_int512_t m,
 		bn_int512_t r) {
@@ -153,7 +153,7 @@ void FSYMBOL(x25519_point_double)(const bn_int512_t p, const bn_int512_t a,
 	/*
 	* t1 = (x1 ** 2) % p
 	* t2 = (z1 ** 2) % p
-	* t3 = (xx * xz) % p
+	* t3 = (x1 * z1) % p
 	* x3 = (((t1 - t2) % p) ** 2) % p
 	* z3 = ((((a * t3) % p) + t1 + t2) * t3) % p
 	* z3 = (z3 << 2) % p

@@ -82,9 +82,9 @@ int32 FSYMBOL(bn_int4097_cmp)(const bn_int4096_t a, const bn_int4096_t b) {
 
 	for (int32 i = BN_4096_SIZE; i >= 0; i--) {
 		if (a[i] > b[i])
-			return a[BN_1024_SIG] ? -1 : 1;
+			return a[BN_4096_SIG] ? -1 : 1;
 		if (a[i] < b[i])
-			return a[BN_1024_SIG] ? 1 : -1;
+			return a[BN_4096_SIG] ? 1 : -1;
 	}
 
 	return 0;

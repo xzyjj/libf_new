@@ -14,7 +14,7 @@
 * @param5: bn_int512_t       # return greatest common divisor
 * @return: void
 */
-void _ed25519_extended_gcd(const bn_int512_t a, const bn_int512_t b,
+static void _ed25519_extended_gcd(const bn_int512_t a, const bn_int512_t b,
 		bn_int512_t x, bn_int512_t y, bn_int512_t r) {
 	bn_int512_t _b, _x, _y, quo, rem;
 
@@ -44,7 +44,7 @@ void _ed25519_extended_gcd(const bn_int512_t a, const bn_int512_t b,
 * @param1: const bn_int512_t # number
 * @param2: const bn_int512_t # modulus
 * @param3: bn_int512_t       # inverse modulus
-* @return: int32             # -1: fail, 0: success
+* @return: int32             # 0: success, -1: fail
 */
 int32 FSYMBOL(ed25519_mod_inverse)(const bn_int512_t a, const bn_int512_t m,
 		bn_int512_t r) {
@@ -77,17 +77,21 @@ void FSYMBOL(ed25519_mod_pow)(const bn_int512_t a, const bn_int512_t b,
 	bn_int512_t rr, quo, a1, b1;
 	FSYMBOL(bn_int512_zero)(rr);
 	FSYMBOL(bn_int512_move)(b1, b);
-	rr[0] = 1;
+	rr[0] = 1; /* rr = 1 */
 
+	/* a1 = a1 % m */
 	FSYMBOL(bn_int512_divmod)(quo, a1, a, m);
 	while (FSYMBOL(bn_int512_cmp_1)(b1, 0) > 0) {
-		if (b1[0] & 1) {
+		if (b1[0] & 1) { /* b1 & 1 */
+			/* rr = (rr * a1) % m */
 			FSYMBOL(bn_int512_mul)(rr, rr, a1);
 			FSYMBOL(bn_int512_divmod)(quo, rr, rr, m);
 		}
 
+		/* a1 = (a1 * a1) % m */
 		FSYMBOL(bn_int512_mul)(a1, a1, a1);
 		FSYMBOL(bn_int512_divmod)(quo, a1, a1, m);
+		/* b1 >>= 1 */
 		FSYMBOL(bn_int512_rsh)(b1);
 	}
 
@@ -99,7 +103,7 @@ void FSYMBOL(ed25519_mod_pow)(const bn_int512_t a, const bn_int512_t b,
 * @param2: const bn_int512_t            # curve constant
 * @param3: const struct ed25519_point * # curve point x1, y1, z1, t1
 * @param4: const struct ed25519_point * # curve point x2, y2, z2, t2
-* @param5: struct x25519_point *        # curve point x3, y3, z3, t3
+* @param5: struct ed25519_point *       # curve point x3, y3, z3, t3
 * @return: void
 */
 void FSYMBOL(ed25519_point_add)(const bn_int512_t p, const bn_int512_t d,
@@ -191,7 +195,7 @@ void FSYMBOL(ed25519_point_add)(const bn_int512_t p, const bn_int512_t d,
 * @param1: const bn_int512_t            # prime modulus
 * @param2: const bn_int512_t            # curve constant
 * @param3: const struct ed25519_point * # curve point x1, y1, z1, t1
-* @param5: struct x25519_point *        # curve point x3, y3, z3, t3
+* @param5: struct ed25519_point *       # curve point x3, y3, z3, t3
 * @return: void
 */
 void FSYMBOL(ed25519_point_double)(const bn_int512_t p, const bn_int512_t d,
@@ -205,7 +209,7 @@ void FSYMBOL(ed25519_point_double)(const bn_int512_t p, const bn_int512_t d,
 * @param2: const bn_int512_t            # curve constant
 * @param3: const bn_int512_t            # private key
 * @param4: const struct ed25519_point * # curve point x1, y1, z1, t1
-* @param5: struct x25519_point *        # curve point x2, y2, z2, t2
+* @param5: struct ed25519_point *       # curve point x2, y2, z2, t2
 * @return: void
 */
 void FSYMBOL(ed25519_scalar_mul)(const bn_int512_t p, const bn_int512_t d,
@@ -248,7 +252,7 @@ void FSYMBOL(ed25519_scalar_mul)(const bn_int512_t p, const bn_int512_t d,
 /* @func: ed25519_point_equal - edwards curve point comparison is equal
 * @param1: const bn_int512_t            # prime modulus
 * @param2: const struct ed25519_point * # curve point x1, y1, z1, t1
-* @param3: const struct x25519_point *  # curve point x2, y2, z2, t2
+* @param3: const struct ed25519_point * # curve point x2, y2, z2, t2
 * @return: int32                        # 0: p1 == p2, 1: p1 != p2
 */
 int32 FSYMBOL(ed25519_point_equal)(const bn_int512_t p,
@@ -331,6 +335,7 @@ void FSYMBOL(ed25519_point_recover_x)(const bn_int512_t p, const bn_int512_t d,
 
 	/* _t2 = _x ** 2 */
 	FSYMBOL(bn_int512_mul)(_t2, _x, _x);
+
 	/* ((_t2 - _x2) % p) != 0 */
 	FSYMBOL(bn_int512_sub)(_t2, _t2, _x2);
 	FSYMBOL(bn_int512_divmod)(_t1, _t2, _t2, p);

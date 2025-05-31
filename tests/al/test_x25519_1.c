@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <time.h>
 #include <libf/sl/xstdint.h>
 #include <libf/sl/xstring.h>
 #include <libf/al/bn_512.h>
@@ -38,6 +41,9 @@ static void hex2bn(bn_int512_t t, const char *s, uint32 len) {
 }
 
 int main(int argc, char *argv[]) {
+	clock_t start, end;
+	double time;
+
 	X25519_ECDH_NEW(a_ctx);
 	X25519_ECDH_NEW(b_ctx);
 
@@ -62,8 +68,12 @@ int main(int argc, char *argv[]) {
 	print_hex("a_priS: ", pri);
 	print_b64("a_priS: ", pri);
 
+	start = clock();
 	FSYMBOL(x25519_ecdh_private)(&a_ctx, (uint8 *)pri);
 	FSYMBOL(x25519_ecdh_public)(&a_ctx);
+	end = clock();
+	time = (double)(end - start) / CLOCKS_PER_SEC;
+	printf("time: %.6f\n", time);
 
 	FSYMBOL(bn_int512_zero)(pri);
 	XSYMBOL(memcpy)(pri, &X25519_PRI(&a_ctx, 0), X25519_LEN);

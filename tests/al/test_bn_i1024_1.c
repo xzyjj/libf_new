@@ -125,5 +125,12 @@ int main(void) {
 	print("b: ", b);
 	printf("cmp: %d\n", FSYMBOL(bn_int1024_cmp)(a, b));
 
+	FSYMBOL(bn_int1024_strtonum)(a, "10", NULL, 10);
+	FSYMBOL(bn_int1024_strtonum)(b, "7", NULL, 10);
+	FSYMBOL(bn_int1024_mul)(r, a, b);
+	print("a: ", a);
+	print("b: ", b);
+	print("mul: ", r);
+
 	return 0;
 }

@@ -78,7 +78,7 @@ static void _sha512_compress(struct sha512_ctx *ctx) {
 	for (int32 i = 16; i < 80; i++)
 		m[i] = SEP1(m[i - 2]) + m[i - 7] + SEP0(m[i - 15]) + m[i - 16];
 
-	for (int32 i = 0; i < 80; ++i) {
+	for (int32 i = 0; i < 80; i++) {
 		t1 = H + SIG1(E) + SCH(E, F, G) + sha512_constants[i] + m[i];
 		t2 = SIG0(A) + SMAJ(A, B, C);
 		H = G;
@@ -163,8 +163,7 @@ void FSYMBOL(sha512_finish)(struct sha512_ctx *ctx, uint64L len) {
 	uint8 padbuf[128];
 	XSYMBOL(memset)(padbuf, 0, sizeof(padbuf));
 	padbuf[0] = 0x80;
-	FSYMBOL(sha512_process)(ctx, padbuf,
-		1 + ((239 - (len % 128)) % 128));
+	FSYMBOL(sha512_process)(ctx, padbuf, 1 + ((239 - (len % 128)) % 128));
 
 	/* bit length */
 	((uint64L *)ctx->buf)[14] = 0;

@@ -61,9 +61,10 @@ static void _md5_compress(struct md5_ctx *ctx) {
 	D = ctx->state[3];
 
 	for (int32 i = 0; i < 16; i++)
-		m[i] = /* BSWAP32( */ ((uint32 *)ctx->buf)[i] /* ) */;
+		m[i] = ((uint32 *)ctx->buf)[i];
 
-	for (int32 i = 0, tmp = 0, f = 0, g = 0; i < 64; i++) {
+	uint32 tmp = 0, f = 0, g = 0;
+	for (int32 i = 0; i < 64; i++) {
 		if (i < 16) {
 			f = FF(B, C, D);
 			g = i;
@@ -133,8 +134,7 @@ void FSYMBOL(md5_finish)(struct md5_ctx *ctx, uint64L len) {
 	uint8 padbuf[64];
 	XSYMBOL(memset)(padbuf, 0, sizeof(padbuf));
 	padbuf[0] = 0x80;
-	FSYMBOL(md5_process)(ctx, padbuf,
-		1 + ((119 - (len % 64)) % 64));
+	FSYMBOL(md5_process)(ctx, padbuf, 1 + ((119 - (len % 64)) % 64));
 
 	/* bit length */
 	((uint64L *)ctx->buf)[7] = len * 8;

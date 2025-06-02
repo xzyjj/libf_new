@@ -49,7 +49,8 @@ static void _sha1_compress(struct sha1_ctx *ctx) {
 	for (int32 i = 16; i < 80; i++)
 		m[i] = ROL(m[i - 3] ^ m[i - 8] ^ m[i - 14] ^ m[i - 16], 1);
 
-	for (int32 i = 0, tmp = 0; i < 80; i++) {
+	uint32 tmp = 0;
+	for (int32 i = 0; i < 80; i++) {
 		if (i < 20) {
 			tmp = ROL(A, 5) + F1(B, C, D) + E + K1 + m[i];
 		} else if (i < 40) {
@@ -117,8 +118,7 @@ void FSYMBOL(sha1_finish)(struct sha1_ctx *ctx, uint64L len) {
 	uint8 padbuf[64];
 	XSYMBOL(memset)(padbuf, 0, sizeof(padbuf));
 	padbuf[0] = 0x80;
-	FSYMBOL(sha1_process)(ctx, padbuf,
-		1 + ((119 - (len % 64)) % 64));
+	FSYMBOL(sha1_process)(ctx, padbuf, 1 + ((119 - (len % 64)) % 64));
 
 	/* bit length */
 	((uint64L *)ctx->buf)[7] = BSWAP64(len * 8);

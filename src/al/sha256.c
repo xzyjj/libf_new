@@ -150,8 +150,7 @@ void FSYMBOL(sha256_finish)(struct sha256_ctx *ctx, uint64L len) {
 	uint8 padbuf[64];
 	XSYMBOL(memset)(padbuf, 0, sizeof(padbuf));
 	padbuf[0] = 0x80;
-	FSYMBOL(sha256_process)(ctx, padbuf,
-		1 + ((119 - (len % 64)) % 64));
+	FSYMBOL(sha256_process)(ctx, padbuf, 1 + ((119 - (len % 64)) % 64));
 
 	/* bit length */
 	((uint64L *)ctx->buf)[7] = BSWAP64(len * 8);

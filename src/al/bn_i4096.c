@@ -15,6 +15,14 @@ void FSYMBOL(bn_int4096_zero)(bn_int4096_t t) {
 	XSYMBOL(memset)(t, 0, sizeof(uint32) * (BN_4096_SIZE + 2));
 } /* end */
 
+/* @func: bn_int4096_bits - get the bit length of big number
+* @param1: bn_int4096_t # number
+* @return: uint32       # bits length
+*/
+uint32 FSYMBOL(bn_int4096_bits)(const bn_int4096_t n) {
+	return FSYMBOL(bn_uint4096_bits)(n);
+} /* end */
+
 /* @func: bn_int4096_move - big number move
 * @param1: bn_int4096_t # target
 * @param2: bn_int4096_t # source
@@ -152,7 +160,8 @@ void FSYMBOL(bn_int4097_rsh)(bn_int4096_t n) {
 * @param3: const bn_int4096_t # number
 * @return: void
 */
-void FSYMBOL(bn_int4096_and)(bn_int4096_t r, bn_int4096_t a, bn_int4096_t b) {
+void FSYMBOL(bn_int4096_and)(bn_int4096_t r,
+		const bn_int4096_t a, const bn_int4096_t b) {
 	FSYMBOL(bn_uint4096_and)(r, a, b);
 
 	r[BN_4096_SIG] = a[BN_4096_SIG] && b[BN_4096_SIG];
@@ -166,7 +175,8 @@ void FSYMBOL(bn_int4096_and)(bn_int4096_t r, bn_int4096_t a, bn_int4096_t b) {
 * @param3: const bn_int4096_t # number
 * @return: void
 */
-void FSYMBOL(bn_int4096_or)(bn_int4096_t r, bn_int4096_t a, bn_int4096_t b) {
+void FSYMBOL(bn_int4096_or)(bn_int4096_t r,
+		const bn_int4096_t a, const bn_int4096_t b) {
 	FSYMBOL(bn_uint4096_or)(r, a, b);
 
 	r[BN_4096_SIG] = a[BN_4096_SIG] || b[BN_4096_SIG];
@@ -180,7 +190,8 @@ void FSYMBOL(bn_int4096_or)(bn_int4096_t r, bn_int4096_t a, bn_int4096_t b) {
 * @param3: const bn_int4096_t # number
 * @return: void
 */
-void FSYMBOL(bn_int4096_xor)(bn_int4096_t r, bn_int4096_t a, bn_int4096_t b) {
+void FSYMBOL(bn_int4096_xor)(bn_int4096_t r,
+		const bn_int4096_t a, const bn_int4096_t b) {
 	FSYMBOL(bn_uint4096_xor)(r, a, b);
 
 	r[BN_4096_SIG] = a[BN_4096_SIG] ^ b[BN_4096_SIG];
@@ -193,7 +204,8 @@ void FSYMBOL(bn_int4096_xor)(bn_int4096_t r, bn_int4096_t a, bn_int4096_t b) {
 * @param2: const bn_int4096_t # number
 * @return: void
 */
-void FSYMBOL(bn_int4096_not)(bn_int4096_t r, bn_int4096_t n) {
+void FSYMBOL(bn_int4096_not)(bn_int4096_t r,
+		const bn_int4096_t n) {
 	FSYMBOL(bn_uint4096_not)(r, n);
 
 	r[BN_4096_SIG] = !n[BN_4096_SIG];
@@ -207,8 +219,8 @@ void FSYMBOL(bn_int4096_not)(bn_int4096_t r, bn_int4096_t n) {
 * @param3: const bn_int4096_t # addend
 * @return: void
 */
-void FSYMBOL(bn_int4096_add)(bn_int4096_t r, const bn_int4096_t a,
-		const bn_int4096_t b) {
+void FSYMBOL(bn_int4096_add)(bn_int4096_t r,
+		const bn_int4096_t a, const bn_int4096_t b) {
 	if (a[BN_4096_SIG] == b[BN_4096_SIG]) {
 		r[BN_4096_SIG] = a[BN_4096_SIG];
 		FSYMBOL(bn_uint4096_add)(r, a, b);
@@ -232,8 +244,8 @@ void FSYMBOL(bn_int4096_add)(bn_int4096_t r, const bn_int4096_t a,
 * @param3: const bn_int4096_t # subtract
 * @return: void
 */
-void FSYMBOL(bn_int4096_sub)(bn_int4096_t r, const bn_int4096_t a,
-		const bn_int4096_t b) {
+void FSYMBOL(bn_int4096_sub)(bn_int4096_t r,
+		const bn_int4096_t a, const bn_int4096_t b) {
 	bn_int4096_t neg;
 	FSYMBOL(bn_int4096_move)(neg, b);
 	neg[BN_4096_SIG] = !neg[BN_4096_SIG];
@@ -247,8 +259,8 @@ void FSYMBOL(bn_int4096_sub)(bn_int4096_t r, const bn_int4096_t a,
 * @param2: const bn_int4096_t # multiplier
 * @return:
 */
-void FSYMBOL(bn_int4096_mul)(bn_int4096_t r, const bn_int4096_t a,
-		const bn_int4096_t b) {
+void FSYMBOL(bn_int4096_mul)(bn_int4096_t r,
+		const bn_int4096_t a, const bn_int4096_t b) {
 	FSYMBOL(bn_uint4096_mul)(r, a, b);
 	r[BN_4096_SIG] = a[BN_4096_SIG] ^ b[BN_4096_SIG];
 
@@ -311,8 +323,8 @@ void FSYMBOL(bn_int4096_strtonum)(bn_int4096_t t, const char *s, char **e,
 } /* end */
 
 /* @func: bn_int4096_numtostr - big number to string
-* @param2: char *             # string buffer
-* @param1: const bn_int4096_t # number
+* @param1: char *             # string buffer
+* @param2: const bn_int4096_t # number
 * @return: void
 */
 void FSYMBOL(bn_int4096_numtostr)(char *buf, const bn_int4096_t n) {

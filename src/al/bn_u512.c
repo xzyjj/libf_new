@@ -15,6 +15,37 @@ void FSYMBOL(bn_uint512_zero)(bn_uint512_t t) {
 	XSYMBOL(memset)(t, 0, sizeof(uint32) * (BN_512_SIZE + 2));
 } /* end */
 
+/* @func: bn_uint512_bits - get the bit length of big number
+* @param1: bn_uint512_t # number
+* @return: uint32       # bits length
+*/
+uint32 FSYMBOL(bn_uint512_bits)(const bn_uint512_t n) {
+	static const uint32 pow2[32] = {
+		0x00000001, 0x00000002, 0x00000004,
+		0x00000008, 0x00000010, 0x00000020,
+		0x00000040, 0x00000080, 0x00000100,
+		0x00000200, 0x00000400, 0x00000800,
+		0x00001000, 0x00002000, 0x00004000,
+		0x00008000, 0x00010000, 0x00020000,
+		0x00040000, 0x00080000, 0x00100000,
+		0x00200000, 0x00400000, 0x00800000,
+		0x01000000, 0x02000000, 0x04000000,
+		0x08000000, 0x10000000, 0x20000000,
+		0x40000000, 0x80000000
+		};
+
+	for (int32 i = BN_512_SIZE - 1; i >= 0; i--) {
+		if (n[i]) {
+			for (int32 k = 31; k >= 0; k--) {
+				if (n[i] & pow2[k])
+					return (i * 32) + k;
+			}
+		}
+	}
+
+	return 0;
+} /* end */
+
 /* @func: bn_uint512_move - big number move
 * @param1: bn_uint512_t # target
 * @param2: bn_uint512_t # source
@@ -135,7 +166,8 @@ void FSYMBOL(bn_uint513_rsh)(bn_uint512_t n) {
 * @param3: const bn_uint512_t # number
 * @return: void
 */
-void FSYMBOL(bn_uint512_and)(bn_uint512_t r, bn_uint512_t a, bn_uint512_t b) {
+void FSYMBOL(bn_uint512_and)(bn_uint512_t r,
+		const bn_uint512_t a, const bn_uint512_t b) {
 	bn_uint512_t rr;
 	FSYMBOL(bn_uint512_zero)(rr);
 
@@ -152,7 +184,8 @@ void FSYMBOL(bn_uint512_and)(bn_uint512_t r, bn_uint512_t a, bn_uint512_t b) {
 * @param3: const bn_uint512_t # number
 * @return: void
 */
-void FSYMBOL(bn_uint512_or)(bn_uint512_t r, bn_uint512_t a, bn_uint512_t b) {
+void FSYMBOL(bn_uint512_or)(bn_uint512_t r,
+		const bn_uint512_t a, const bn_uint512_t b) {
 	bn_uint512_t rr;
 	FSYMBOL(bn_uint512_zero)(rr);
 
@@ -169,7 +202,8 @@ void FSYMBOL(bn_uint512_or)(bn_uint512_t r, bn_uint512_t a, bn_uint512_t b) {
 * @param3: const bn_uint512_t # number
 * @return: void
 */
-void FSYMBOL(bn_uint512_xor)(bn_uint512_t r, bn_uint512_t a, bn_uint512_t b) {
+void FSYMBOL(bn_uint512_xor)(bn_uint512_t r,
+		const bn_uint512_t a, const bn_uint512_t b) {
 	bn_uint512_t rr;
 	FSYMBOL(bn_uint512_zero)(rr);
 
@@ -185,7 +219,8 @@ void FSYMBOL(bn_uint512_xor)(bn_uint512_t r, bn_uint512_t a, bn_uint512_t b) {
 * @param2: const bn_uint512_t # number
 * @return: void
 */
-void FSYMBOL(bn_uint512_not)(bn_uint512_t r, bn_uint512_t n) {
+void FSYMBOL(bn_uint512_not)(bn_uint512_t r,
+		const bn_uint512_t n) {
 	bn_uint512_t rr;
 	FSYMBOL(bn_uint512_zero)(rr);
 
@@ -200,10 +235,10 @@ void FSYMBOL(bn_uint512_not)(bn_uint512_t r, bn_uint512_t n) {
 * @param1: bn_uint512_t       # sum
 * @param2: const bn_uint512_t # addend
 * @param3: const bn_uint512_t # addend
-* @return: uint32              # carry overflow
+* @return: uint32             # carry overflow
 */
-uint32 FSYMBOL(bn_uint512_add)(bn_uint512_t r, const bn_uint512_t a,
-		const bn_uint512_t b) {
+uint32 FSYMBOL(bn_uint512_add)(bn_uint512_t r,
+		const bn_uint512_t a, const bn_uint512_t b) {
 	bn_uint512_t rr;
 	FSYMBOL(bn_uint512_move)(rr, a);
 
@@ -230,7 +265,8 @@ uint32 FSYMBOL(bn_uint512_add)(bn_uint512_t r, const bn_uint512_t a,
 * @param3: uint32             # addend
 * @return: uint32             # carry overflow
 */
-uint32 FSYMBOL(bn_uint512_add_1)(bn_uint512_t r, const bn_uint512_t a, uint32 b) {
+uint32 FSYMBOL(bn_uint512_add_1)(bn_uint512_t r,
+		const bn_uint512_t a, uint32 b) {
 	bn_uint512_t rr;
 	FSYMBOL(bn_uint512_move)(rr, a);
 
@@ -258,8 +294,8 @@ uint32 FSYMBOL(bn_uint512_add_1)(bn_uint512_t r, const bn_uint512_t a, uint32 b)
 * @param3: const bn_uint512_t # subtract
 * @return: void
 */
-void FSYMBOL(bn_uint512_sub)(bn_uint512_t r, const bn_uint512_t a,
-		const bn_uint512_t b) {
+void FSYMBOL(bn_uint512_sub)(bn_uint512_t r,
+		const bn_uint512_t a, const bn_uint512_t b) {
 	bn_uint512_t rr;
 	FSYMBOL(bn_uint512_move)(rr, a);
 
@@ -285,7 +321,8 @@ void FSYMBOL(bn_uint512_sub)(bn_uint512_t r, const bn_uint512_t a,
 * @param3: uint32             # subtract
 * @return: void
 */
-void FSYMBOL(bn_uint512_sub_1)(bn_uint512_t r, const bn_uint512_t a, uint32 b) {
+void FSYMBOL(bn_uint512_sub_1)(bn_uint512_t r,
+		const bn_uint512_t a, uint32 b) {
 	bn_uint512_t rr;
 	FSYMBOL(bn_uint512_move)(rr, a);
 
@@ -311,8 +348,8 @@ void FSYMBOL(bn_uint512_sub_1)(bn_uint512_t r, const bn_uint512_t a, uint32 b) {
 * @param2: const bn_uint512_t # multiplier
 * @return: uint32             # carry overflow
 */
-uint32 FSYMBOL(bn_uint512_mul)(bn_uint512_t r, const bn_uint512_t a,
-		const bn_uint512_t b) {
+uint32 FSYMBOL(bn_uint512_mul)(bn_uint512_t r,
+		const bn_uint512_t a, const bn_uint512_t b) {
 	bn_uint512_t rr;
 	FSYMBOL(bn_uint512_zero)(rr);
 
@@ -345,7 +382,8 @@ uint32 FSYMBOL(bn_uint512_mul)(bn_uint512_t r, const bn_uint512_t a,
 * @param2: uint32             # multiplier
 * @return: uint32             # carry overflow
 */
-uint32 FSYMBOL(bn_uint512_mul_1)(bn_uint512_t r, const bn_uint512_t a, uint32 b) {
+uint32 FSYMBOL(bn_uint512_mul_1)(bn_uint512_t r,
+		const bn_uint512_t a, uint32 b) {
 	bn_uint512_t rr;
 	FSYMBOL(bn_uint512_zero)(rr);
 
@@ -375,7 +413,7 @@ uint32 FSYMBOL(bn_uint512_mul_1)(bn_uint512_t r, const bn_uint512_t a, uint32 b)
 */
 void FSYMBOL(bn_uint512_div)(bn_uint512_t quo, bn_uint512_t rem,
 		const bn_uint512_t a, const bn_uint512_t b) {
-	bn_uint512_t rquo, rrem, sh_b;
+	bn_uint512_t rquo, rrem, sh_b, pow2;
 	FSYMBOL(bn_uint512_move)(rrem, a);
 	FSYMBOL(bn_uint512_move)(sh_b, b);
 	FSYMBOL(bn_uint512_move)(rem, rrem);
@@ -389,7 +427,16 @@ void FSYMBOL(bn_uint512_div)(bn_uint512_t quo, bn_uint512_t rem,
 		return;
 	}
 
-	int32 sh = 0;
+	uint32 sh = 0;
+	uint32 psh = FSYMBOL(bn_uint512_bits)(rrem)
+		- FSYMBOL(bn_uint512_bits)(sh_b);
+	if (psh > 15) {
+		FSYMBOL(bn_uint512_zero)(pow2);
+		pow2[psh / 32] = 1U << (psh % 32);
+		FSYMBOL(bn_uint512_mul)(sh_b, sh_b, pow2);
+		sh = psh;
+	}
+
 	while (FSYMBOL(bn_uint513_cmp)(rrem, sh_b) >= 0) {
 		FSYMBOL(bn_uint513_lsh)(sh_b);
 		sh++;

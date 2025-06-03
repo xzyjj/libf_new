@@ -1,4 +1,4 @@
-/* sha3.c - secure hash-3 algorithm implementations */
+/* sha3_fast.c - secure hash-3 algorithm implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstdint.h>
@@ -29,7 +29,7 @@ static const uint8 keccak_rho[5][5] = {
 	};
 
 #undef ROTL64
-#define ROTL64(x, n) (((x) << (n)) | ((x) >> (64 - (n))))
+#define ROTL64(x, n) ((x << n) | (x >> (64 - n)))
 /* end */
 
 /* @func: _keccak_f1600 (static) - keccak-f permutation function
@@ -41,37 +41,155 @@ static void _keccak_f1600(uint64L state[5][5]) {
 
 	for (int32 i = 0; i < SHA3_KECCAK_ROUNDS; i++) {
 		/* theta */
+#undef THETA_1
+#define THETA_1(t, s, x) \
+	t[x] = s[0][x] \
+		^ s[1][x] \
+		^ s[2][x] \
+		^ s[3][x] \
+		^ s[4][x]
+
+#if 1
+
+		THETA_1(C, state,  0);
+		THETA_1(C, state,  1);
+		THETA_1(C, state,  2);
+		THETA_1(C, state,  3);
+		THETA_1(C, state,  4);
+
+#else
+
 		for (int32 x = 0; x < 5; x++) {
 			C[x] = 0;
 			for (int32 y = 0; y < 5; y++)
 				C[x] ^= state[y][x];
 		}
+
+#endif
+
+#undef THETA_2
+#define THETA_2(t, s, x, c0, c1) \
+	t[x] = ROTL64(s[c0], 1) ^ s[c1];
+
+#if 1
+
+		THETA_2(D, C, 0, 1, 4);
+		THETA_2(D, C, 1, 2, 0);
+		THETA_2(D, C, 2, 3, 1);
+		THETA_2(D, C, 3, 4, 2);
+		THETA_2(D, C, 4, 0, 3);
+
+#else
+
 		for (int32 x = 0; x < 5; x++) {
 			D[x] = ROTL64(C[(x + 1) % 5], 1) ^ C[(x + 4) % 5];
 		}
+
+#endif
+
+#undef THETA_3
+#define THETA_3(t, s, x) \
+	t[0][x] ^= s[x]; \
+	t[1][x] ^= s[x]; \
+	t[2][x] ^= s[x]; \
+	t[3][x] ^= s[x]; \
+	t[4][x] ^= s[x]
+
+#if 1
+
+		THETA_3(state, D, 0);
+		THETA_3(state, D, 1);
+		THETA_3(state, D, 2);
+		THETA_3(state, D, 3);
+		THETA_3(state, D, 4);
+
+#else
+
 		for (int32 x = 0; x < 5; x++) {
 			for (int32 y = 0; y < 5; y++)
 				state[y][x] ^= D[x];
 		}
 
+#endif
+
 		/* rho */
+#if 1
+
+		for (int32 y = 0; y < 5; y++) {
+			state[y][0] = ROTL64(state[y][0], keccak_rho[y][0]);
+			state[y][1] = ROTL64(state[y][1], keccak_rho[y][1]);
+			state[y][2] = ROTL64(state[y][2], keccak_rho[y][2]);
+			state[y][3] = ROTL64(state[y][3], keccak_rho[y][3]);
+			state[y][4] = ROTL64(state[y][4], keccak_rho[y][4]);
+		}
+
+#else
+
 		for (int32 x = 0; x < 5; x++) {
 			for (int32 y = 0; y < 5; y++)
 				state[y][x] = ROTL64(state[y][x],
 					keccak_rho[y][x]);
 		}
 
+#endif
+
 		/* pi */
 		for (int32 x = 0; x < 5; x++) {
 			for (int32 y = 0; y < 5; y++)
 				B[y][x] = state[y][x];
 		}
+
+#undef PI_1
+#define PI_1(t, s, y, c0, c1, c2, c3, c4) \
+	t[y][0] = s[0][c0]; \
+	t[y][1] = s[1][c1]; \
+	t[y][2] = s[2][c2]; \
+	t[y][3] = s[3][c3]; \
+	t[y][4] = s[4][c4]
+
+#if 1
+
+		PI_1(state, B, 0, 0, 1, 2, 3, 4);
+		PI_1(state, B, 1, 3, 4, 0, 1, 2);
+		PI_1(state, B, 2, 1, 2, 3, 4, 0);
+		PI_1(state, B, 3, 4, 0, 1, 2, 3);
+		PI_1(state, B, 4, 2, 3, 4, 0, 1);
+
+#else
+
 		for (int32 x = 0; x < 5; x++) {
 			for (int32 y = 0; y < 5; y++)
 				state[y][x] = B[x][((3 * y) + x) % 5];
 		}
 
+#endif
+
 		/* chi */
+#undef CHI_1
+#define CHI_1(t, s, y) \
+	t[0] = s[y][0] ^ (~s[y][1] & s[y][2]); \
+	t[1] = s[y][1] ^ (~s[y][2] & s[y][3]); \
+	t[2] = s[y][2] ^ (~s[y][3] & s[y][4]); \
+	t[3] = s[y][3] ^ (~s[y][4] & s[y][0]); \
+	t[4] = s[y][4] ^ (~s[y][0] & s[y][1])
+
+#undef CHI_2
+#define CHI_2(t, s, y) \
+	t[y][0] = s[0]; \
+	t[y][1] = s[1]; \
+	t[y][2] = s[2]; \
+	t[y][3] = s[3]; \
+	t[y][4] = s[4]
+
+#if 0
+
+		for (int32 y = 0; y < 5; y++) {
+			CHI_1(C, state, y);
+			CHI_2(state, C, y);
+		}
+
+#else
+
 		for (int32 y = 0; y < 5; y++) {
 			for (int32 x = 0; x < 5; x++)
 				C[x] = state[y][x] ^ (~state[y][(x + 1) % 5]
@@ -79,6 +197,8 @@ static void _keccak_f1600(uint64L state[5][5]) {
 			for (int32 x = 0; x < 5; x++)
 				state[y][x] = C[x];
 		}
+
+#endif
 
 		/* iota */
 		state[0][0] ^= keccak_rndc[i];

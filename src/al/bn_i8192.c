@@ -15,6 +15,14 @@ void FSYMBOL(bn_int8192_zero)(bn_int8192_t t) {
 	XSYMBOL(memset)(t, 0, sizeof(uint32) * (BN_8192_SIZE + 2));
 } /* end */
 
+/* @func: bn_int8192_bits - get the bit length of big number
+* @param1: bn_int8192_t # number
+* @return: uint32       # bits length
+*/
+uint32 FSYMBOL(bn_int8192_bits)(const bn_int8192_t n) {
+	return FSYMBOL(bn_uint8192_bits)(n);
+} /* end */
+
 /* @func: bn_int8192_move - big number move
 * @param1: bn_int8192_t # target
 * @param2: bn_int8192_t # source
@@ -152,7 +160,8 @@ void FSYMBOL(bn_int8193_rsh)(bn_int8192_t n) {
 * @param3: const bn_int8192_t # number
 * @return: void
 */
-void FSYMBOL(bn_int8192_and)(bn_int8192_t r, bn_int8192_t a, bn_int8192_t b) {
+void FSYMBOL(bn_int8192_and)(bn_int8192_t r,
+		const bn_int8192_t a, const bn_int8192_t b) {
 	FSYMBOL(bn_uint8192_and)(r, a, b);
 
 	r[BN_8192_SIG] = a[BN_8192_SIG] && b[BN_8192_SIG];
@@ -166,7 +175,8 @@ void FSYMBOL(bn_int8192_and)(bn_int8192_t r, bn_int8192_t a, bn_int8192_t b) {
 * @param3: const bn_int8192_t # number
 * @return: void
 */
-void FSYMBOL(bn_int8192_or)(bn_int8192_t r, bn_int8192_t a, bn_int8192_t b) {
+void FSYMBOL(bn_int8192_or)(bn_int8192_t r,
+		const bn_int8192_t a, const bn_int8192_t b) {
 	FSYMBOL(bn_uint8192_or)(r, a, b);
 
 	r[BN_8192_SIG] = a[BN_8192_SIG] || b[BN_8192_SIG];
@@ -180,7 +190,8 @@ void FSYMBOL(bn_int8192_or)(bn_int8192_t r, bn_int8192_t a, bn_int8192_t b) {
 * @param3: const bn_int8192_t # number
 * @return: void
 */
-void FSYMBOL(bn_int8192_xor)(bn_int8192_t r, bn_int8192_t a, bn_int8192_t b) {
+void FSYMBOL(bn_int8192_xor)(bn_int8192_t r,
+		const bn_int8192_t a, const bn_int8192_t b) {
 	FSYMBOL(bn_uint8192_xor)(r, a, b);
 
 	r[BN_8192_SIG] = a[BN_8192_SIG] ^ b[BN_8192_SIG];
@@ -193,7 +204,8 @@ void FSYMBOL(bn_int8192_xor)(bn_int8192_t r, bn_int8192_t a, bn_int8192_t b) {
 * @param2: const bn_int8192_t # number
 * @return: void
 */
-void FSYMBOL(bn_int8192_not)(bn_int8192_t r, bn_int8192_t n) {
+void FSYMBOL(bn_int8192_not)(bn_int8192_t r,
+		const bn_int8192_t n) {
 	FSYMBOL(bn_uint8192_not)(r, n);
 
 	r[BN_8192_SIG] = !n[BN_8192_SIG];
@@ -207,8 +219,8 @@ void FSYMBOL(bn_int8192_not)(bn_int8192_t r, bn_int8192_t n) {
 * @param3: const bn_int8192_t # addend
 * @return: void
 */
-void FSYMBOL(bn_int8192_add)(bn_int8192_t r, const bn_int8192_t a,
-		const bn_int8192_t b) {
+void FSYMBOL(bn_int8192_add)(bn_int8192_t r,
+		const bn_int8192_t a, const bn_int8192_t b) {
 	if (a[BN_8192_SIG] == b[BN_8192_SIG]) {
 		r[BN_8192_SIG] = a[BN_8192_SIG];
 		FSYMBOL(bn_uint8192_add)(r, a, b);
@@ -232,8 +244,8 @@ void FSYMBOL(bn_int8192_add)(bn_int8192_t r, const bn_int8192_t a,
 * @param3: const bn_int8192_t # subtract
 * @return: void
 */
-void FSYMBOL(bn_int8192_sub)(bn_int8192_t r, const bn_int8192_t a,
-		const bn_int8192_t b) {
+void FSYMBOL(bn_int8192_sub)(bn_int8192_t r,
+		const bn_int8192_t a, const bn_int8192_t b) {
 	bn_int8192_t neg;
 	FSYMBOL(bn_int8192_move)(neg, b);
 	neg[BN_8192_SIG] = !neg[BN_8192_SIG];
@@ -247,8 +259,8 @@ void FSYMBOL(bn_int8192_sub)(bn_int8192_t r, const bn_int8192_t a,
 * @param2: const bn_int8192_t # multiplier
 * @return:
 */
-void FSYMBOL(bn_int8192_mul)(bn_int8192_t r, const bn_int8192_t a,
-		const bn_int8192_t b) {
+void FSYMBOL(bn_int8192_mul)(bn_int8192_t r,
+		const bn_int8192_t a, const bn_int8192_t b) {
 	FSYMBOL(bn_uint8192_mul)(r, a, b);
 	r[BN_8192_SIG] = a[BN_8192_SIG] ^ b[BN_8192_SIG];
 
@@ -311,8 +323,8 @@ void FSYMBOL(bn_int8192_strtonum)(bn_int8192_t t, const char *s, char **e,
 } /* end */
 
 /* @func: bn_int8192_numtostr - big number to string
-* @param2: char *             # string buffer
-* @param1: const bn_int8192_t # number
+* @param1: char *             # string buffer
+* @param2: const bn_int8192_t # number
 * @return: void
 */
 void FSYMBOL(bn_int8192_numtostr)(char *buf, const bn_int8192_t n) {

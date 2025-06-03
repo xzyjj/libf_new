@@ -62,3 +62,13 @@
 ## Secure Hash-3 Standard (SHS)(SHA256/224/512/384)
 
 	- [nist.fips.202.pdf](https://nvlpubs.nist.gov/nistpubs/fips/nist.fips.202.pdf)
+
+## DEFLATE Compressed Algorithm
+
+	- [rfc1951.txt](https://www.rfc-editor.org/rfc/rfc1951.txt)
+	- [rfc1951.html](https://www.rfc-editor.org/rfc/rfc1951.html)
+
+## ChaCha20 and Poly1305 for IETF Protocols
+
+	- [rfc8439.txt](https://www.rfc-editor.org/rfc/rfc8439.txt)
+	- [rfc8439.html](https://www.rfc-editor.org/rfc/rfc8439.html)

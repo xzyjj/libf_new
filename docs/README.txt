@@ -1,11 +1,13 @@
 # libf (Library Free)
 
-	The purpose of libf is to provide a 100% Free/Freedom reference implementation,
-	and follow minimal design and dependencies principle.
+	The purpose of libf is to provide a 100% Free (Freedom) reference
+	implementation, and follow minimal design and dependencies principle.
 
 ## al (Algorithm Library)
 
 ## ds (Data Structure)
+
+## hl (Hardware Library)
 
 ## ml (Media/Audio Library)
 

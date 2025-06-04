@@ -5,7 +5,8 @@
 #include <libf/al/chacha20.h>
 
 
-/* @def: chacha20 */
+/* @def: chacha20
+* key padding constant */
 static const uint8 chacha20_constant[] = "expand 32-byte k";
 
 #undef PACK4

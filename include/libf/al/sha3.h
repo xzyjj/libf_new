@@ -40,6 +40,18 @@
 #undef SHA3_512_RATE
 #define SHA3_512_RATE 72
 
+#undef SHA3_SHAKE128_TYPE
+#define SHA3_SHAKE128_TYPE 5
+/* (1600 - (2 * 128)) / 8 */
+#undef SHA3_SHAKE128_RATE
+#define SHA3_SHAKE128_RATE 168
+
+#undef SHA3_SHAKE256_TYPE
+#define SHA3_SHAKE256_TYPE 6
+/* (1600 - (2 * 256)) / 8 */
+#undef SHA3_SHAKE256_RATE
+#define SHA3_SHAKE256_RATE 136
+
 #undef SHA3_STATE_SIZE
 #define SHA3_STATE_SIZE (5 * 5 * 8)
 #undef SHA3_KECCAK_ROUNDS
@@ -48,8 +60,11 @@
 #undef sha3_ctx
 struct sha3_ctx {
 	uint64L state[5][5];
-	uint8 buf[SHA3_STATE_SIZE];
-	uint8 digest[SHA3_512_LEN];
+	union {
+		uint8 buf[SHA3_STATE_SIZE];
+		uint8 digest[SHA3_STATE_SIZE];
+	} u;
+	uint8 pad;
 	uint32 rate;
 	uint32 dsize;
 	uint32 count;
@@ -58,8 +73,10 @@ struct sha3_ctx {
 #undef SHA3_NEW
 #define SHA3_NEW(x) struct sha3_ctx x
 
+#undef SHA3_SETPAD
+#define SHA3_SETPAD(x) ((x)->pad)
 #undef SHA3_STATE
-#define SHA3_STATE(x, n) ((x)->digest[n])
+#define SHA3_STATE(x, n) ((x)->u.digest[n])
 /* end */
 
 #ifdef __cplusplus
@@ -67,7 +84,7 @@ extern "C" {
 #endif
 
 /* sha3.c */
-extern int32 FSYMBOL(sha3_init)(struct sha3_ctx *ctx, int32 type);
+extern int32 FSYMBOL(sha3_init)(struct sha3_ctx *ctx, int32 type, uint32 dsize);
 extern void FSYMBOL(sha3_process)(struct sha3_ctx *ctx, const uint8 *s,
 		uint64 len);
 extern void FSYMBOL(sha3_finish)(struct sha3_ctx *ctx);

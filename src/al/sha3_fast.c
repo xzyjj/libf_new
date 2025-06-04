@@ -275,9 +275,16 @@ static void _keccak_squeeze(uint64L state[5][5], uint8 *out, uint32 len,
 
 /* @func: sha3_init - sha3 init function
 * @param1: struct sha3_ctx # sha3 struct context
-* @return: int32           # 0: no error, -1: type error
+* @param2: int32           # digest type
+* @param3: uint32          # SHAKE digest length (byte)
+* @return: int32           # 0: no error, -1: type error, \
+*                           -2: dsize too large
 */
-int32 FSYMBOL(sha3_init)(struct sha3_ctx *ctx, int32 type) {
+int32 FSYMBOL(sha3_init)(struct sha3_ctx *ctx, int32 type, uint32 dsize) {
+	if (dsize > SHA3_STATE_SIZE)
+		return -2;
+
+	ctx->pad = 0x06;
 	if (type == SHA3_224_TYPE) {
 		ctx->rate = SHA3_224_RATE;
 		ctx->dsize = SHA3_224_LEN;
@@ -290,11 +297,19 @@ int32 FSYMBOL(sha3_init)(struct sha3_ctx *ctx, int32 type) {
 	} else if (type == SHA3_512_TYPE) {
 		ctx->rate = SHA3_512_RATE;
 		ctx->dsize = SHA3_512_LEN;
+	} else if (type == SHA3_SHAKE128_TYPE) {
+		ctx->rate = SHA3_SHAKE128_RATE;
+		ctx->dsize = dsize;
+		ctx->pad = 0x1f;
+	} else if (type == SHA3_SHAKE256_TYPE) {
+		ctx->rate = SHA3_SHAKE256_RATE;
+		ctx->dsize = dsize;
+		ctx->pad = 0x1f;
 	} else {
 		return -1;
 	}
 
-	XSYMBOL(memset)(ctx->state, 0, SHA3_STATE_SIZE);
+	XSYMBOL(memset)(ctx->state, 0, sizeof(ctx->state));
 	ctx->count = 0;
 
 	return 0;
@@ -302,17 +317,17 @@ int32 FSYMBOL(sha3_init)(struct sha3_ctx *ctx, int32 type) {
 
 /* @func: sha3_process - sha3 processing buffer
 * @param1: struct sha3_ctx # sha3 struct context
-* @param2: const uint8 *       # input buffer
-* @param3: uint64              # input length
+* @param2: const uint8 *   # input buffer
+* @param3: uint64          # input length
 * @return: void
 */
 void FSYMBOL(sha3_process)(struct sha3_ctx *ctx, const uint8 *s,
 		uint64 len) {
 	uint32 n = ctx->count;
 	for (uint64 i = 0; i < len; i++) {
-		ctx->buf[n++] = s[i];
+		ctx->u.buf[n++] = s[i];
 		if (n == ctx->rate) {
-			_keccak_absorb(ctx->state, ctx->buf,
+			_keccak_absorb(ctx->state, ctx->u.buf,
 				ctx->rate, ctx->rate);
 			n = 0;
 		}
@@ -326,12 +341,12 @@ void FSYMBOL(sha3_process)(struct sha3_ctx *ctx, const uint8 *s,
 * @return: void
 */
 void FSYMBOL(sha3_finish)(struct sha3_ctx *ctx) {
-	XSYMBOL(memset)(ctx->buf + ctx->count, 0, ctx->rate - ctx->count);
-	ctx->buf[ctx->count] = 0x06;
-	ctx->buf[ctx->rate - 1] = 0x80;
+	XSYMBOL(memset)(ctx->u.buf + ctx->count, 0, ctx->rate - ctx->count);
+	ctx->u.buf[ctx->count] = ctx->pad;
+	ctx->u.buf[ctx->rate - 1] = 0x80;
 
-	_keccak_absorb(ctx->state, ctx->buf, ctx->rate, ctx->rate);
-	_keccak_squeeze(ctx->state, ctx->digest, ctx->dsize, ctx->rate);
+	_keccak_absorb(ctx->state, ctx->u.buf, ctx->rate, ctx->rate);
+	_keccak_squeeze(ctx->state, ctx->u.digest, ctx->dsize, ctx->rate);
 } /* end */
 
 /* @func: sha3 - sha3 processing

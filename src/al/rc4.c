@@ -27,7 +27,7 @@ void FSYMBOL(rc4_init)(struct rc4_ctx *ctx, const uint8 *key, uint32 len) {
 	ctx->j = 0;
 } /* end */
 
-/* @func: rc4_crypto - rc4 encrypt and decrypt
+/* @func: rc4_crypto - rc4 encrypt and decrypt (stream)
 * @param1: struct rc4_ctx * # rc4 context struct
 * @param2: uint8 *          # buffer
 * @param3: uint32           # length

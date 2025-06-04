@@ -351,7 +351,6 @@ static void _des_permute_ip1(uint8 *out, uint8 *in) {
 	}
 } /* end */
 
-
 /* @func: des_crypto - des encrypt and decrypt
 * @param1: struct des_ctx * # des struct context
 * @param2: uint8 *          # buffer

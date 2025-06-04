@@ -8,7 +8,7 @@ int main(void) {
 	uint64 read_size = 0;
 	SHA3_NEW(ctx1);
 
-	FSYMBOL(sha3_init)(&ctx1, SHA3_256_TYPE);
+	FSYMBOL(sha3_init)(&ctx1, SHA3_256_TYPE, 0);
 
 	char buf[1 << 17];
 	while ((read_size = fread(buf, 1, sizeof(buf), stdin)) > 0) {

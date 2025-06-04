@@ -126,6 +126,7 @@ int32 FSYMBOL(ed25519_sign_verify)(struct ed25519_sign_ctx *ctx,
 	bn_int512_t Rs, s, h, t, pub;
 	struct ed25519_point A, R, sB, hA;
 	SHA512_NEW(sha_h_ctx);
+
 	FSYMBOL(bn_int512_zero)(pub);
 	/* copy(pub, key, ED25519_LEN) */
 	XSYMBOL(memcpy)(pub, key, ED25519_LEN);

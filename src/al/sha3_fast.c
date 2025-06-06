@@ -134,13 +134,33 @@ static void _keccak_f1600(uint64L state[5][5]) {
 #endif
 
 		/* pi */
+#undef PI_1
+#define PI_1(t, s, y) \
+	t[y][0] = s[y][0]; \
+	t[y][1] = s[y][1]; \
+	t[y][2] = s[y][2]; \
+	t[y][3] = s[y][3]; \
+	t[y][4] = s[y][4]
+
+#if 1
+
+		PI_1(B, state, 0);
+		PI_1(B, state, 1);
+		PI_1(B, state, 2);
+		PI_1(B, state, 3);
+		PI_1(B, state, 4);
+
+#else
+
 		for (int32 x = 0; x < 5; x++) {
 			for (int32 y = 0; y < 5; y++)
 				B[y][x] = state[y][x];
 		}
 
-#undef PI_1
-#define PI_1(t, s, y, c0, c1, c2, c3, c4) \
+#endif
+
+#undef PI_2
+#define PI_2(t, s, y, c0, c1, c2, c3, c4) \
 	t[y][0] = s[0][c0]; \
 	t[y][1] = s[1][c1]; \
 	t[y][2] = s[2][c2]; \
@@ -149,11 +169,11 @@ static void _keccak_f1600(uint64L state[5][5]) {
 
 #if 1
 
-		PI_1(state, B, 0, 0, 1, 2, 3, 4);
-		PI_1(state, B, 1, 3, 4, 0, 1, 2);
-		PI_1(state, B, 2, 1, 2, 3, 4, 0);
-		PI_1(state, B, 3, 4, 0, 1, 2, 3);
-		PI_1(state, B, 4, 2, 3, 4, 0, 1);
+		PI_2(state, B, 0, 0, 1, 2, 3, 4);
+		PI_2(state, B, 1, 3, 4, 0, 1, 2);
+		PI_2(state, B, 2, 1, 2, 3, 4, 0);
+		PI_2(state, B, 3, 4, 0, 1, 2, 3);
+		PI_2(state, B, 4, 2, 3, 4, 0, 1);
 
 #else
 
@@ -181,7 +201,7 @@ static void _keccak_f1600(uint64L state[5][5]) {
 	t[y][3] = s[3]; \
 	t[y][4] = s[4]
 
-#if 0
+#if 1
 
 		for (int32 y = 0; y < 5; y++) {
 			CHI_1(C, state, y);
@@ -356,7 +376,6 @@ void FSYMBOL(sha3_finish)(struct sha3_ctx *ctx) {
 * @return: void
 */
 void FSYMBOL(sha3)(struct sha3_ctx *ctx, const uint8 *s, uint64 len) {
-	ctx->count = 0;
 	FSYMBOL(sha3_process)(ctx, s, len);
 	FSYMBOL(sha3_finish)(ctx);
 } /* end */

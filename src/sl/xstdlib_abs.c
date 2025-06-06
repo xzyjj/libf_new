@@ -1,8 +1,8 @@
-/* xabs.c - absolute value integer calculation implementations */
+/* xstdlib_abs.c - absolute value integer calculation implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstdint.h>
-#include <libf/sl/xabs.h>
+#include <libf/sl/xstdlib.h>
 
 
 /* @func: abs - return an integer absolute value

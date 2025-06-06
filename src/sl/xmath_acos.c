@@ -6,7 +6,7 @@
 #include <libf/sl/xmath.h>
 
 
-/* @func: _acos (static) - arc cosine function ()
+/* @func: _acos (static) - arc cosine function
 * @param1: float64 # input value
 * @return: float64 # arc cosine of value
 */

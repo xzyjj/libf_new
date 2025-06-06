@@ -1,12 +1,11 @@
-/* xstrto_strtofl_float.c - string and number convert implementations */
+/* xstrto_atof.c - string to floating conversion implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
 #include <libf/sl/xfloat.h>
 #include <libf/sl/xstring.h>
-#include <libf/sl/xstrto.h>
-#include <libf/sl/xstrto_float.h>
+#include <libf/sl/xstdlib.h>
 #include <libf/sl/xmath.h>
 
 

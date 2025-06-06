@@ -1,9 +1,9 @@
-/* xstrto_strtoul.c - string and number convert implementations */
+/* xstdlib_atoi.c - string to number conversion implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
-#include <libf/sl/xstrto.h>
+#include <libf/sl/xstdlib.h>
 
 
 /* @func: _strtoull (static) - string convert integer

@@ -6,7 +6,10 @@
 #include <libf/al/poly1305.h>
 
 
-/* @def: poly1305 */
+/* @def: poly1305
+* P = 2**130 - 5
+* h = ((h + m) * r) % P */
+
 #undef PACK4
 #define PACK4(x) ((uint32)((x)[0]) | (uint32)((x)[1]) << 8 \
 	| (uint32)((x)[2]) << 16 | (uint32)((x)[3]) << 24)
@@ -15,34 +18,32 @@
 /* @func: poly1305_init - poly1305 init function
 * @param1: struct poly1305_ctx * # poly1305 struct context
 * @param2: const uint8 * # key (length: POLY1305_KEYLEN)
-* @param3: const uint8 * # nonce (length: POLY1305_RANLEN)
 * @return: void
 */
-void FSYMBOL(poly1305_init)(struct poly1305_ctx *ctx, const uint8 *key,
-		const uint8 *ran) {
+void FSYMBOL(poly1305_init)(struct poly1305_ctx *ctx, const uint8 *key) {
 	ctx->r[0] = PACK4(key) & 0x3ffffff;
 	ctx->r[1] = (PACK4(key + 3) >> 2) & 0x3ffff03;
 	ctx->r[2] = (PACK4(key + 6) >> 4) & 0x3ffc0ff;
 	ctx->r[3] = (PACK4(key + 9) >> 6) & 0x3f03fff;
 	ctx->r[4] = (PACK4(key + 12) >> 8) & 0x00fffff;
 
-	ctx->s[0] = PACK4(ran);
-	ctx->s[1] = PACK4(ran + 4);
-	ctx->s[2] = PACK4(ran + 8);
-	ctx->s[3] = PACK4(ran + 12);
+	ctx->s[0] = PACK4(key + 16);
+	ctx->s[1] = PACK4(key + 20);
+	ctx->s[2] = PACK4(key + 24);
+	ctx->s[3] = PACK4(key + 28);
 
 	XSYMBOL(memset)(ctx->h, 0, sizeof(ctx->h));
 	ctx->count = 0;
 } /* end */
 
-/* @func: poly1305_process - poly1305 processing buffer
+/* @func: poly1305_block - poly1305 block function
 * @param1: struct poly1305_ctx * # poly1305 struct context
-* @param2: const uint8 * # input buffer
-* @param3: uint64        # input length
+* @param2: const uint8 * # input buffer (length: POLY1305_BLOCKSIZE)
+* @param3: uint32        # padding bit
 * @return: void
 */
-void FSYMBOL(poly1305_process)(struct poly1305_ctx *ctx, const uint8 *s,
-		uint64 len) {
+void FSYMBOL(poly1305_block)(struct poly1305_ctx *ctx, const uint8 *s,
+		uint32 padbit) {
 	uint32 h[5], r[5], w[5];
 	uint64L d[5];
 
@@ -53,64 +54,76 @@ void FSYMBOL(poly1305_process)(struct poly1305_ctx *ctx, const uint8 *s,
 	for (int32 i = 0; i < 5; i++)
 		w[i] = r[i] * 5;
 
-	while (len >= POLY1305_BLOCKSIZE) {
-		/* h = h + m */
-		h[0] += PACK4(s) & 0x3ffffff;
-		h[1] += (PACK4(s + 3) >> 2) & 0x3ffffff;
-		h[2] += (PACK4(s + 6) >> 4) & 0x3ffffff;
-		h[3] += (PACK4(s + 9) >> 6) & 0x3ffffff;
-		h[4] += PACK4(s + 12) >> 8;
+	/* h = h + m */
+	h[0] += PACK4(s) & 0x3ffffff;
+	h[1] += (PACK4(s + 3) >> 2) & 0x3ffffff;
+	h[2] += (PACK4(s + 6) >> 4) & 0x3ffffff;
+	h[3] += (PACK4(s + 9) >> 6) & 0x3ffffff;
+	h[4] += (PACK4(s + 12) >> 8) | padbit;
 
-		/* d = h * r */
-		d[0] = ((uint64L)h[0] * r[0])
-			+ ((uint64L)h[1] * w[4])
-			+ ((uint64L)h[2] * w[3])
-			+ ((uint64L)h[3] * w[2])
-			+ ((uint64L)h[4] * w[1]);
-		d[1] = (d[0] >> 26)
-			+ ((uint64L)h[0] * r[1])
-			+ ((uint64L)h[1] * r[0])
-			+ ((uint64L)h[2] * w[4])
-			+ ((uint64L)h[3] * w[3])
-			+ ((uint64L)h[4] * w[2]);
-		d[2] = (d[1] >> 26)
-			+ ((uint64L)h[0] * r[2])
-			+ ((uint64L)h[1] * r[1])
-			+ ((uint64L)h[2] * r[0])
-			+ ((uint64L)h[3] * w[4])
-			+ ((uint64L)h[4] * w[3]);
-		d[3] = (d[2] >> 26)
-			+ ((uint64L)h[0] * r[3])
-			+ ((uint64L)h[1] * r[2])
-			+ ((uint64L)h[2] * r[1])
-			+ ((uint64L)h[3] * r[0])
-			+ ((uint64L)h[4] * w[4]);
-		d[4] = (d[3] >> 26)
-			+ ((uint64L)h[0] * r[4])
-			+ ((uint64L)h[1] * r[3])
-			+ ((uint64L)h[2] * r[2])
-			+ ((uint64L)h[3] * r[1])
-			+ ((uint64L)h[4] * r[0]);
+	/* d = h * r */
+	d[0] = ((uint64L)h[0] * r[0])
+		+ ((uint64L)h[1] * w[4])
+		+ ((uint64L)h[2] * w[3])
+		+ ((uint64L)h[3] * w[2])
+		+ ((uint64L)h[4] * w[1]);
+	d[1] = (d[0] >> 26)
+		+ ((uint64L)h[0] * r[1])
+		+ ((uint64L)h[1] * r[0])
+		+ ((uint64L)h[2] * w[4])
+		+ ((uint64L)h[3] * w[3])
+		+ ((uint64L)h[4] * w[2]);
+	d[2] = (d[1] >> 26)
+		+ ((uint64L)h[0] * r[2])
+		+ ((uint64L)h[1] * r[1])
+		+ ((uint64L)h[2] * r[0])
+		+ ((uint64L)h[3] * w[4])
+		+ ((uint64L)h[4] * w[3]);
+	d[3] = (d[2] >> 26)
+		+ ((uint64L)h[0] * r[3])
+		+ ((uint64L)h[1] * r[2])
+		+ ((uint64L)h[2] * r[1])
+		+ ((uint64L)h[3] * r[0])
+		+ ((uint64L)h[4] * w[4]);
+	d[4] = (d[3] >> 26)
+		+ ((uint64L)h[0] * r[4])
+		+ ((uint64L)h[1] * r[3])
+		+ ((uint64L)h[2] * r[2])
+		+ ((uint64L)h[3] * r[1])
+		+ ((uint64L)h[4] * r[0]);
 
-		/* h = d % p */
-		h[0] = (uint32)d[0] & 0x3ffffff;
-		h[1] = (uint32)d[1] & 0x3ffffff;
-		h[2] = (uint32)d[2] & 0x3ffffff;
-		h[3] = (uint32)d[3] & 0x3ffffff;
-		h[4] = (uint32)d[4] & 0x3ffffff;
+	/* h = d % p */
+	h[0] = (uint32)d[0] & 0x3ffffff;
+	h[1] = (uint32)d[1] & 0x3ffffff;
+	h[2] = (uint32)d[2] & 0x3ffffff;
+	h[3] = (uint32)d[3] & 0x3ffffff;
+	h[4] = (uint32)d[4] & 0x3ffffff;
 
-		h[0] += ((uint32)d[4] >> 26) * 5;
-		h[1] += d[0] >> 26;
-		h[0] = h[0] & 0x3ffffff;
-
-		len -= POLY1305_BLOCKSIZE;
-		s += POLY1305_BLOCKSIZE;
-	}
-	ctx->count = len;
-	XSYMBOL(memcpy)(ctx->buf, s, len);
+	h[0] += (uint32)(d[4] >> 26) * 5;
+	h[1] += h[0] >> 26;
+	h[0] = h[0] & 0x3ffffff;
 
 	for (int32 i = 0; i < 5; i++)
 		ctx->h[i] = h[i];
+} /* end */
+
+/* @func: poly1305_process - poly1305 processing buffer
+* @param1: struct poly1305_ctx * # poly1305 struct context
+* @param2: const uint8 * # input buffer
+* @param3: uint64        # input length
+* @return: void
+*/
+void FSYMBOL(poly1305_process)(struct poly1305_ctx *ctx, const uint8 *s,
+		uint64 len) {
+	uint32 n = ctx->count;
+	for (uint64 i = 0; i < len; i++) {
+		ctx->buf[n++] = s[i];
+		if (n == POLY1305_BLOCKSIZE) {
+			FSYMBOL(poly1305_block)(ctx, ctx->buf, 1 << 24);
+			n = 0;
+		}
+	}
+	ctx->count = n;
 } /* end */
 
 /* @func: poly1305_finish - poly1305 process the remaining bytes in the \
@@ -125,7 +138,7 @@ void FSYMBOL(poly1305_finish)(struct poly1305_ctx *ctx) {
 		XSYMBOL(memset)(ctx->buf + ctx->count, 0,
 			POLY1305_BLOCKSIZE - ctx->count);
 		ctx->buf[ctx->count] = 0x01;
-		FSYMBOL(poly1305_process)(ctx, ctx->buf, POLY1305_BLOCKSIZE);
+		FSYMBOL(poly1305_block)(ctx, ctx->buf, 0);
 	}
 
 	for (int32 i = 0; i < 5; i++)
@@ -154,8 +167,9 @@ void FSYMBOL(poly1305_finish)(struct poly1305_ctx *ctx) {
 	t[2] &= 0x3ffffff;
 	t[3] &= 0x3ffffff;
 
+	/* swap */
 	uint32 t_mask = (t[4] >> 31) - 1;
-	uint32 h_mask = t_mask ^ t_mask;
+	uint32 h_mask = ~t_mask;
 	h[0] = (h[0] & h_mask) | (t[0] & t_mask);
 	h[1] = (h[1] & h_mask) | (t[1] & t_mask);
 	h[2] = (h[2] & h_mask) | (t[2] & t_mask);

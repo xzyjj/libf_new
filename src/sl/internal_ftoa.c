@@ -1,14 +1,13 @@
-/* xstrto_fltostr_float.c - string and number convert implementations */
+/* internal_ftoa.c - floating to string conversion implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
 #include <libf/sl/xfloat.h>
 #include <libf/sl/xstring.h>
-#include <libf/sl/xstrto.h>
-#include <libf/sl/xstrto_float.h>
-#include <libf/sl/xabs.h>
+#include <libf/sl/xstdlib.h>
 #include <libf/sl/xmath.h>
+#include <libf/sl/internal.h>
 
 
 /* @func: _out_pad (static) - padding character
@@ -25,14 +24,14 @@ static int32 _out_pad(int32 n, char *p, char c, int32 x) {
 	return n;
 } /* end */
 
-/* @func: fltostr_num - float64 convert string (decimal)
+/* @func: internal_fltostr_num - float64 convert string (decimal)
 * @param1: int32   # size offset
 * @param2: char *  # buffer pointer
 * @param3: float64 # float64 value
-* @param4: int32   # precision
+* @param4: int32   # precision (max: FLTO_PREMAX)
 * @return: int32   # string length (+offset)
 */
-int32 XSYMBOL(fltostr_num)(int32 n, char *p, float64 v, int32 pre) {
+int32 XSYMBOL(internal_fltostr_num)(int32 n, char *p, float64 v, int32 pre) {
 	uint32 big[90], *a, *z, *r;
 	XSYMBOL(memset)(big, 0, sizeof(big));
 	int32 e = 0, intlen = 0;
@@ -52,18 +51,20 @@ int32 XSYMBOL(fltostr_num)(int32 n, char *p, float64 v, int32 pre) {
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
 	pre = XSYMBOL(abs)(pre);
+	pre = MIN(pre, FLTO_PREMAX);
+
 	v = XSYMBOL(fabs)(v);
 	v = XSYMBOL(frexp)(v, &e) * 2;
-	/* integer length (e * log10(2)) */
-	intlen = e ? ((e * 0.3010299956639812) + ((e > 0) ? 1 : 0)) : 0;
-	e--;
-
 	if (v < 0) {
 		a = z = r = big;
 	} else {
 		a = z = r = big + (sizeof(big) / sizeof(*big))
 			- XFP_DBL_MANT_DIG - 1;
 	}
+
+	/* integer length (e * log10(2)) */
+	intlen = e ? ((e * 0.3010299956639812) + ((e > 0) ? 1 : 0)) : 0;
+	e--;
 
 	/* enlarge */
 	do {
@@ -87,7 +88,7 @@ int32 XSYMBOL(fltostr_num)(int32 n, char *p, float64 v, int32 pre) {
 	}
 
 	/* max precision */
-	uint32 need = ((MIN(pre, 324) + (XFP_DBL_MANT_DIG / 3) + 8) / 9) + 1;
+	uint32 need = ((pre + (XFP_DBL_MANT_DIG / 3) + 8) / 9) + 1;
 	/* negative */
 	while (e < 0) {
 		uint32 carry = 0, sh = MIN(9, -e);
@@ -119,9 +120,10 @@ int32 XSYMBOL(fltostr_num)(int32 n, char *p, float64 v, int32 pre) {
 
 	char buf[12];
 	for (uint32 *d = a; d < z; d++) {
-		int32 k = XSYMBOL(ulltostr_d)(0, buf, *d); /* get length */
+		/* get length */
+		int32 k = XSYMBOL(internal_ulltostr_d)(0, buf, *d);
 		if (d != a && k < 9) {
-			XSYMBOL(ulltostr_d)(9 - k, buf, *d);
+			XSYMBOL(internal_ulltostr_d)(9 - k, buf, *d);
 			_out_pad(0, buf, '0', 9 - k);
 			k = 9;
 		}
@@ -145,29 +147,4 @@ int32 XSYMBOL(fltostr_num)(int32 n, char *p, float64 v, int32 pre) {
 		len = _out_pad(len, p, '0', pre);
 
 	return len;
-} /* end */
-
-/* @func: fltostr - floating convert string
-* @param1: char *  # string buffer
-* @param2: float64 # float
-* @param3: int32   # base type
-* @param4: int32   # precision
-* @return: char *  # buffer pointer
-*/
-char *XSYMBOL(fltostr)(char *buf, float64 v, int32 type, int32 pre) {
-	int32 n = 0;
-	switch (type) {
-		case 10:
-			n = XSYMBOL(fltostr_num)(0, buf, v, pre);
-			break;
-		case 11:
-			break;
-		case 12:
-			break;
-		default:
-			break;
-	}
-	buf[n] = '\0';
-
-	return buf;
 } /* end */

@@ -87,7 +87,7 @@ static void _keccak_f1600(uint64L state[5][5]) {
 
 /* @func: _keccak_absorb (static) - keccak absorb function
 * @param1: uint64L [5][5] # state buffer
-* @param2: const uint8 *  # input buffer
+* @param2: const uint8 *  # input buffer (length: >=rate)
 * @param3: uint32         # input length
 * @param4: uint32         # bitrate length (byte)
 * @return: uint32         # remaining length
@@ -158,10 +158,10 @@ static void _keccak_squeeze(uint64L state[5][5], uint8 *out, uint32 len,
 * @param2: int32           # digest type
 * @param3: uint32          # SHAKE digest length (byte)
 * @return: int32           # 0: no error, -1: type error, \
-*                           -2: dsize too large
+*                           -2: digest size error
 */
 int32 FSYMBOL(sha3_init)(struct sha3_ctx *ctx, int32 type, uint32 dsize) {
-	if (dsize > SHA3_STATE_SIZE)
+	if (!dsize || dsize > SHA3_STATE_SIZE)
 		return -2;
 
 	ctx->pad = 0x06;
@@ -236,7 +236,6 @@ void FSYMBOL(sha3_finish)(struct sha3_ctx *ctx) {
 * @return: void
 */
 void FSYMBOL(sha3)(struct sha3_ctx *ctx, const uint8 *s, uint64 len) {
-	ctx->count = 0;
 	FSYMBOL(sha3_process)(ctx, s, len);
 	FSYMBOL(sha3_finish)(ctx);
 } /* end */

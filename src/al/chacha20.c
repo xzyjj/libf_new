@@ -18,11 +18,11 @@ static const uint8 chacha20_constant[] = "expand 32-byte k";
 /* end */
 
 /* @func: _chacha20_qr (static) - chacha20 quarter round function
-* @param1: uint32 * # state buffer
-* @param2: uint32   # index a
-* @param3: uint32   # index b
-* @param4: uint32   # index c
-* @param5: uint32   # index d
+* @param1: uint32 [16] # state buffer
+* @param2: uint32      # index a
+* @param3: uint32      # index b
+* @param4: uint32      # index c
+* @param5: uint32      # index d
 * @return: void
 */
 static void _chacha20_qr(uint32 state[16], uint32 a, uint32 b,

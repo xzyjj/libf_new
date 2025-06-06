@@ -1,10 +1,10 @@
-/* xgetopt_getsubopt.c - get command options implementations */
+/* xgetopt_getsubopt.c - get command suboptions implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
 #include <libf/sl/xstring.h>
-#include <libf/sl/xgetopt.h>
+#include <libf/sl/xstdlib.h>
 
 
 /* @func: getsubopt - parse suboption arguments from a string

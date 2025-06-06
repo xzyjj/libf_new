@@ -1,9 +1,9 @@
-/* xalloc_umalloc.c - memory allocator implementations */
+/* internal_umalloc.c - memory allocator implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
-#include <libf/sl/xalloc_umalloc.h>
+#include <libf/sl/internal.h>
 #include <libf/ds/list.h>
 
 
@@ -20,11 +20,9 @@
 
 /* 32/64bit are 8/16byte aligend */
 #undef CHUNK_ALIGNED_SIZE
-#define CHUNK_ALIGNED_SIZE(x) \
-	(16 * (((x) + CHUNK_SIZE + 15) / 16))
+#define CHUNK_ALIGNED_SIZE(x) (16 * (((x) + CHUNK_SIZE + 15) / 16))
 #undef CHUNK_NODE_ALIGNED_SIZE
-#define CHUNK_NODE_ALIGNED_SIZE(x) \
-	(16 * (((x) + 15) / 16))
+#define CHUNK_NODE_ALIGNED_SIZE(x) (16 * (((x) + 15) / 16))
 
 #undef NEXT_CHUNK
 #define NEXT_CHUNK(x) \
@@ -196,12 +194,12 @@ static void *_umalloc_chunk(struct umalloc_ctx *ctx,
 	return NULL;
 } /* end */
 
-/* @func: umalloc - memory allocator
+/* @func: internal_umalloc - memory allocator
 * @param1: struct umalloc_ctx * # umalloc context struct
 * @param2: uint64               # allocate size
 * @return: void *               # umalloc allocated pointer
 */
-void *XSYMBOL(umalloc)(struct umalloc_ctx *ctx, uint64 size) {
+void *XSYMBOL(internal_umalloc)(struct umalloc_ctx *ctx, uint64 size) {
 	struct umalloc_chunk_node *node;
 	struct umalloc_chunk *chunk;
 	if (size >= ALLOC_SIZE_MAX) { /* big-block */
@@ -238,12 +236,12 @@ void *XSYMBOL(umalloc)(struct umalloc_ctx *ctx, uint64 size) {
 	return chunk ? ++chunk : NULL;
 } /* end */
 
-/* @func: ufree - free allocated memory
+/* @func: internal_ufree - free allocated memory
 * @param1: struct umalloc_ctx * # umalloc context struct
 * @param2: void *               # umalloc allocated pointer
 * @return: void
 */
-void XSYMBOL(ufree)(struct umalloc_ctx *ctx, void *p) {
+void XSYMBOL(internal_ufree)(struct umalloc_ctx *ctx, void *p) {
 	struct umalloc_chunk_node *node;
 	struct umalloc_chunk *chunk = p;
 	chunk--;
@@ -270,11 +268,11 @@ void XSYMBOL(ufree)(struct umalloc_ctx *ctx, void *p) {
 	}
 } /* end */
 
-/* @func: ufree_all - free all allocated memory
+/* @func: internal_ufree_all - free all allocated memory
 * @param1: struct umalloc_ctx * # umalloc context struct
 * @return: void
 */
-void XSYMBOL(ufree_all)(struct umalloc_ctx *ctx) {
+void XSYMBOL(internal_ufree_all)(struct umalloc_ctx *ctx) {
 	struct umalloc_chunk_node *node;
 	while (ctx->chunk.node) {
 		LIST_FOR_EACH(ctx->chunk.node, pos) {
@@ -287,12 +285,12 @@ void XSYMBOL(ufree_all)(struct umalloc_ctx *ctx) {
 	}
 } /* end */
 
-/* @func: umalloc_idle - count idle chunk
+/* @func: internal_umalloc_idle - count idle chunk
 * @param1: struct umalloc_ctx * # umalloc context struct
 * @param2: int32                # 0: chunk, 1: size
 * @return: uint64               # count size
 */
-uint64 XSYMBOL(umalloc_idle)(struct umalloc_ctx *ctx, int32 type) {
+uint64 XSYMBOL(internal_umalloc_idle)(struct umalloc_ctx *ctx, int32 type) {
 	uint64 n = 0;
 	struct umalloc_chunk_node *node;
 	struct umalloc_chunk *chunk;

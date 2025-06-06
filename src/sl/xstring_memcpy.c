@@ -1,4 +1,4 @@
-/* xstring_memcpy.c - string operations implementations */
+/* xstring_memcpy.c - copy memory area implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstdint.h>

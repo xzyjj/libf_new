@@ -1,8 +1,8 @@
-/* xrand.c - random number generation implementations */
+/* xstdlib_random.c - random number generation implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstdint.h>
-#include <libf/sl/xrand.h>
+#include <libf/sl/xstdlib.h>
 
 
 /* @func: random_r - reentrant random number generator

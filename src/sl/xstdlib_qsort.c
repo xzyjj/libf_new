@@ -4,7 +4,7 @@
 #include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
 #include <libf/sl/xstring.h>
-#include <libf/sl/xsort.h>
+#include <libf/sl/xstdlib.h>
 
 
 /* @func: _qsort_swap (static) - memory swap

@@ -135,7 +135,6 @@ void FSYMBOL(sha1_finish)(struct sha1_ctx *ctx, uint64L len) {
 * @return: void
 */
 void FSYMBOL(sha1)(struct sha1_ctx *ctx, const uint8 *s, uint64 len) {
-	ctx->count = 0;
 	FSYMBOL(sha1_process)(ctx, s, len);
 	FSYMBOL(sha1_finish)(ctx, len);
 } /* end */

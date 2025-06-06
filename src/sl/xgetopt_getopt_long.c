@@ -1,10 +1,10 @@
-/* xgetopt_getopt_long.c - get command options implementations */
+/* xgetopt_getopt_long.c - get command long options implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
 #include <libf/sl/xstring.h>
-#include <libf/sl/xgetopt.h>
+#include <libf/sl/xgetopt_long.h>
 
 
 /* @func: _getopt_long_r (static) - command-line long option parsing

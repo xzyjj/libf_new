@@ -9,9 +9,7 @@
 
 /* @def: poly1305 */
 #undef POLY1305_KEYLEN
-#define POLY1305_KEYLEN 16
-#undef POLY1305_RANLEN
-#define POLY1305_RANLEN 16
+#define POLY1305_KEYLEN 32
 #undef POLY1305_TAGLEN
 #define POLY1305_TAGLEN 16
 #undef POLY1305_BLOCKSIZE
@@ -39,8 +37,9 @@ extern "C" {
 #endif
 
 /* poly1305.c */
-extern void FSYMBOL(poly1305_init)(struct poly1305_ctx *ctx, const uint8 *key,
-		const uint8 *ran);
+extern void FSYMBOL(poly1305_init)(struct poly1305_ctx *ctx, const uint8 *key);
+extern void FSYMBOL(poly1305_block)(struct poly1305_ctx *ctx, const uint8 *s,
+		uint32 padbit);
 extern void FSYMBOL(poly1305_process)(struct poly1305_ctx *ctx, const uint8 *s,
 		uint64 len);
 extern void FSYMBOL(poly1305_finish)(struct poly1305_ctx *ctx);

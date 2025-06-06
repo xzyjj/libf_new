@@ -72,3 +72,8 @@
 
 	- [rfc8439.txt](https://www.rfc-editor.org/rfc/rfc8439.txt)
 	- [rfc8439.html](https://www.rfc-editor.org/rfc/rfc8439.html)
+
+## BLAKE2 Cryptographic Hash and Message Authentication Code (MAC)
+
+	- [rfc7693.txt](https://www.rfc-editor.org/rfc/rfc7693.txt)
+	- [rfc7693.html](https://www.rfc-editor.org/rfc/rfc7693.html)

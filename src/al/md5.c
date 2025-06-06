@@ -148,7 +148,6 @@ void FSYMBOL(md5_finish)(struct md5_ctx *ctx, uint64L len) {
 * @return: void
 */
 void FSYMBOL(md5)(struct md5_ctx *ctx, const uint8 *s, uint64 len) {
-	ctx->count = 0;
 	FSYMBOL(md5_process)(ctx, s, len);
 	FSYMBOL(md5_finish)(ctx, len);
 } /* end */

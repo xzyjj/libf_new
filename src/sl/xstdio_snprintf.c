@@ -1,4 +1,4 @@
-/* xstdio_snprintf.c - standard input/output implements */
+/* xstdio_snprintf.c - format value to string conversion implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstddef.h>
@@ -6,7 +6,7 @@
 #include <libf/sl/xstdarg.h>
 #include <libf/sl/xstring.h>
 #include <libf/sl/xstdio.h>
-#include <libf/sl/xstdio_float.h>
+#include <libf/sl/internal.h>
 
 
 /* @def: snprintf */
@@ -62,9 +62,9 @@ static int32 _snout(const char *s, uint64 n, void *arg) {
 int32 XSYMBOL(vsnprintf)(char *buf, uint64 len, const char *fmt,
 		va_list ap) {
 	struct _snout_ctx p = { buf, buf + len };
-	FMT_VPRINTF_NEW(ctx, _snout_pad, _snout, &p);
+	FMT_NEW(ctx, _snout_pad, _snout, &p);
 
-	int32 r = XSYMBOL(fmt_vprintf)(&ctx, fmt, ap);
+	int32 r = XSYMBOL(internal_fmt)(&ctx, fmt, ap);
 	*((char *)(p.pbuf)) = '\0';
 
 	return r;
@@ -81,9 +81,9 @@ int32 XSYMBOL(snprintf)(char *buf, uint64 len, const char *fmt, ...) {
 	va_list ap;
 	va_start(ap, fmt);
 	struct _snout_ctx p = { buf, buf + len };
-	FMT_VPRINTF_NEW(ctx, _snout_pad, _snout, &p);
+	FMT_NEW(ctx, _snout_pad, _snout, &p);
 
-	int32 r = XSYMBOL(fmt_vprintf)(&ctx, fmt, ap);
+	int32 r = XSYMBOL(internal_fmt)(&ctx, fmt, ap);
 	*((char *)(p.pbuf)) = '\0';
 
 	return r;

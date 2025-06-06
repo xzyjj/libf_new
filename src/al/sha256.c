@@ -167,7 +167,6 @@ void FSYMBOL(sha256_finish)(struct sha256_ctx *ctx, uint64L len) {
 * @return: void
 */
 void FSYMBOL(sha256)(struct sha256_ctx *ctx, const uint8 *s, uint64 len) {
-	ctx->count = 0;
 	FSYMBOL(sha256_process)(ctx, s, len);
 	FSYMBOL(sha256_finish)(ctx, len);
 } /* end */

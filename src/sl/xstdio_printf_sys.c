@@ -5,8 +5,8 @@
 #include <libf/sl/xstdint.h>
 #include <libf/sl/xstdarg.h>
 #include <libf/sl/xstring.h>
-#include <libf/sl/xstdio_float.h>
 #include <libf/sl/xstdio_sys.h>
+#include <libf/sl/internal.h>
 
 #include <stdio.h>
 
@@ -49,9 +49,9 @@ static int32 _out(const char *s, uint64 n, void *arg) {
 * @return: int32        # 0: no error, -1: format error
 */
 int32 XSYMBOL(vfprintf)(FILE *fp, const char *fmt, va_list ap) {
-	FMT_VPRINTF_NEW(ctx, _out_pad, _out, fp);
+	FMT_NEW(ctx, _out_pad, _out, fp);
 
-	return XSYMBOL(fmt_vprintf)(&ctx, fmt, ap);
+	return XSYMBOL(internal_fmt)(&ctx, fmt, ap);
 } /* end */
 
 /* @func: fprintf - print formatted output (FILE)
@@ -62,9 +62,9 @@ int32 XSYMBOL(vfprintf)(FILE *fp, const char *fmt, va_list ap) {
 int32 XSYMBOL(fprintf)(FILE *fp, const char *fmt, ...) {
 	va_list ap;
 	va_start(ap, fmt);
-	FMT_VPRINTF_NEW(ctx, _out_pad, _out, fp);
+	FMT_NEW(ctx, _out_pad, _out, fp);
 
-	return XSYMBOL(fmt_vprintf)(&ctx, fmt, ap);
+	return XSYMBOL(internal_fmt)(&ctx, fmt, ap);
 } /* end */
 
 /* @func: vprintf - print formatted output (va_list)
@@ -73,9 +73,9 @@ int32 XSYMBOL(fprintf)(FILE *fp, const char *fmt, ...) {
 * @return: int32        # 0: no error, -1: format error
 */
 int32 XSYMBOL(vprintf)(const char *fmt, va_list ap) {
-	FMT_VPRINTF_NEW(ctx, _out_pad, _out, stdout);
+	FMT_NEW(ctx, _out_pad, _out, stdout);
 
-	return XSYMBOL(fmt_vprintf)(&ctx, fmt, ap);
+	return XSYMBOL(internal_fmt)(&ctx, fmt, ap);
 } /* end */
 
 /* @func: printf - print formatted output
@@ -86,7 +86,7 @@ int32 XSYMBOL(vprintf)(const char *fmt, va_list ap) {
 int32 XSYMBOL(printf)(const char *fmt, ...) {
 	va_list ap;
 	va_start(ap, fmt);
-	FMT_VPRINTF_NEW(ctx, _out_pad, _out, stdout);
+	FMT_NEW(ctx, _out_pad, _out, stdout);
 
-	return XSYMBOL(fmt_vprintf)(&ctx, fmt, ap);
+	return XSYMBOL(internal_fmt)(&ctx, fmt, ap);
 } /* end */

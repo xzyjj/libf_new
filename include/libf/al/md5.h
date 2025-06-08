@@ -8,15 +8,18 @@
 
 
 /* @def: md5 */
+#undef MD5_LEN
+#define MD5_LEN 16
+#undef MD5_BLOCKSIZE
+#define MD5_BLOCKSIZE 64
+
 #undef md5_ctx
 struct md5_ctx {
 	uint32 count;
 	uint32 state[4];
-	uint8 buf[64];
+	uint8 buf[MD5_BLOCKSIZE];
 };
 
-#undef MD5_LEN
-#define MD5_LEN 16
 #undef MD5_NEW
 #define	MD5_NEW(x) \
 	struct md5_ctx x = { \

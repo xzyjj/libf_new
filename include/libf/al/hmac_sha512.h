@@ -10,20 +10,12 @@
 
 
 /* @def: hmac_sha512 */
-#undef HAMC_SHA512_BLOCKSIZE
-#define HAMC_SHA512_BLOCKSIZE 128
-#undef HAMC_SHA512_LEN
-#define HAMC_SHA512_LEN SHA512_LEN
-
-#undef HAMC_SHA384_BLOCKSIZE
-#define HAMC_SHA384_BLOCKSIZE 128
-#undef HAMC_SHA384_LEN
-#define HAMC_SHA384_LEN SHA384_LEN
-
 #undef hmac_sha512_ctx
 struct hmac_sha512_ctx {
-	uint8 ipad[HAMC_SHA512_BLOCKSIZE];
-	uint8 opad[HAMC_SHA512_BLOCKSIZE];
+	uint8 ipad[SHA512_BLOCKSIZE];
+	uint8 opad[SHA512_BLOCKSIZE];
+	struct sha512_ctx ipad_ctx;
+	struct sha512_ctx opad_ctx;
 	uint8 state[SHA512_LEN];
 };
 
@@ -45,12 +37,18 @@ extern "C" {
 /* hmac_sha512.c */
 extern void FSYMBOL(hmac_sha512_init)(struct hmac_sha512_ctx *ctx, const uint8 *key,
 		uint32 key_len);
+extern void FSYMBOL(hmac_sha512_process)(struct hmac_sha512_ctx *ctx, const uint8 *s,
+		uint64 len);
+extern void FSYMBOL(hmac_sha512_finish)(struct hmac_sha512_ctx *ctx, uint64L len);
 extern void FSYMBOL(hmac_sha512)(struct hmac_sha512_ctx *ctx, const uint8 *s,
-		uint32 len);
+		uint64 len);
 extern void FSYMBOL(hmac_sha384_init)(struct hmac_sha512_ctx *ctx, const uint8 *key,
 		uint32 key_len);
+extern void FSYMBOL(hmac_sha384_process)(struct hmac_sha512_ctx *ctx, const uint8 *s,
+		uint64 len);
+extern void FSYMBOL(hmac_sha384_finish)(struct hmac_sha512_ctx *ctx, uint64L len);
 extern void FSYMBOL(hmac_sha384)(struct hmac_sha512_ctx *ctx, const uint8 *s,
-		uint32 len);
+		uint64 len);
 
 #ifdef __cplusplus
 }

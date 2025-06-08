@@ -131,7 +131,7 @@ void FSYMBOL(sha256_process)(struct sha256_ctx *ctx, const uint8 *s,
 	uint32 n = ctx->count;
 	for (uint64 i = 0; i < len; i++) {
 		ctx->buf[n++] = s[i];
-		if (n == 64) {
+		if (n == SHA256_BLOCKSIZE) {
 			_sha256_compress(ctx);
 			n = 0;
 		}
@@ -147,7 +147,7 @@ void FSYMBOL(sha256_process)(struct sha256_ctx *ctx, const uint8 *s,
 */
 void FSYMBOL(sha256_finish)(struct sha256_ctx *ctx, uint64L len) {
 	/* padding */
-	uint8 padbuf[64];
+	uint8 padbuf[SHA256_BLOCKSIZE];
 	XSYMBOL(memset)(padbuf, 0, sizeof(padbuf));
 	padbuf[0] = 0x80;
 	FSYMBOL(sha256_process)(ctx, padbuf, 1 + ((119 - (len % 64)) % 64));

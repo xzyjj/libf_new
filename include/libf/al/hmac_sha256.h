@@ -9,21 +9,13 @@
 #include <libf/al/sha256.h>
 
 
-/* @def: hmac_256 */
-#undef HAMC_SHA256_BLOCKSIZE
-#define HAMC_SHA256_BLOCKSIZE 64
-#undef HAMC_SHA256_LEN
-#define HAMC_SHA256_LEN SHA256_LEN
-
-#undef HAMC_SHA224_BLOCKSIZE
-#define HAMC_SHA224_BLOCKSIZE 64
-#undef HAMC_SHA224_LEN
-#define HAMC_SHA224_LEN SHA224_LEN
-
+/* @def: hmac_sha256 */
 #undef hmac_sha256_ctx
 struct hmac_sha256_ctx {
-	uint8 ipad[HAMC_SHA256_BLOCKSIZE];
-	uint8 opad[HAMC_SHA256_BLOCKSIZE];
+	uint8 ipad[SHA256_BLOCKSIZE];
+	uint8 opad[SHA256_BLOCKSIZE];
+	struct sha256_ctx ipad_ctx;
+	struct sha256_ctx opad_ctx;
 	uint8 state[SHA256_LEN];
 };
 
@@ -45,12 +37,18 @@ extern "C" {
 /* hmac_sha256.c */
 extern void FSYMBOL(hmac_sha256_init)(struct hmac_sha256_ctx *ctx, const uint8 *key,
 		uint32 key_len);
+extern void FSYMBOL(hmac_sha256_process)(struct hmac_sha256_ctx *ctx, const uint8 *s,
+		uint64 len);
+extern void FSYMBOL(hmac_sha256_finish)(struct hmac_sha256_ctx *ctx, uint64L len);
 extern void FSYMBOL(hmac_sha256)(struct hmac_sha256_ctx *ctx, const uint8 *s,
-		uint32 len);
+		uint64 len);
 extern void FSYMBOL(hmac_sha224_init)(struct hmac_sha256_ctx *ctx, const uint8 *key,
 		uint32 key_len);
+extern void FSYMBOL(hmac_sha224_process)(struct hmac_sha256_ctx *ctx, const uint8 *s,
+		uint64 len);
+extern void FSYMBOL(hmac_sha224_finish)(struct hmac_sha256_ctx *ctx, uint64L len);
 extern void FSYMBOL(hmac_sha224)(struct hmac_sha256_ctx *ctx, const uint8 *s,
-		uint32 len);
+		uint64 len);
 
 #ifdef __cplusplus
 }

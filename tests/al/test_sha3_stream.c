@@ -51,12 +51,12 @@ int main(void) {
 	printf("\n");
 
 	FSYMBOL(sha3_finish)(&ctx5);
-	for (uint32 i = 0; i < ctx5.dsize; i++)
+	for (uint32 i = 0; i < SHA3_256_LEN; i++)
 		printf("%02x", SHA3_STATE(&ctx5, i));
 	printf("\n");
 
 	FSYMBOL(sha3_finish)(&ctx6);
-	for (uint32 i = 0; i < ctx6.dsize; i++)
+	for (uint32 i = 0; i < SHA3_512_LEN; i++)
 		printf("%02x", SHA3_STATE(&ctx6, i));
 	printf("\n");
 

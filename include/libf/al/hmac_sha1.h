@@ -10,15 +10,12 @@
 
 
 /* @def: hmac_sha1 */
-#undef HAMC_SHA1_BLOCKSIZE
-#define HAMC_SHA1_BLOCKSIZE 64
-#undef HAMC_SHA1_LEN
-#define HAMC_SHA1_LEN SHA1_LEN
-
 #undef hmac_sha1_ctx
 struct hmac_sha1_ctx {
-	uint8 ipad[HAMC_SHA1_BLOCKSIZE];
-	uint8 opad[HAMC_SHA1_BLOCKSIZE];
+	uint8 ipad[SHA1_BLOCKSIZE];
+	uint8 opad[SHA1_BLOCKSIZE];
+	struct sha1_ctx ipad_ctx;
+	struct sha1_ctx opad_ctx;
 	uint8 state[SHA1_LEN];
 };
 
@@ -35,8 +32,11 @@ extern "C" {
 /* hmac_sha1.c */
 extern void FSYMBOL(hmac_sha1_init)(struct hmac_sha1_ctx *ctx, const uint8 *key,
 		uint32 key_len);
+extern void FSYMBOL(hmac_sha1_process)(struct hmac_sha1_ctx *ctx, const uint8 *s,
+		uint64 len);
+extern void FSYMBOL(hmac_sha1_finish)(struct hmac_sha1_ctx *ctx, uint64L len);
 extern void FSYMBOL(hmac_sha1)(struct hmac_sha1_ctx *ctx, const uint8 *s,
-		uint32 len);
+		uint64 len);
 
 #ifdef __cplusplus
 }

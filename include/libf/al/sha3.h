@@ -75,6 +75,10 @@ struct sha3_ctx {
 
 #undef SHA3_SETPAD
 #define SHA3_SETPAD(x) ((x)->pad)
+#undef SHA3_GETDSIZE
+#define SHA3_GETDSIZE(x) ((x)->dsize)
+#undef SHA3_GETRATE
+#define SHA3_GETRATE(x) ((x)->rate)
 #undef SHA3_STATE
 #define SHA3_STATE(x, n) ((x)->u.digest[n])
 /* end */

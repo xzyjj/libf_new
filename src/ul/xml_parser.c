@@ -228,7 +228,7 @@ static int32 _xml_statement_attr(struct xml_ctx *ctx) {
 	for (; *(ctx->str) != '\0'; ctx->str++, ctx->len++) {
 		char c = *(ctx->str);
 		switch (st) {
-			case 0: /* name start or end */
+			case 0: /* name start, or end */
 				if (BREAK_CHARACTER(c))
 					break;
 				if (!XSYMBOL(strncmp)("?>", ctx->str, 2)) /* end */
@@ -320,7 +320,7 @@ static int32 _xml_statement(struct xml_ctx *ctx) {
 				ctx->len++;
 				st = 1;
 				break;
-			case 1: /* name start or end */
+			case 1: /* name start, or end */
 				if (BREAK_CHARACTER(c))
 					break;
 				if (!XSYMBOL(strncmp)("?>", ctx->str, 2)) { /* end */
@@ -351,7 +351,7 @@ static int32 _xml_statement(struct xml_ctx *ctx) {
 				len++;
 				st = 2;
 				break;
-			case 2: /* name or end */
+			case 2: /* name, attribute or end */
 				if (BREAK_CHARACTER(c)) { /* attribute */
 					if (ctx->call(XML_STATEMENT_START,
 							e,
@@ -379,7 +379,7 @@ static int32 _xml_statement(struct xml_ctx *ctx) {
 
 				len++;
 				break;
-			case 3: /* attribute or end */
+			case 3: /* attribute and end */
 				k = _xml_statement_attr(ctx); /* attribute */
 				if (k < 0)
 					return k;
@@ -447,6 +447,7 @@ static int32 _xml_doctype(struct xml_ctx *ctx) {
 					ctx->len++;
 					return 0;
 				}
+
 				if (!BREAK_CHARACTER(c)) {
 					ctx->err = XML_ERR_DOCTYPE_START;
 					return -1;
@@ -499,7 +500,7 @@ static int32 _xml_doctype(struct xml_ctx *ctx) {
 				len++;
 				st = 2;
 				break;
-			case 2: /* name */
+			case 2: /* name, next or end */
 				if (BREAK_CHARACTER(c)) { /* next */
 					if (ctx->call(XML_DOCTYPE_NAME,
 							e,
@@ -559,7 +560,7 @@ static int32 _xml_element_attr(struct xml_ctx *ctx) {
 	for (; *(ctx->str) != '\0'; ctx->str++, ctx->len++) {
 		char c = *(ctx->str);
 		switch (st) {
-			case 0: /* name start or end */
+			case 0: /* name start, or end */
 				if (BREAK_CHARACTER(c))
 					break;
 				if (c == '/' || c == '>') /* end */
@@ -697,7 +698,7 @@ static int32 _xml_element_start(struct xml_ctx *ctx) {
 				len++;
 				st = 2;
 				break;
-			case 2: /* name or end */
+			case 2: /* name, attribute, empty or end */
 				if (BREAK_CHARACTER(c)) { /* attribute */
 					if (ctx->call(XML_ELEMENT_START,
 							e,
@@ -733,7 +734,7 @@ static int32 _xml_element_start(struct xml_ctx *ctx) {
 
 				len++;
 				break;
-			case 3: /* attribute or end */
+			case 3: /* attribute, empty or end */
 				k = _xml_element_attr(ctx); /* attribute */
 				if (k < 0)
 					return k;
@@ -753,6 +754,7 @@ static int32 _xml_element_start(struct xml_ctx *ctx) {
 					return -1;
 				}
 
+				/* empty end */
 				if (ctx->call_end(XML_ELEMENT_EMPTY_END,
 						NULL,
 						0,

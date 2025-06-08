@@ -161,9 +161,6 @@ static void _keccak_squeeze(uint64L state[5][5], uint8 *out, uint32 len,
 *                           -2: digest size error
 */
 int32 FSYMBOL(sha3_init)(struct sha3_ctx *ctx, int32 type, uint32 dsize) {
-	if (!dsize || dsize > SHA3_STATE_SIZE)
-		return -2;
-
 	ctx->pad = 0x06;
 	if (type == SHA3_224_TYPE) {
 		ctx->rate = SHA3_224_RATE;
@@ -178,10 +175,14 @@ int32 FSYMBOL(sha3_init)(struct sha3_ctx *ctx, int32 type, uint32 dsize) {
 		ctx->rate = SHA3_512_RATE;
 		ctx->dsize = SHA3_512_LEN;
 	} else if (type == SHA3_SHAKE128_TYPE) {
+		if (!dsize || dsize > SHA3_STATE_SIZE)
+			return -2;
 		ctx->rate = SHA3_SHAKE128_RATE;
 		ctx->dsize = dsize;
 		ctx->pad = 0x1f;
 	} else if (type == SHA3_SHAKE256_TYPE) {
+		if (!dsize || dsize > SHA3_STATE_SIZE)
+			return -2;
 		ctx->rate = SHA3_SHAKE256_RATE;
 		ctx->dsize = dsize;
 		ctx->pad = 0x1f;

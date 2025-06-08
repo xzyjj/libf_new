@@ -34,6 +34,8 @@
 ## Keyed-Hash Message Authentication Code (HMAC)
 
 	- [fips-198-1_final.pdf](https://csrc.nist.gov/files/pubs/fips/198-1/final/docs/fips-198-1_final.pdf)
+	- [rfc2104.txt](https://www.rfc-editor.org/rfc/rfc2104.txt)
+	- [rfc2104.html](https://www.rfc-editor.org/rfc/rfc2104.html)
 
 ## Introduction to Algorithms
 
@@ -62,6 +64,7 @@
 ## Secure Hash-3 Standard (SHS)(SHA256/224/512/384)
 
 	- [nist.fips.202.pdf](https://nvlpubs.nist.gov/nistpubs/fips/nist.fips.202.pdf)
+	- [Keccak-reference-3.0.pdf](https://keccak.team/files/Keccak-reference-3.0.pdf)
 
 ## DEFLATE Compressed Algorithm
 
@@ -77,3 +80,7 @@
 
 	- [rfc7693.txt](https://www.rfc-editor.org/rfc/rfc7693.txt)
 	- [rfc7693.html](https://www.rfc-editor.org/rfc/rfc7693.html)
+
+## cSHAKE, KMAC, TupleHash and ParallelHash Algorithms
+
+	- [NIST.SP.800-185.pdf](http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf)

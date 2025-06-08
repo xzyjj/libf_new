@@ -115,7 +115,7 @@ void FSYMBOL(md5_process)(struct md5_ctx *ctx, const uint8 *s,
 	uint32 n = ctx->count;
 	for (uint64 i = 0; i < len; i++) {
 		ctx->buf[n++] = s[i];
-		if (n == 64) {
+		if (n == MD5_BLOCKSIZE) {
 			_md5_compress(ctx);
 			n = 0;
 		}
@@ -131,7 +131,7 @@ void FSYMBOL(md5_process)(struct md5_ctx *ctx, const uint8 *s,
 */
 void FSYMBOL(md5_finish)(struct md5_ctx *ctx, uint64L len) {
 	/* padding */
-	uint8 padbuf[64];
+	uint8 padbuf[MD5_BLOCKSIZE];
 	XSYMBOL(memset)(padbuf, 0, sizeof(padbuf));
 	padbuf[0] = 0x80;
 	FSYMBOL(md5_process)(ctx, padbuf, 1 + ((119 - (len % 64)) % 64));

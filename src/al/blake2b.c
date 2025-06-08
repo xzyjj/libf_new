@@ -142,10 +142,10 @@ void FSYMBOL(blake2b_process)(struct blake2b_ctx *ctx, const uint8 *s,
 * @return: void
 */
 void FSYMBOL(blake2b_finish)(struct blake2b_ctx *ctx) {
-	XSYMBOL(memset)(ctx->buf + ctx->count, 0,
-		BLAKE2B_BLOCKSIZE - ctx->count);
-	ctx->tsize[0] += ctx->count;
+	XSYMBOL(memset)(ctx->buf + ctx->count, 0, BLAKE2B_BLOCKSIZE
+		- ctx->count);
 	ctx->flags[0] = (uint64L)-1;
+	ctx->tsize[0] += ctx->count;
 	_blake2b_compress(ctx);
 } /* end */
 

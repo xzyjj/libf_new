@@ -10,15 +10,12 @@
 
 
 /* @def: hmac_md5 */
-#undef HAMC_MD5_BLOCKSIZE
-#define HAMC_MD5_BLOCKSIZE 64
-#undef HAMC_MD5_LEN
-#define HAMC_MD5_LEN MD5_LEN
-
 #undef hmac_md5_ctx
 struct hmac_md5_ctx {
-	uint8 ipad[HAMC_MD5_BLOCKSIZE];
-	uint8 opad[HAMC_MD5_BLOCKSIZE];
+	uint8 ipad[MD5_BLOCKSIZE];
+	uint8 opad[MD5_BLOCKSIZE];
+	struct md5_ctx ipad_ctx;
+	struct md5_ctx opad_ctx;
 	uint8 state[MD5_LEN];
 };
 
@@ -35,8 +32,11 @@ extern "C" {
 /* hmac_md5.c */
 extern void FSYMBOL(hmac_md5_init)(struct hmac_md5_ctx *ctx, const uint8 *key,
 		uint32 key_len);
+extern void FSYMBOL(hmac_md5_process)(struct hmac_md5_ctx *ctx, const uint8 *s,
+		uint64 len);
+extern void FSYMBOL(hmac_md5_finish)(struct hmac_md5_ctx *ctx, uint64L len);
 extern void FSYMBOL(hmac_md5)(struct hmac_md5_ctx *ctx, const uint8 *s,
-		uint32 len);
+		uint64 len);
 
 #ifdef __cplusplus
 }

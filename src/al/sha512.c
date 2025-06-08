@@ -144,7 +144,7 @@ void FSYMBOL(sha512_process)(struct sha512_ctx *ctx, const uint8 *s,
 	uint32 n = ctx->count;
 	for (uint64 i = 0; i < len; i++) {
 		ctx->buf[n++] = s[i];
-		if (n == 128) {
+		if (n == SHA512_BLOCKSIZE) {
 			_sha512_compress(ctx);
 			n = 0;
 		}
@@ -160,7 +160,7 @@ void FSYMBOL(sha512_process)(struct sha512_ctx *ctx, const uint8 *s,
 */
 void FSYMBOL(sha512_finish)(struct sha512_ctx *ctx, uint64L len) {
 	/* padding */
-	uint8 padbuf[128];
+	uint8 padbuf[SHA512_BLOCKSIZE];
 	XSYMBOL(memset)(padbuf, 0, sizeof(padbuf));
 	padbuf[0] = 0x80;
 	FSYMBOL(sha512_process)(ctx, padbuf, 1 + ((239 - (len % 128)) % 128));

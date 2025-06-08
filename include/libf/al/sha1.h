@@ -8,15 +8,18 @@
 
 
 /* @def: sha1 */
+#undef SHA1_LEN
+#define SHA1_LEN 20
+#undef SHA1_BLOCKSIZE
+#define SHA1_BLOCKSIZE 64
+
 #undef sha1_ctx
 struct sha1_ctx {
 	uint32 count;
 	uint32 state[5];
-	uint8 buf[64];
+	uint8 buf[SHA1_BLOCKSIZE];
 };
 
-#undef SHA1_LEN
-#define SHA1_LEN 20
 #undef SHA1_NEW
 #define	SHA1_NEW(x) \
 	struct sha1_ctx x = { \

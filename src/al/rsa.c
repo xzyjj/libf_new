@@ -131,7 +131,6 @@ int32 FSYMBOL(rsa4096_genkey)(const bn_int8192_t p, const bn_int8192_t q,
 	FSYMBOL(bn_int8192_zero)(e);
 	e[0] = 65537;
 
-	_t[0] = 2;
 	/* d = inv(e, _a) */
 	return FSYMBOL(rsa4096_mod_inverse)(e, _a, d);
 } /* end */

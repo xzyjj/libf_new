@@ -8,15 +8,20 @@
 
 
 /* @def: sha256 */
+#undef SHA224_LEN
+#define SHA224_LEN 28
+#undef SHA256_LEN
+#define SHA256_LEN 32
+#undef SHA256_BLOCKSIZE
+#define SHA256_BLOCKSIZE 64
+
 #undef sha256_ctx
 struct sha256_ctx {
 	uint32 count;
 	uint32 state[8];
-	uint8 buf[64];
+	uint8 buf[SHA256_BLOCKSIZE];
 };
 
-#undef SHA256_LEN
-#define SHA256_LEN 32
 #undef SHA256_NEW
 #define	SHA256_NEW(x) \
 	struct sha256_ctx x = { \
@@ -27,8 +32,6 @@ struct sha256_ctx {
 		0x1f83d9ab, 0x5be0cd19 \
 		} }
 
-#undef SHA224_LEN
-#define SHA224_LEN 28
 #undef SHA224_NEW
 #define	SHA224_NEW(x) \
 	struct sha256_ctx x = { \

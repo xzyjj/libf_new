@@ -8,15 +8,20 @@
 
 
 /* @def: sha512 */
+#undef SHA384_LEN
+#define SHA384_LEN 48
+#undef SHA512_LEN
+#define SHA512_LEN 64
+#undef SHA512_BLOCKSIZE
+#define SHA512_BLOCKSIZE 128
+
 #undef sha512_ctx
 struct sha512_ctx {
 	uint32 count;
 	uint64L state[8];
-	uint8 buf[128];
+	uint8 buf[SHA512_BLOCKSIZE];
 };
 
-#undef SHA512_LEN
-#define SHA512_LEN 64
 #undef SHA512_NEW
 #define	SHA512_NEW(x) \
 	struct sha512_ctx x = { \
@@ -28,8 +33,6 @@ struct sha512_ctx {
 		0x1f83d9abfb41bd6b, 0x5be0cd19137e2179 \
 		} }
 
-#undef SHA384_LEN
-#define SHA384_LEN 48
 #undef SHA384_NEW
 #define	SHA384_NEW(x) \
 	struct sha512_ctx x = { \

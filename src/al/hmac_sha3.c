@@ -57,7 +57,7 @@ void FSYMBOL(hmac_sha3_process)(struct hmac_sha3_ctx *ctx, const uint8 *s,
 } /* end */
 
 /* @func: hmac_sha3_finish - hmac-sha3 process the remaining bytes in the \
-*                              buffer and end
+*                            buffer and end
 * @param1: struct hmac_sha3_ctx * # hmac-sha3 struct context
 * @return: void
 */
@@ -77,8 +77,8 @@ void FSYMBOL(hmac_sha3_finish)(struct hmac_sha3_ctx *ctx) {
 
 /* @func: hmac_sha3 - hmac-sha3 processing
 * @param1: struct hmac_sha3_ctx * # hmac-sha3 struct context
-* @param2: conat uint8 *            # input buffer
-* @param3: uint64                   # input length
+* @param2: conat uint8 *          # input buffer
+* @param3: uint64                 # input length
 * @return: void
 */
 void FSYMBOL(hmac_sha3)(struct hmac_sha3_ctx *ctx, const uint8 *s,

@@ -1,4 +1,5 @@
-/* x25519_ecdh.c - x25519 elliptic curve diffie-hellman (ecdh) key exchange implementations */
+/* x25519_ecdh.c - x25519 elliptic curve diffie-hellman (ecdh) \
+*                  key exchange implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstdint.h>
@@ -19,7 +20,7 @@ void FSYMBOL(x25519_ecdh_init)(struct x25519_ecdh_ctx *ctx) {
 		X25519_B, NULL, 10);
 } /* end */
 
-/* @func: x25519_ecdh_init - x25519 private key operation function
+/* @func: x25519_ecdh_private - x25519 private key operation function
 * @param1: struct x25519_ecdh_ctx # x25519-ecdh struct context
 * @param2: const uint8 *          # private key (length: X25519_LEN)
 * @return: void

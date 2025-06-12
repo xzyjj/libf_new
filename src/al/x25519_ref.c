@@ -1,9 +1,10 @@
-/* x25519.c - curve25519 elliptic-curve crypto (ecc) implementations */
+/* x25519_ref.c - curve25519 elliptic-curve crypto (ecc) implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstdint.h>
+#include <libf/sl/xstring.h>
 #include <libf/al/bn_512.h>
-#include <libf/al/x25519.h>
+#include <libf/al/x25519_ref.h>
 
 
 /* @func: _x25519_extended_gcd (static) - extended euclidean algorithm
@@ -253,6 +254,7 @@ void FSYMBOL(x25519_scalar_mul)(const bn_int512_t p, const bn_int512_t a,
 
 /* @func: x25519_clamp_key - private key clamping
 * @param1: bn_int512_t # private key
+* @return: void
 */
 void FSYMBOL(x25519_clamp_key)(bn_int512_t k) {
 	k[0] &= ~0x07;
@@ -261,8 +263,58 @@ void FSYMBOL(x25519_clamp_key)(bn_int512_t k) {
 } /* end */
 
 /* @func: x25519_base_mask - mask the most significant bit of 'u' (rfc7748-5.0)
-* @param1: bn_int512_t # private key
+* @param1: bn_int512_t # base point
+* @return: void
 */
 void FSYMBOL(x25519_base_mask)(bn_int512_t b) {
 	b[7] &= 0x7fffffff;
+} /* end */
+
+/* @func: x25519_private_key - x25519 private key operation function
+* @param1: uint8 * # private key (length: X25519_LEN)
+* @return: void
+*/
+void FSYMBOL(x25519_private_key)(uint8 *pri) {
+	FSYMBOL(x25519_clamp_key)((uint32 *)pri);
+} /* end */
+
+/* @func: x25519_public_key - x25519 public key create function
+* @param1: const uint8 * # private key (length: X25519_LEN)
+* @param2: uint8 *       # public key (length: X25519_LEN)
+* @return: void
+*/
+void FSYMBOL(x25519_public_key)(const uint8 *pri, uint8 *pub) {
+	bn_int512_t p, a, b, _pri, _pub;
+	FSYMBOL(bn_int512_strtonum)(p, X25519_P, NULL, 10);
+	FSYMBOL(bn_int512_strtonum)(a, X25519_A, NULL, 10);
+	FSYMBOL(bn_int512_strtonum)(b, X25519_B, NULL, 10);
+	FSYMBOL(bn_int512_zero)(_pri);
+	XSYMBOL(memcpy)(_pri, pri, X25519_LEN);
+
+	FSYMBOL(x25519_scalar_mul)(p, a, _pri, b, _pub);
+
+	XSYMBOL(memcpy)(pub, _pub, X25519_LEN);
+} /* end */
+
+/* @func: x25519_shared_key - x25519 shared key create function
+* @param1: const uint8 * # private key (length: X25519_LEN)
+* @param2: const uint8 * # public key (length: X25519_LEN)
+* @param3: uint8 *       # shared key (length: X25519_LEN)
+* @return: void
+*/
+void FSYMBOL(x25519_shared_key)(const uint8 *pri, const uint8 *pub,
+		uint8 *key) {
+	bn_int512_t p, a, b, _pri, _pub, _key;
+	FSYMBOL(bn_int512_strtonum)(p, X25519_P, NULL, 10);
+	FSYMBOL(bn_int512_strtonum)(a, X25519_A, NULL, 10);
+	FSYMBOL(bn_int512_strtonum)(b, X25519_B, NULL, 10);
+	FSYMBOL(bn_int512_zero)(_pri);
+	FSYMBOL(bn_int512_zero)(_pub);
+	XSYMBOL(memcpy)(_pri, pri, X25519_LEN);
+	XSYMBOL(memcpy)(_pub, pub, X25519_LEN);
+
+	FSYMBOL(x25519_base_mask)(_pub);
+	FSYMBOL(x25519_scalar_mul)(p, a, _pri, _pub, _key);
+
+	XSYMBOL(memcpy)(key, _key, X25519_LEN);
 } /* end */

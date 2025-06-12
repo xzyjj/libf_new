@@ -1,9 +1,10 @@
-/* x448.c - curve448 elliptic-curve crypto (ecc) implementations */
+/* x448_ref.c - curve448 elliptic-curve crypto (ecc) implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstdint.h>
+#include <libf/sl/xstring.h>
 #include <libf/al/bn_1024.h>
-#include <libf/al/x448.h>
+#include <libf/al/x448_ref.h>
 
 
 /* @func: _x448_extended_gcd (static) - extended euclidean algorithm
@@ -253,8 +254,57 @@ void FSYMBOL(x448_scalar_mul)(const bn_int1024_t p, const bn_int1024_t a,
 
 /* @func: x448_clamp_key - private key clamping
 * @param1: bn_int1024_t # private key
+* @return: void
 */
 void FSYMBOL(x448_clamp_key)(bn_int1024_t k) {
 	k[0] &= ~0x03;
 	k[13] |= 0x80000000;
+} /* end */
+
+/* @func: x448_private_key - x448 private key operation function
+* @param1: uint8 * # private key (length: X448_LEN)
+* @return: void
+*/
+void FSYMBOL(x448_private_key)(uint8 *pri) {
+	FSYMBOL(x448_clamp_key)((uint32 *)pri);
+} /* end */
+
+/* @func: x448_public_key - x448 public key create function
+* @param1: const uint8 * # private key (length: X448_LEN)
+* @param2: uint8 *       # public key (length: X448_LEN)
+* @return: void
+*/
+void FSYMBOL(x448_public_key)(const uint8 *pri, uint8 *pub) {
+	bn_int1024_t p, a, b, _pri, _pub;
+	FSYMBOL(bn_int1024_strtonum)(p, X448_P, NULL, 10);
+	FSYMBOL(bn_int1024_strtonum)(a, X448_A, NULL, 10);
+	FSYMBOL(bn_int1024_strtonum)(b, X448_B, NULL, 10);
+	FSYMBOL(bn_int1024_zero)(_pri);
+	XSYMBOL(memcpy)(_pri, pri, X448_LEN);
+
+	FSYMBOL(x448_scalar_mul)(p, a, _pri, b, _pub);
+
+	XSYMBOL(memcpy)(pub, _pub, X448_LEN);
+} /* end */
+
+/* @func: x448_shared_key - x448 shared key create function
+* @param1: const uint8 * # private key (length: X448_LEN)
+* @param2: const uint8 * # public key (length: X448_LEN)
+* @param3: uint8 *       # shared key (length: X448_LEN)
+* @return: void
+*/
+void FSYMBOL(x448_shared_key)(const uint8 *pri, const uint8 *pub,
+		uint8 *key) {
+	bn_int1024_t p, a, b, _pri, _pub, _key;
+	FSYMBOL(bn_int1024_strtonum)(p, X448_P, NULL, 10);
+	FSYMBOL(bn_int1024_strtonum)(a, X448_A, NULL, 10);
+	FSYMBOL(bn_int1024_strtonum)(b, X448_B, NULL, 10);
+	FSYMBOL(bn_int1024_zero)(_pri);
+	FSYMBOL(bn_int1024_zero)(_pub);
+	XSYMBOL(memcpy)(_pri, pri, X448_LEN);
+	XSYMBOL(memcpy)(_pub, pub, X448_LEN);
+
+	FSYMBOL(x448_scalar_mul)(p, a, _pri, _pub, _key);
+
+	XSYMBOL(memcpy)(key, _key, X448_LEN);
 } /* end */

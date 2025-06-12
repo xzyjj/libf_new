@@ -2,6 +2,7 @@
 
 #include <libf/config.h>
 #include <libf/sl/xstdint.h>
+#include <libf/sl/xstring.h>
 #include <libf/al/x25519_fast.h>
 
 
@@ -32,7 +33,7 @@ static void _x25519_add(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
 
 	/* r = a + b */
 	for (int32 i = 0; i < 8; i++) {
-		tmp = (uint64L)a[i] + b[i] + carry,
+		tmp = (uint64L)a[i] + b[i] + carry;
 		r[i] = tmp & 0xffffffff;
 		carry = tmp >> 32;
 	}
@@ -65,7 +66,7 @@ static void _x25519_sub(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
 
 	/* r = a - b */
 	for (int32 i = 0; i < 8; i++) {
-		tmp = (int64L)a[i] - b[i] + (int32)carry,
+		tmp = (int64L)a[i] - b[i] + (int32)carry;
 		r[i] = tmp & 0xffffffff;
 		carry = tmp >> 32;
 	}
@@ -153,20 +154,21 @@ static void _x25519_mul(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
 *                                      multiplication (modular reduction)
 * @param1: uint32 [8]       # product
 * @param2: const uint32 [8] # multiplicand
+* @param2: const uint32 [8] # addend
 * @return: void
 */
-static void _x25519_mul121665(uint32 r[8], const uint32 a[8]) {
+static void _x25519_mul121665(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
 	uint32 carry = 0;
 	uint64L tmp = 0;
 
-	/* r = a * 121665 */
+	/* r = a * 121665 + b */
 	for (int32 i = 0; i < 8; i++) {
-		tmp = (uint64L)a[i] * 121665 + carry;
+		tmp = (uint64L)a[i] * 121665 + b[i] + carry;
 		r[i] = tmp & 0xffffffff;
 		carry = tmp >> 32;
 	}
 
-	/* r = r % p */
+	/* r = r % p (modular reduction) */
 	carry *= 38;
 	for (int32 i = 0; i < 8; i++) {
 		tmp = (uint64L)r[i] + carry;
@@ -319,7 +321,7 @@ static void _x25519_mod(uint32 r[8]) {
 
 	/* rr = r - p */
 	for (int32 i = 0; i < 8; i++) {
-		tmp = (int64L)r[i] - p[i] + (int32)carry,
+		tmp = (int64L)r[i] - p[i] + (int32)carry;
 		rr[i] = tmp & 0xffffffff;
 		carry = tmp >> 32;
 	}
@@ -332,7 +334,7 @@ static void _x25519_mod(uint32 r[8]) {
 
 	/* rr = rr + t */
 	for (int32 i = 0; i < 8; i++) {
-		tmp = (uint64L)rr[i] + t[i] + carry,
+		tmp = (uint64L)rr[i] + t[i] + carry;
 		rr[i] = tmp & 0xffffffff;
 		carry = tmp >> 32;
 	}
@@ -404,8 +406,8 @@ void FSYMBOL(x25519_fast_scalar_mul)(const uint32 k[8], const uint32 b[8],
 		_x25519_mul(x1, AA, BB);
 
 		/* z1 = E * (AA + 121665 * E) */
-		_x25519_mul121665(z1, E);
-		_x25519_add(z1, z1, AA);
+		_x25519_mul121665(z1, E, AA);
+		/* _x25519_add(z1, z1, AA); */
 		_x25519_mul(z1, z1, E);
 
 		_x25519_swap(x1, x2, k_t);
@@ -419,7 +421,7 @@ void FSYMBOL(x25519_fast_scalar_mul)(const uint32 k[8], const uint32 b[8],
 } /* end */
 
 /* @func: x25519_fast_clamp_key - private key clamping
-* @param1: bn_int512_t # private key
+* @param1: uint32 [8] # private key
 */
 void FSYMBOL(x25519_fast_clamp_key)(uint32 k[8]) {
 	k[0] &= ~0x07;
@@ -428,8 +430,42 @@ void FSYMBOL(x25519_fast_clamp_key)(uint32 k[8]) {
 } /* end */
 
 /* @func: x25519_fast_base_mask - mask the most significant bit of 'u'
-* @param1: bn_int512_t # private key
+* @param1: uint32 [8] # base point
 */
 void FSYMBOL(x25519_fast_base_mask)(uint32 b[8]) {
 	b[7] &= 0x7fffffff;
+} /* end */
+
+/* @func: x25519_fast_private_key - x25519 private key operation function
+* @param1: uint8 * # private key (length: X25519_LEN)
+* @return: void
+*/
+void FSYMBOL(x25519_fast_private_key)(uint8 *pri) {
+	FSYMBOL(x25519_fast_clamp_key)((uint32 *)pri);
+} /* end */
+
+/* @func: x25519_fast_public_key - x25519 public key create function
+* @param1: const uint8 * # private key (length: X25519_LEN)
+* @param2: uint8 *       # public key (length: X25519_LEN)
+* @return: void
+*/
+void FSYMBOL(x25519_fast_public_key)(const uint8 *pri, uint8 *pub) {
+	FSYMBOL(x25519_fast_scalar_mul)((uint32 *)pri, X25519_FAST_B,
+		(uint32 *)pub);
+} /* end */
+
+/* @func: x25519_fast_shared_key - x25519 shared key create function
+* @param1: const uint8 * # private key (length: X25519_LEN)
+* @param2: const uint8 * # public key (length: X25519_LEN)
+* @param3: uint8 *       # shared key (length: X25519_LEN)
+* @return: void
+*/
+void FSYMBOL(x25519_fast_shared_key)(const uint8 *pri, const uint8 *pub,
+		uint8 *key) {
+	uint32 _pub[8];
+	XSYMBOL(memcpy)(_pub, pub, X25519_LEN);
+
+	FSYMBOL(x25519_fast_base_mask)(_pub);
+	FSYMBOL(x25519_fast_scalar_mul)((uint32 *)pri, _pub,
+		(uint32 *)key);
 } /* end */

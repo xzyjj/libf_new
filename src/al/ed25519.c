@@ -297,11 +297,11 @@ void FSYMBOL(ed25519_point_recover_x)(const bn_int512_t p, const bn_int512_t d,
 	* x1 = y2 - 1
 	* x2 = ((d * y2) % p) + 1
 	* x2 = (x1 * inv(x2, p)) % p
-	* x = modpow(x2, (q + 3 / 8), q)
+	* x = modpow(x2, (p + 3) / 8, p)
 	* if ((x ** 2) % p)
-	*   x = (x * modpow(2, (q - 1) / 4, p)) % p
+	*   x = (x * modpow(2, (p - 1) / 4, p)) % p
 	* if ((x & 1) != sign)
-	*   x = q - x
+	*   x = p - x
 	*/
 
 	FSYMBOL(bn_int512_zero)(_t1);
@@ -391,9 +391,8 @@ void FSYMBOL(ed25519_point_compress)(const bn_int512_t p,
 	FSYMBOL(bn_int512_divmod)(_t, _y, _y, p);
 
 	/* r = _y | ((_x & 1) << 255) */
-	FSYMBOL(bn_int512_zero)(_t);
-	_t[7] |= (_x[0] & 1) << 31;
-	FSYMBOL(bn_int512_or)(r, _y, _t);
+	_y[7] |= (_x[0] & 1) << 31;
+	FSYMBOL(bn_int512_move)(r, _y);
 } /* end */
 
 /* @func: ed25519_point_decompress - curve point decompress
@@ -407,6 +406,13 @@ void FSYMBOL(ed25519_point_decompress)(const bn_int512_t p, const bn_int512_t d,
 		const bn_int512_t k, struct ed25519_point *r_xyz1) {
 	bn_int512_t _y, _x, _t;
 	FSYMBOL(bn_int512_move)(_y, k);
+	/*
+	* y = y1 & ((1 << 255) - 1)
+	* x1 = rec_x(p, d, y, k >> 255)
+	* y1 = y1
+	* z1 = 1
+	* t1 = (x1 * y) % p
+	*/
 
 	/* _y = _y & ((1 << 255) - 1) */
 	_y[7] &= (1U << 31) - 1;

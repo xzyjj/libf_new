@@ -24,26 +24,8 @@ static const uint32 _x25519_fast_b[8] = {
 	9, 0, 0, 0, 0, 0, 0, 0
 	};
 
-#undef X25519_FAST_ECDH_NEW
-#define X25519_FAST_ECDH_NEW(x) struct x25519_fast_ecdh_ctx x
-
-#undef x25519_fast_ecdh_ctx
-struct x25519_fast_ecdh_ctx {
-	uint32 b[8];
-	uint32 pri[8], pub[8];
-	uint32 key[8];
-};
-
-#undef X25519_FAST_LEN
-#define X25519_FAST_LEN 32
-
-#undef X25519_FAST_PRI
-#define X25519_FAST_PRI(x, n) (((uint8 *)(x)->pri)[n])
-#undef X25519_FAST_PUB
-#define X25519_FAST_PUB(x, n) (((uint8 *)(x)->pub)[n])
-
-#undef X25519_FAST_KEY
-#define X25519_FAST_KEY(x, n) (((uint8 *)(x)->key)[n])
+#undef X25519_LEN
+#define X25519_LEN 32
 /* end */
 
 #ifdef __cplusplus
@@ -55,14 +37,10 @@ extern void FSYMBOL(x25519_fast_scalar_mul)(const uint32 k[8], const uint32 b[8]
 		uint32 r[8]);
 extern void FSYMBOL(x25519_fast_clamp_key)(uint32 k[8]);
 extern void FSYMBOL(x25519_fast_base_mask)(uint32 b[8]);
-
-/* x25519_fast_ecdh.c */
-extern void FSYMBOL(x25519_fast_ecdh_init)(struct x25519_fast_ecdh_ctx *ctx);
-extern void FSYMBOL(x25519_fast_ecdh_private)(struct x25519_fast_ecdh_ctx *ctx,
-		const uint8 *key);
-extern void FSYMBOL(x25519_fast_ecdh_public)(struct x25519_fast_ecdh_ctx *ctx);
-extern void FSYMBOL(x25519_fast_ecdh_exchange)(struct x25519_fast_ecdh_ctx *ctx,
-		const uint8 *key);
+extern void FSYMBOL(x25519_fast_private_key)(uint8 *pri);
+extern void FSYMBOL(x25519_fast_public_key)(const uint8 *pri, uint8 *pub);
+extern void FSYMBOL(x25519_fast_shared_key)(const uint8 *pri, const uint8 *pub,
+		uint8 *key);
 
 #ifdef __cplusplus
 }

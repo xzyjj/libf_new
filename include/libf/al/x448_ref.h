@@ -1,7 +1,7 @@
-/* x448.h - curve448 elliptic-curve crypto (ecc) definitions */
+/* x448_ref.h - curve448 elliptic-curve crypto (ecc) definitions */
 
-#ifndef LIBF_AL_X448_H
-#define LIBF_AL_X448_H
+#ifndef LIBF_AL_X448_REF_H
+#define LIBF_AL_X448_REF_H
 
 #include <libf/config.h>
 #include <libf/sl/xstdint.h>
@@ -23,33 +23,15 @@ struct x448_point {
 	bn_int1024_t z;
 };
 
-#undef X448_ECDH_NEW
-#define X448_ECDH_NEW(x) struct x448_ecdh_ctx x
-
-#undef x448_ecdh_ctx
-struct x448_ecdh_ctx {
-	bn_uint1024_t p, a, b;
-	bn_uint1024_t pri, pub;
-	bn_uint1024_t key;
-};
-
 #undef X448_LEN
 #define X448_LEN 56
-
-#undef X448_PRI
-#define X448_PRI(x, n) (((uint8 *)(x)->pri)[n])
-#undef X448_PUB
-#define X448_PUB(x, n) (((uint8 *)(x)->pub)[n])
-
-#undef X448_KEY
-#define X448_KEY(x, n) (((uint8 *)(x)->key)[n])
 /* end */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* x448.c */
+/* x448_ref.c */
 extern int32 FSYMBOL(x448_mod_inverse)(const bn_int1024_t a, const bn_int1024_t m,
 		bn_int1024_t r);
 extern void FSYMBOL(x448_point_add)(const bn_int1024_t p,
@@ -63,15 +45,10 @@ extern void FSYMBOL(x448_point_double)(const bn_int1024_t p, const bn_int1024_t 
 extern void FSYMBOL(x448_scalar_mul)(const bn_int1024_t p, const bn_int1024_t a,
 		const bn_int1024_t k, const bn_int1024_t b, bn_int1024_t r);
 extern void FSYMBOL(x448_clamp_key)(bn_int1024_t k);
-extern void FSYMBOL(x448_base_mask)(bn_int1024_t b);
-
-/* x448_ecdh.c */
-extern void FSYMBOL(x448_ecdh_init)(struct x448_ecdh_ctx *ctx);
-extern void FSYMBOL(x448_ecdh_private)(struct x448_ecdh_ctx *ctx,
-		const uint8 *key);
-extern void FSYMBOL(x448_ecdh_public)(struct x448_ecdh_ctx *ctx);
-extern void FSYMBOL(x448_ecdh_exchange)(struct x448_ecdh_ctx *ctx,
-		const uint8 *key);
+extern void FSYMBOL(x448_private_key)(uint8 *pri);
+extern void FSYMBOL(x448_public_key)(const uint8 *pri, uint8 *pub);
+extern void FSYMBOL(x448_shared_key)(const uint8 *pri, const uint8 *pub,
+		uint8 *key);
 
 #ifdef __cplusplus
 }

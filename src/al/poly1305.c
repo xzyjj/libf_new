@@ -17,7 +17,7 @@
 
 /* @func: poly1305_init - poly1305 init function
 * @param1: struct poly1305_ctx * # poly1305 struct context
-* @param2: const uint8 * # key (length: POLY1305_KEYLEN)
+* @param2: const uint8 *         # key (length: POLY1305_KEYLEN)
 * @return: void
 */
 void FSYMBOL(poly1305_init)(struct poly1305_ctx *ctx, const uint8 *key) {
@@ -38,8 +38,8 @@ void FSYMBOL(poly1305_init)(struct poly1305_ctx *ctx, const uint8 *key) {
 
 /* @func: poly1305_block - poly1305 block function
 * @param1: struct poly1305_ctx * # poly1305 struct context
-* @param2: const uint8 * # input buffer (length: POLY1305_BLOCKSIZE)
-* @param3: uint32        # padding bit
+* @param2: const uint8 *         # input buffer (length: POLY1305_BLOCKSIZE)
+* @param3: uint32                # padding bit
 * @return: void
 */
 void FSYMBOL(poly1305_block)(struct poly1305_ctx *ctx, const uint8 *s,
@@ -109,8 +109,8 @@ void FSYMBOL(poly1305_block)(struct poly1305_ctx *ctx, const uint8 *s,
 
 /* @func: poly1305_process - poly1305 processing buffer
 * @param1: struct poly1305_ctx * # poly1305 struct context
-* @param2: const uint8 * # input buffer
-* @param3: uint64        # input length
+* @param2: const uint8 *         # input buffer
+* @param3: uint64                # input length
 * @return: void
 */
 void FSYMBOL(poly1305_process)(struct poly1305_ctx *ctx, const uint8 *s,
@@ -198,8 +198,8 @@ void FSYMBOL(poly1305_finish)(struct poly1305_ctx *ctx) {
 
 /* @func: poly1305 - poly1305 processing
 * @param1: struct poly1305_ctx * # poly1305 struct context
-* @param2: const uint8 * # input buffer
-* @param3: uint64        # input length
+* @param2: const uint8 *         # input buffer
+* @param3: uint64                # input length
 * @return: void
 */
 void FSYMBOL(poly1305)(struct poly1305_ctx *ctx, const uint8 *s, uint64 len) {

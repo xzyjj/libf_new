@@ -6,7 +6,7 @@
 #include <libf/sl/xstring.h>
 #include <libf/al/base64.h>
 #include <libf/al/base16.h>
-#include <libf/al/x25519_fast.h>
+#include <libf/al/x25519_ref.h>
 
 
 static void print_b64u8(const char *s, const uint8 *p) {
@@ -33,49 +33,35 @@ static void hex2u8(uint8 *p, const char *s, uint32 len) {
 int main(int argc, char *argv[]) {
 	const char *s = NULL;
 
-	/* A */
 	s = argv[1];
-	uint8 a_pri[X25519_LEN], a_pub[X25519_LEN], a_key[X25519_LEN];
+	uint8 a_pri[X25519_LEN], a_pub[X25519_LEN], a_B[X25519_LEN];
 	hex2u8(a_pri, s, XSYMBOL(strlen)(s));
 	print_hex2u8("a_priS: ", a_pri);
 	print_b64u8("a_priS: ", a_pri);
 
-	/* B */
 	s = argv[2];
-	uint8 b_pri[X25519_LEN], b_pub[X25519_LEN], b_key[X25519_LEN];
-	hex2u8(b_pri, s, XSYMBOL(strlen)(s));
-	print_hex2u8("b_priS: ", b_pri);
-	print_b64u8("b_priS: ", b_pri);
+	hex2u8(a_B, s, XSYMBOL(strlen)(s));
+	print_hex2u8("a_B: ", a_B);
+	print_b64u8("a_B: ", a_B);
 
-	/* A */
-	FSYMBOL(x25519_fast_private_key)(a_pri);
+	FSYMBOL(x25519_private_key)(a_pri);
 	print_hex2u8("a_pri: ", a_pri);
 	print_b64u8("a_pri: ", a_pri);
 
-	/* B */
-	FSYMBOL(x25519_fast_private_key)(b_pri);
-	print_hex2u8("b_pri: ", b_pri);
-	print_b64u8("b_pri: ", b_pri);
+	bn_int512_t p, a, b, _pri, _pub;
+	FSYMBOL(bn_int512_strtonum)(p, X25519_P, NULL, 10);
+	FSYMBOL(bn_int512_strtonum)(a, X25519_A, NULL, 10);
+	FSYMBOL(bn_int512_zero)(b);
+	FSYMBOL(bn_int512_zero)(_pri);
+	XSYMBOL(memcpy)(_pri, a_pri, X25519_LEN);
+	XSYMBOL(memcpy)(b, a_B, X25519_LEN);
 
-	/* A */
-	FSYMBOL(x25519_fast_public_key)(a_pri, a_pub);
+	FSYMBOL(x25519_base_mask)(b);
+	FSYMBOL(x25519_scalar_mul)(p, a, _pri, b, _pub);
+
+	XSYMBOL(memcpy)(a_pub, _pub, X25519_LEN);
 	print_hex2u8("a_pub: ", a_pub);
 	print_b64u8("a_pub: ", a_pub);
-
-	/* B */
-	FSYMBOL(x25519_fast_public_key)(b_pri, b_pub);
-	print_hex2u8("b_pub: ", b_pub);
-	print_b64u8("b_pub: ", b_pub);
-
-	/* A */
-	FSYMBOL(x25519_fast_shared_key)(a_pri, b_pub, a_key);
-	print_hex2u8("a_key: ", a_key);
-	print_b64u8("a_key: ", a_key);
-
-	/* B */
-	FSYMBOL(x25519_fast_shared_key)(b_pri, a_pub, b_key);
-	print_hex2u8("b_key: ", b_key);
-	print_b64u8("b_key: ", b_key);
 
 	return 0;
 }

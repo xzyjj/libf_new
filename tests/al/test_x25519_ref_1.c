@@ -6,7 +6,7 @@
 #include <libf/sl/xstring.h>
 #include <libf/al/base64.h>
 #include <libf/al/base16.h>
-#include <libf/al/x25519_fast.h>
+#include <libf/al/x25519_ref.h>
 
 
 static void print_b64u8(const char *s, const uint8 *p) {
@@ -48,32 +48,32 @@ int main(int argc, char *argv[]) {
 	print_b64u8("b_priS: ", b_pri);
 
 	/* A */
-	FSYMBOL(x25519_fast_private_key)(a_pri);
+	FSYMBOL(x25519_private_key)(a_pri);
 	print_hex2u8("a_pri: ", a_pri);
 	print_b64u8("a_pri: ", a_pri);
 
 	/* B */
-	FSYMBOL(x25519_fast_private_key)(b_pri);
+	FSYMBOL(x25519_private_key)(b_pri);
 	print_hex2u8("b_pri: ", b_pri);
 	print_b64u8("b_pri: ", b_pri);
 
 	/* A */
-	FSYMBOL(x25519_fast_public_key)(a_pri, a_pub);
+	FSYMBOL(x25519_public_key)(a_pri, a_pub);
 	print_hex2u8("a_pub: ", a_pub);
 	print_b64u8("a_pub: ", a_pub);
 
 	/* B */
-	FSYMBOL(x25519_fast_public_key)(b_pri, b_pub);
+	FSYMBOL(x25519_public_key)(b_pri, b_pub);
 	print_hex2u8("b_pub: ", b_pub);
 	print_b64u8("b_pub: ", b_pub);
 
 	/* A */
-	FSYMBOL(x25519_fast_shared_key)(a_pri, b_pub, a_key);
+	FSYMBOL(x25519_shared_key)(a_pri, b_pub, a_key);
 	print_hex2u8("a_key: ", a_key);
 	print_b64u8("a_key: ", a_key);
 
 	/* B */
-	FSYMBOL(x25519_fast_shared_key)(b_pri, a_pub, b_key);
+	FSYMBOL(x25519_shared_key)(b_pri, a_pub, b_key);
 	print_hex2u8("b_key: ", b_key);
 	print_b64u8("b_key: ", b_key);
 

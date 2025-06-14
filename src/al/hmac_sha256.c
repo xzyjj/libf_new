@@ -17,6 +17,8 @@
 void FSYMBOL(hmac_sha256_init)(struct hmac_sha256_ctx *ctx, const uint8 *key,
 		uint32 key_len) {
 	SHA256_NEW(sha256_ctx);
+	FSYMBOL(sha256_init)(&sha256_ctx);
+
 	if (key_len > SHA256_BLOCKSIZE) {
 		FSYMBOL(sha256)(&sha256_ctx, key, key_len);
 		key = &(SHA256_STATE(&sha256_ctx, 0));
@@ -85,6 +87,8 @@ void FSYMBOL(hmac_sha256)(struct hmac_sha256_ctx *ctx, const uint8 *s,
 void FSYMBOL(hmac_sha224_init)(struct hmac_sha256_ctx *ctx, const uint8 *key,
 		uint32 key_len) {
 	SHA224_NEW(sha224_ctx);
+	FSYMBOL(sha224_init)(&sha224_ctx);
+
 	if (key_len > SHA256_BLOCKSIZE) {
 		FSYMBOL(sha256)(&sha224_ctx, key, key_len);
 		key = &(SHA224_STATE(&sha224_ctx, 0));

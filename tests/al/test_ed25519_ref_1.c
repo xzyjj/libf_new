@@ -7,7 +7,7 @@
 #include <libf/al/bn_512.h>
 #include <libf/al/base64.h>
 #include <libf/al/base16.h>
-#include <libf/al/ed25519.h>
+#include <libf/al/ed25519_ref.h>
 
 
 static void print(const char *s, const bn_int512_t v) {

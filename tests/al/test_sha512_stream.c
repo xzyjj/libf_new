@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
 #include <libf/al/sha512.h>
 
@@ -8,6 +7,8 @@ int main(void) {
 	uint64 read_size = 0, total_size = 0;
 	SHA512_NEW(ctx1);
 	SHA384_NEW(ctx2);
+	FSYMBOL(sha512_init)(&ctx1);
+	FSYMBOL(sha384_init)(&ctx2);
 
 	char buf[1 << 17];
 	while ((read_size = fread(buf, 1, sizeof(buf), stdin)) > 0) {

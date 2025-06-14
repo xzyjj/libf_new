@@ -107,8 +107,9 @@ void FSYMBOL(chacha20_block)(const uint32 state[16], uint32 out[16]) {
 * @param3: uint32        # count block (starting)
 * @param4: uint8 *       # buffer
 * @param5: uint64        # length
+* @return: uint32        # count (+initial count)
 */
-void FSYMBOL(chacha20_crypto)(const uint8 *key, const uint8 *ran,
+uint32 FSYMBOL(chacha20_crypto)(const uint8 *key, const uint8 *ran,
 		uint32 count, uint8 *buf, uint64 len) {
 	uint32 state[16];
 	uint8 keystream[CHACHA20_BLOCKSIZE];
@@ -127,4 +128,6 @@ void FSYMBOL(chacha20_crypto)(const uint8 *key, const uint8 *ran,
 		len -= n;
 		state[CHACHA20_CINDEX]++;
 	}
+
+	return state[CHACHA20_CINDEX];
 } /* end */

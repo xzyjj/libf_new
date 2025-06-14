@@ -18,3 +18,11 @@
 ## tl (Terminal Library)
 
 ## ul (Uncategory Library)
+
+## misc
+
+	C compiler Flags:
+
+	$ -O1 -g -std=c99 -Wall -Wextra -Wpedantic -Wno-format-pedantic \
+	-Wno-trigraphs -fno-builtin -fno-inline-functions \
+	-finline-hint-functions

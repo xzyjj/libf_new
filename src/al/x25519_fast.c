@@ -422,6 +422,7 @@ void FSYMBOL(x25519_fast_scalar_mul)(const uint32 k[8], const uint32 b[8],
 
 /* @func: x25519_fast_clamp_key - private key clamping
 * @param1: uint32 [8] # private key
+* @return: void
 */
 void FSYMBOL(x25519_fast_clamp_key)(uint32 k[8]) {
 	k[0] &= ~0x07;
@@ -431,6 +432,7 @@ void FSYMBOL(x25519_fast_clamp_key)(uint32 k[8]) {
 
 /* @func: x25519_fast_base_mask - mask the most significant bit of 'u'
 * @param1: uint32 [8] # base point
+* @return: void
 */
 void FSYMBOL(x25519_fast_base_mask)(uint32 b[8]) {
 	b[7] &= 0x7fffffff;

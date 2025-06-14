@@ -17,6 +17,8 @@
 void FSYMBOL(hmac_sha1_init)(struct hmac_sha1_ctx *ctx, const uint8 *key,
 		uint32 key_len) {
 	SHA1_NEW(sha1_ctx);
+	FSYMBOL(sha1_init)(&sha1_ctx);
+
 	if (key_len > SHA1_BLOCKSIZE) {
 		FSYMBOL(sha1)(&sha1_ctx, key, key_len);
 		key = &(SHA1_STATE(&sha1_ctx, 0));

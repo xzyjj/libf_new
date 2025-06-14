@@ -7,6 +7,7 @@
 int main(void) {
 	uint64 read_size = 0, total_size = 0;
 	SHA1_NEW(ctx);
+	FSYMBOL(sha1_init)(&ctx);
 
 	char buf[1 << 17];
 	while ((read_size = fread(buf, 1, sizeof(buf), stdin)) > 0) {

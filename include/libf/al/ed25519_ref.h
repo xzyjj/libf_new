@@ -1,7 +1,7 @@
-/* ed25519.h - edwards-curve digital signature algorithm (eddsa) definitions */
+/* ed25519_ref.h - edwards-curve digital signature algorithm (eddsa) definitions */
 
-#ifndef LIBF_AL_ED25519_H
-#define LIBF_AL_ED25519_H
+#ifndef LIBF_AL_ED25519_REF_H
+#define LIBF_AL_ED25519_REF_H
 
 #include <libf/config.h>
 #include <libf/sl/xstdint.h>

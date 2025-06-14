@@ -23,24 +23,9 @@ struct sha256_ctx {
 };
 
 #undef SHA256_NEW
-#define	SHA256_NEW(x) \
-	struct sha256_ctx x = { \
-		.count = 0, \
-		.state = { \
-		0x6a09e667, 0xbb67ae85, 0x3c6ef372, \
-		0xa54ff53a, 0x510e527f, 0x9b05688c, \
-		0x1f83d9ab, 0x5be0cd19 \
-		} }
-
+#define	SHA256_NEW(x) struct sha256_ctx x
 #undef SHA224_NEW
-#define	SHA224_NEW(x) \
-	struct sha256_ctx x = { \
-		.count = 0, \
-		.state = { \
-		0xc1059ed8, 0x367cd507, 0x3070dd17, \
-		0xf70e5939, 0xffc00b31, 0x68581511, \
-		0x64f98fa7, 0xbefa4fa4 \
-		} }
+#define	SHA224_NEW(x) struct sha256_ctx x
 
 #undef SHA256_STATE
 #define SHA256_STATE(x, n) (((uint8 *)((x)->state))[n])

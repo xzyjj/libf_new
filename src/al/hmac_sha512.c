@@ -17,6 +17,8 @@
 void FSYMBOL(hmac_sha512_init)(struct hmac_sha512_ctx *ctx, const uint8 *key,
 		uint32 key_len) {
 	SHA512_NEW(sha512_ctx);
+	FSYMBOL(sha512_init)(&sha512_ctx);
+
 	if (key_len > SHA512_BLOCKSIZE) {
 		FSYMBOL(sha512)(&sha512_ctx, key, key_len);
 		key = &(SHA512_STATE(&sha512_ctx, 0));
@@ -85,6 +87,8 @@ void FSYMBOL(hmac_sha512)(struct hmac_sha512_ctx *ctx, const uint8 *s,
 void FSYMBOL(hmac_sha384_init)(struct hmac_sha512_ctx *ctx, const uint8 *key,
 		uint32 key_len) {
 	SHA384_NEW(sha384_ctx);
+	FSYMBOL(sha384_init)(&sha384_ctx);
+
 	if (key_len > SHA512_BLOCKSIZE) {
 		FSYMBOL(sha512)(&sha384_ctx, key, key_len);
 		key = &(SHA384_STATE(&sha384_ctx, 0));

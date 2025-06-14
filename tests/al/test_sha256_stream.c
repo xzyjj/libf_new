@@ -8,6 +8,8 @@ int main(void) {
 	uint64 read_size = 0, total_size = 0;
 	SHA256_NEW(ctx1);
 	SHA224_NEW(ctx2);
+	FSYMBOL(sha256_init)(&ctx1);
+	FSYMBOL(sha224_init)(&ctx2);
 
 	char buf[1 << 17];
 	while ((read_size = fread(buf, 1, sizeof(buf), stdin)) > 0) {

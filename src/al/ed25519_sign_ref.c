@@ -1,11 +1,11 @@
-//* ed25519_sign.c - edwards-curve digital signature algorithm (eddsa) implementations */
+//* ed25519_sign_ref.c - edwards-curve digital signature algorithm (eddsa) implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstdint.h>
 #include <libf/sl/xstring.h>
 #include <libf/al/bn_512.h>
 #include <libf/al/sha512.h>
-#include <libf/al/ed25519.h>
+#include <libf/al/ed25519_ref.h>
 
 
 /* @func: ed25519_sign_init - ed25519 init function
@@ -38,6 +38,7 @@ void FSYMBOL(ed25519_sign_init)(struct ed25519_sign_ctx *ctx) {
 void FSYMBOL(ed25519_sign_private)(struct ed25519_sign_ctx *ctx,
 		const uint8 *key) {
 	SHA512_NEW(sha_ctx);
+	FSYMBOL(sha512_init)(&sha_ctx);
 	FSYMBOL(sha512)(&sha_ctx, key, ED25519_LEN);
 
 	/* copy(pri, sha, ED25519_LEN) */
@@ -75,17 +76,17 @@ void FSYMBOL(ed25519_sign)(struct ed25519_sign_ctx *ctx,
 		const uint8 *mesg, uint32 len) {
 	bn_int512_t t, r, Rs, h, s;
 	struct ed25519_point R;
-	SHA512_NEW(sha_r_ctx);
-	SHA512_NEW(sha_h_ctx);
+	SHA512_NEW(sha_ctx);
 
 	/* sh = sha(ran + mesg) */
-	FSYMBOL(sha512_process)(&sha_r_ctx, (uint8 *)ctx->ran, ED25519_LEN);
-	FSYMBOL(sha512_process)(&sha_r_ctx, mesg, len);
-	FSYMBOL(sha512_finish)(&sha_r_ctx, len + ED25519_LEN);
+	FSYMBOL(sha512_init)(&sha_ctx);
+	FSYMBOL(sha512_process)(&sha_ctx, (uint8 *)ctx->ran, ED25519_LEN);
+	FSYMBOL(sha512_process)(&sha_ctx, mesg, len);
+	FSYMBOL(sha512_finish)(&sha_ctx, len + ED25519_LEN);
 
 	/* r = copy(r, sh, SHA512_LEN) % q */
 	FSYMBOL(bn_int512_zero)(r);
-	XSYMBOL(memcpy)(r, &(SHA512_STATE(&sha_r_ctx, 0)), SHA512_LEN);
+	XSYMBOL(memcpy)(r, &(SHA512_STATE(&sha_ctx, 0)), SHA512_LEN);
 	FSYMBOL(bn_int512_divmod)(t, r, r, ctx->q);
 
 	/* Rs = compress(p, scalar(p, d, r, xyz1)) */
@@ -93,14 +94,15 @@ void FSYMBOL(ed25519_sign)(struct ed25519_sign_ctx *ctx,
 	FSYMBOL(ed25519_point_compress)(ctx->p, &R, Rs);
 
 	/* sh = sha(Rs + pub + mesg) */
-	FSYMBOL(sha512_process)(&sha_h_ctx, (uint8 *)Rs, ED25519_LEN);
-	FSYMBOL(sha512_process)(&sha_h_ctx, (uint8 *)ctx->pub, ED25519_LEN);
-	FSYMBOL(sha512_process)(&sha_h_ctx, mesg, len);
-	FSYMBOL(sha512_finish)(&sha_h_ctx, len + (ED25519_LEN * 2));
+	FSYMBOL(sha512_init)(&sha_ctx);
+	FSYMBOL(sha512_process)(&sha_ctx, (uint8 *)Rs, ED25519_LEN);
+	FSYMBOL(sha512_process)(&sha_ctx, (uint8 *)ctx->pub, ED25519_LEN);
+	FSYMBOL(sha512_process)(&sha_ctx, mesg, len);
+	FSYMBOL(sha512_finish)(&sha_ctx, len + (ED25519_LEN * 2));
 
 	/* h = copy(h, sh, SHA512_LEN) % q */
 	FSYMBOL(bn_int512_zero)(h);
-	XSYMBOL(memcpy)(h, &(SHA512_STATE(&sha_h_ctx, 0)), SHA512_LEN);
+	XSYMBOL(memcpy)(h, &(SHA512_STATE(&sha_ctx, 0)), SHA512_LEN);
 	FSYMBOL(bn_int512_divmod)(t, h, h, ctx->q);
 
 	/* s = ((h * pri) + r) % q */
@@ -125,7 +127,7 @@ int32 FSYMBOL(ed25519_sign_verify)(struct ed25519_sign_ctx *ctx,
 		const uint8 *mesg, uint32 len) {
 	bn_int512_t Rs, s, h, t, pub;
 	struct ed25519_point A, R, sB, hA;
-	SHA512_NEW(sha_h_ctx);
+	SHA512_NEW(sha_ctx);
 
 	FSYMBOL(bn_int512_zero)(pub);
 	/* copy(pub, key, ED25519_LEN) */
@@ -148,14 +150,15 @@ int32 FSYMBOL(ed25519_sign_verify)(struct ed25519_sign_ctx *ctx,
 		return 1;
 
 	/* sh = sha(Rs + pub + mesg) */
-	FSYMBOL(sha512_process)(&sha_h_ctx, (uint8 *)Rs, ED25519_LEN);
-	FSYMBOL(sha512_process)(&sha_h_ctx, (uint8 *)pub, ED25519_LEN);
-	FSYMBOL(sha512_process)(&sha_h_ctx, mesg, len);
-	FSYMBOL(sha512_finish)(&sha_h_ctx, len + (ED25519_LEN * 2));
+	FSYMBOL(sha512_init)(&sha_ctx);
+	FSYMBOL(sha512_process)(&sha_ctx, (uint8 *)Rs, ED25519_LEN);
+	FSYMBOL(sha512_process)(&sha_ctx, (uint8 *)pub, ED25519_LEN);
+	FSYMBOL(sha512_process)(&sha_ctx, mesg, len);
+	FSYMBOL(sha512_finish)(&sha_ctx, len + (ED25519_LEN * 2));
 
 	/* h = copy(h, sh, SHA512_LEN) % q */
 	FSYMBOL(bn_int512_zero)(h);
-	XSYMBOL(memcpy)(h, &(SHA512_STATE(&sha_h_ctx, 0)), SHA512_LEN);
+	XSYMBOL(memcpy)(h, &(SHA512_STATE(&sha_ctx, 0)), SHA512_LEN);
 	FSYMBOL(bn_int512_divmod)(t, h, h, ctx->q);
 
 	/* sB = scalar(p, d, s, xyz1) */

@@ -21,13 +21,7 @@ struct sha1_ctx {
 };
 
 #undef SHA1_NEW
-#define	SHA1_NEW(x) \
-	struct sha1_ctx x = { \
-		.count = 0, \
-		.state = { \
-		0x67452301, 0xefcdab89, 0x98badcfe, \
-		0x10325476, 0xc3d2e1f0 \
-		} }
+#define	SHA1_NEW(x) struct sha1_ctx x
 
 #undef SHA1_STATE
 #define SHA1_STATE(x, n) (((uint8 *)((x)->state))[n])

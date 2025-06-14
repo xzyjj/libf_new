@@ -28,7 +28,7 @@ extern "C" {
 extern void FSYMBOL(chacha20_init_state)(uint32 state[16], const uint8 key[64],
 		const uint8 ran[12], uint32 count);
 extern void FSYMBOL(chacha20_block)(const uint32 state[16], uint32 out[16]);
-extern void FSYMBOL(chacha20_crypto)(const uint8 *key, const uint8 *ran,
+extern uint32 FSYMBOL(chacha20_crypto)(const uint8 *key, const uint8 *ran,
 		uint32 count, uint8 *buf, uint64 len);
 
 #ifdef __cplusplus

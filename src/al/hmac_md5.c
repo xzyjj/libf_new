@@ -17,6 +17,8 @@
 void FSYMBOL(hmac_md5_init)(struct hmac_md5_ctx *ctx, const uint8 *key,
 		uint32 key_len) {
 	MD5_NEW(md5_ctx);
+	FSYMBOL(md5_init)(&md5_ctx);
+
 	if (key_len > MD5_BLOCKSIZE) {
 		FSYMBOL(md5)(&md5_ctx, key, key_len);
 		key = &(MD5_STATE(&md5_ctx, 0));

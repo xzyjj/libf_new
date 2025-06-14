@@ -21,13 +21,7 @@ struct md5_ctx {
 };
 
 #undef MD5_NEW
-#define	MD5_NEW(x) \
-	struct md5_ctx x = { \
-		.count = 0, \
-		.state = { \
-		0x67452301, 0xefcdab89, \
-		0x98badcfe, 0x10325476 \
-		} }
+#define	MD5_NEW(x) struct md5_ctx x
 
 #undef MD5_STATE
 #define MD5_STATE(x, n) (((uint8 *)((x)->state))[n])

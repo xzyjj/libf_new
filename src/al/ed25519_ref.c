@@ -1,9 +1,9 @@
-/* ed25519.c - edwards-curve digital signature algorithm (eddsa) implementations */
+/* ed25519_ref.c - edwards-curve digital signature algorithm (eddsa) implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstdint.h>
 #include <libf/al/bn_512.h>
-#include <libf/al/ed25519.h>
+#include <libf/al/ed25519_ref.h>
 
 
 /* @func: _ed25519_extended_gcd (static) - extended euclidean algorithm
@@ -260,8 +260,10 @@ int32 FSYMBOL(ed25519_point_equal)(const bn_int512_t p,
 		const struct ed25519_point *xyz2) {
 	bn_int512_t _a, _b, _t;
 	/*
-	* (((x1 * z2) - (x2 * z1)) % p) != 0
-	* (((y1 * z2) - (y2 * z1)) % p) != 0
+	* if ((x1 * z2) - (x2 * z1))
+	*   return 1;
+	* if ((y1 * z2) - (y2 * z1))
+	*   return 1;
 	*/
 
 	FSYMBOL(bn_int512_mul)(_a, xyz1->x, xyz2->z);
@@ -298,7 +300,7 @@ void FSYMBOL(ed25519_point_recover_x)(const bn_int512_t p, const bn_int512_t d,
 	* x2 = ((d * y2) % p) + 1
 	* x2 = (x1 * inv(x2, p)) % p
 	* x = modpow(x2, (p + 3) / 8, p)
-	* if ((x ** 2) % p)
+	* if (((x ** 2) % p) - x2)
 	*   x = (x * modpow(2, (p - 1) / 4, p)) % p
 	* if ((x & 1) != sign)
 	*   x = p - x
@@ -333,12 +335,12 @@ void FSYMBOL(ed25519_point_recover_x)(const bn_int512_t p, const bn_int512_t d,
 	/* _x = modpow(_x2, _t2, p) */
 	FSYMBOL(ed25519_mod_pow)(_x2, _t2, p, _x);
 
-	/* _t2 = _x ** 2 */
+	/* _t2 = (_x ** 2) % p */
 	FSYMBOL(bn_int512_mul)(_t2, _x, _x);
-
-	/* ((_t2 - _x2) % p) != 0 */
-	FSYMBOL(bn_int512_sub)(_t2, _t2, _x2);
 	FSYMBOL(bn_int512_divmod)(_t1, _t2, _t2, p);
+
+	/* (_t2 - _x2) != 0 */
+	FSYMBOL(bn_int512_sub)(_t2, _t2, _x2);
 	if (FSYMBOL(bn_int512_cmp_1)(_t2, 0)) {
 		/* _t2 = (p - 1) / 4 */
 		FSYMBOL(bn_int512_zero)(_t1);
@@ -405,19 +407,19 @@ void FSYMBOL(ed25519_point_compress)(const bn_int512_t p,
 void FSYMBOL(ed25519_point_decompress)(const bn_int512_t p, const bn_int512_t d,
 		const bn_int512_t k, struct ed25519_point *r_xyz1) {
 	bn_int512_t _y, _x, _t;
-	FSYMBOL(bn_int512_move)(_y, k);
 	/*
-	* y = y1 & ((1 << 255) - 1)
+	* y = k & ((1 << 255) - 1)
 	* x1 = rec_x(p, d, y, k >> 255)
 	* y1 = y1
 	* z1 = 1
 	* t1 = (x1 * y) % p
 	*/
 
-	/* _y = _y & ((1 << 255) - 1) */
+	/* _y = k & ((1 << 255) - 1) */
+	FSYMBOL(bn_int512_move)(_y, k);
 	_y[7] &= (1U << 31) - 1;
 
-	/* _x = rec_x(p, d, _y) */
+	/* _x = rec_x(p, d, _y, k >> 255) */
 	FSYMBOL(ed25519_point_recover_x)(p, d, _y, k[7] >> 31, _x);
 
 	/* x, y, z, t = (_x, _y, 1, (_x * _y) % p) */

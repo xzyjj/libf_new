@@ -122,6 +122,7 @@ int32 XSYMBOL(internal_fltostr_num)(int32 n, char *p, float64 v, int32 pre) {
 	for (uint32 *d = a; d < z; d++) {
 		/* get length */
 		int32 k = XSYMBOL(internal_ulltostr_d)(0, buf, *d);
+
 		if (d != a && k < 9) {
 			XSYMBOL(internal_ulltostr_d)(9 - k, buf, *d);
 			_out_pad(0, buf, '0', 9 - k);

@@ -336,12 +336,10 @@ static void _ed25519_pow(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
 */
 static uint32 _ed25519_iszero(const uint32 a[8]) {
 	uint32 r = 0;
-	for (int32 i = 0; i < 8; i++) {
-		for (int32 j = 0; j < 32; j++)
-			r |= (a[i] >> j) & 1;
-	}
+	for (int32 i = 0; i < 8; i++)
+		r |= a[i];
 
-	return ~r & 1;
+	return r == 0;
 } /* end */
 
 /* @func: ed25519_fast_point_add - edwards curve point addition
@@ -432,7 +430,7 @@ void FSYMBOL(ed25519_fast_scalar_mul)(const uint32 k[8],
 	_xyz1.y[0] = 1;
 	_xyz1.z[0] = 1;
 	/*
-	* _xyz1 = (0, 1, 1, 8)
+	* _xyz1 = (0, 1, 1, 0)
 	* _xyz2 = xyz1
 	*/
 
@@ -570,7 +568,7 @@ void FSYMBOL(ed25519_fast_point_compress)(const struct ed25519_point *xyz1,
 	_ed25519_mul(y, xyz1->y, z);
 	_ed25519_mod(y);
 
-	/* r = _y | ((_x & 1) << 255) */
+	/* r = y | ((x & 1) << 255) */
 	y[7] |= (x[0] & 1) << 31;
 
 	for (int32 i = 0; i < 8; i++)

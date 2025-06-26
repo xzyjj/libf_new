@@ -5,7 +5,7 @@
 #include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
 #include <libf/sl/xfloat.h>
-#include <libf/sl/xrand.h>
+#include <libf/sl/xstdlib.h>
 #include <libf/ds/list.h>
 
 

@@ -19,17 +19,18 @@
 #define LIBF_MARCH_BIT_64 64
 
 /* machine architecture 32bit/64bit */
-#undef LIBF_MARCH_BIT
-#ifdef __SIZEOF_POINTER__
-#	if (__SIZEOF_POINTER__ == 4)
-#		define LIBF_MARCH_BIT LIBF_MARCH_BIT_32
-#	elif (__SIZEOF_POINTER__ == 8)
-#		define LIBF_MARCH_BIT LIBF_MARCH_BIT_64
+#ifndef LIBF_MARCH_BIT
+#	ifdef __SIZEOF_POINTER__
+#		if (__SIZEOF_POINTER__ == 4)
+#			define LIBF_MARCH_BIT LIBF_MARCH_BIT_32
+#		elif (__SIZEOF_POINTER__ == 8)
+#			define LIBF_MARCH_BIT LIBF_MARCH_BIT_64
+#		else
+#			error "!!!unknown __SIZEOF_POINTER__!!!"
+#		endif
 #	else
-#		error "!!!unknown __SIZEOF_POINTER__!!!"
+#		error "!!!undefined __SIZEOF_POINTER__!!!"
 #	endif
-#else
-#	error "!!!undefined __SIZEOF_POINTER__!!!"
 #endif
 
 /* x86 32bit/64bit */
@@ -66,37 +67,38 @@
 #define LIBF_MARCH_TYPE_LOONGARCH_64 12
 
 /* machine architecture type */
-#undef LIBF_MARCH_TYPE
-#if defined(__i386__)
-#	define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_X86_32
-#elif defined(__x86_64__)
-#	define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_X86_64
-#elif (defined(__arm__) || defined(__thumb__) || defined(__ARM_EABI__))
-#	define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_ARM_32
-#elif defined(__aarch64__)
-#	define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_ARM_64
-#elif (defined(__riscv) && defined(__riscv_xlen))
-#	if (__riscv_xlen == 32)
-#		define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_RISCV_32
+#ifndef LIBF_MARCH_TYPE
+#	if defined(__i386__)
+#		define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_X86_32
+#	elif defined(__x86_64__)
+#		define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_X86_64
+#	elif (defined(__arm__) || defined(__thumb__) || defined(__ARM_EABI__))
+#		define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_ARM_32
+#	elif defined(__aarch64__)
+#		define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_ARM_64
+#	elif (defined(__riscv) && defined(__riscv_xlen))
+#		if (__riscv_xlen == 32)
+#			define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_RISCV_32
+#		else
+#			define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_RISCV_64
+#		endif
+#	elif defined(__mips)
+#		if defined(__mips64)
+#			define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_MIPS_64
+#		else
+#			define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_MIPS_32
+#		endif
+#	elif defined(__ia64__)
+#		define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_IA64_64
+#	elif defined(__powerpc64__)
+#		define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_PPC_64
+#	elif defined(__s390x__)
+#		define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_S390_64
+#	elif defined(__loongarch64)
+#		define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_LOONGARCH_64
 #	else
-#		define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_RISCV_64
+#		error "!!!unknown LIBF_MARCH_TYPE!!!"
 #	endif
-#elif defined(__mips)
-#	if defined(__mips64)
-#		define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_MIPS_64
-#	else
-#		define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_MIPS_32
-#	endif
-#elif defined(__ia64__)
-#	define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_IA64_64
-#elif defined(__powerpc64__)
-#	define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_PPC_64
-#elif defined(__s390x__)
-#	define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_S390_64
-#elif defined(__loongarch64)
-#	define LIBF_MARCH_TYPE LIBF_MARCH_TYPE_LOONGARCH_64
-#else
-#	error "!!!unknown MARCH TYPE!!!"
 #endif
 
 /* no system (Bare Metal platform) */
@@ -113,8 +115,9 @@
 #define LIBF_PLATFORM_TYPE_OPENBSD 2
 
 /* platform */
-#undef LIBF_PLATFORM_TYPE
-#define LIBF_PLATFORM_TYPE LIBF_PLATFORM_TYPE_LINUX
+#ifndef LIBF_PLATFORM_TYPE
+#	define LIBF_PLATFORM_TYPE LIBF_PLATFORM_TYPE_LINUX
+#endif
 
 
 #endif

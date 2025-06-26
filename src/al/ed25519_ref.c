@@ -221,7 +221,7 @@ void FSYMBOL(ed25519_scalar_mul)(const bn_int512_t p, const bn_int512_t d,
 	FSYMBOL(bn_int512_zero)(_xyz1.z);
 	FSYMBOL(bn_int512_zero)(_xyz1.t);
 	_xyz1.y[0] = 1;
-	_xyz1.z[0] = 1; /* xyz1 = (0, 1, 1, 8) */
+	_xyz1.z[0] = 1; /* xyz1 = (0, 1, 1, 0) */
 
 	FSYMBOL(bn_int512_move)(_xyz2.x, xyz1->x);
 	FSYMBOL(bn_int512_move)(_xyz2.y, xyz1->y);

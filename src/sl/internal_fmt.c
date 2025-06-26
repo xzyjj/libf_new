@@ -316,29 +316,39 @@ int32 XSYMBOL(internal_fmt)(struct fmt_ctx *ctx, const char *fmt,
 		ctx->precise = 0;
 		ctx->flags = 0;
 
-		/* base prefix */
-		if (*fmt == '#') {
-			ctx->flags |= FG_BASE_PREFIX;
-			fmt++;
+		while (1) {
+			switch (*fmt) {
+				case '#': /* base prefix */
+					ctx->flags |= FG_BASE_PREFIX;
+					fmt++;
+					break;
+				case '+': /* show positive and negative */
+					ctx->flags |= FG_POSITIVE_NEGATIVE;
+					fmt++;
+					break;
+				case '-': /* align left */
+					ctx->flags |= FG_ALIGN_LEFT;
+					fmt++;
+					break;
+				case '0': /* zero padding */
+					ctx->flags |= FG_ALIGN_RIGHT_ZERO;
+					fmt++;
+					break;
+				default:
+					goto e;
+			}
 		}
-
-		/* show positive and negative */
-		if (*fmt == '+') {
-			ctx->flags |= FG_POSITIVE_NEGATIVE;
-			fmt++;
-		}
+e:
 
 		/* align left and right */
-		if (*fmt == '-' || (*fmt >= '0' && *fmt <= '9')) {
-			if (*fmt == '-') { /* align left */
-				ctx->flags |= FG_ALIGN_LEFT;
-				fmt++;
-			} else if (*fmt == '0') { /* zero padding */
-				ctx->flags |= FG_ALIGN_RIGHT_ZERO;
-				fmt++;
+		if (*fmt == '*' || (*fmt >= '0' && *fmt <= '9')) {
+			if (ctx->flags & FG_ALIGN_LEFT) {
+				ctx->flags &= ~FG_ALIGN_RIGHT_ZERO;
 			} else { /* align right */
 				ctx->flags |= FG_ALIGN_RIGHT;
 			}
+			if (ctx->flags & FG_ALIGN_RIGHT_ZERO)
+				ctx->flags &= ~FG_ALIGN_RIGHT;
 
 			if (*fmt == '*') { /* dynamic */
 				ctx->align = va_arg(ap, int64);
@@ -374,33 +384,38 @@ int32 XSYMBOL(internal_fmt)(struct fmt_ctx *ctx, const char *fmt,
 		}
 
 		/* length modifier */
-		if (*fmt == 'L') { /* long double */
-			fmt++;
-			ctx->flags |= FG_LONG_DOUBLE;
-		} else if (*fmt == 'l') {
-			fmt++;
-			if (*fmt == 'l') { /* long long */
-				ctx->flags |= FG_LONG_LONG;
-			} else { /* long */
-				fmt--;
+		switch (*fmt) {
+			case 'L': /* long double */
+				ctx->flags |= FG_LONG_DOUBLE;
+				fmt++;
+				break;
+			case 'l':
+				fmt++;
+				if (*fmt == 'l') { /* long long */
+					ctx->flags |= FG_LONG_LONG;
+				} else { /* long */
+					ctx->flags |= FG_LONG;
+					fmt--;
+				}
+				fmt++;
+				break;
+			case 'h':
+				fmt++;
+				if (*fmt == 'h') { /* char */
+					ctx->flags |= FG_CHAR;
+				} else { /* short */
+					ctx->flags |= FG_SHORT;
+					fmt--;
+				}
+				fmt++;
+				break;
+			case 'z': /* size_t */
+			case 't': /* ptrdiff_t */
 				ctx->flags |= FG_LONG;
-			}
-			fmt++;
-		} else if (*fmt == 'h') {
-			fmt++;
-			if (*fmt == 'h') { /* char */
-				ctx->flags |= FG_CHAR;
-			} else { /* short */
-				fmt--;
-				ctx->flags |= FG_SHORT;
-			}
-			fmt++;
-		} else if (*fmt == 'z') { /* size_t */
-			fmt++;
-			ctx->flags |= FG_LONG;
-		} else if (*fmt == 't') { /* ptrdiff_t */
-			fmt++;
-			ctx->flags |= FG_LONG;
+				fmt++;
+				break;
+			default:
+				break;
 		}
 
 		/* conversion specifiers */
@@ -421,6 +436,10 @@ int32 XSYMBOL(internal_fmt)(struct fmt_ctx *ctx, const char *fmt,
 				} else {
 					ctx->va._i64L = va_arg(ap, int32);
 				}
+
+				/* output */
+				if (_fmt_di(ctx))
+					return -2;
 				break;
 			case 'o': /* octal */
 			case 'u': /* decimal */
@@ -438,12 +457,24 @@ int32 XSYMBOL(internal_fmt)(struct fmt_ctx *ctx, const char *fmt,
 				} else {
 					ctx->va._u64L = va_arg(ap, uint32);
 				}
+
+				/* output */
+				if (_fmt_ouxXp(ctx))
+					return -2;
 				break;
 			case 'c': /* character */
 				ctx->va._char = (char)va_arg(ap, uint32);
+
+				/* output */
+				if (_fmt_cs(ctx))
+					return -2;
 				break;
 			case 's': /* string */
 				ctx->va._str = va_arg(ap, char *);
+
+				/* output */
+				if (_fmt_cs(ctx))
+					return -2;
 				break;
 			case 'e': /* floating-point */
 			case 'E':
@@ -456,38 +487,8 @@ int32 XSYMBOL(internal_fmt)(struct fmt_ctx *ctx, const char *fmt,
 				if (!ctx->precise)
 					ctx->precise = 6;
 				ctx->va._f64 = va_arg(ap, float64);
-				break;
-			default:
-				return -1;
-		}
 
-		switch (ctx->specifiers) {
-			case 'd': /* decimal */
-			case 'i':
-				if (_fmt_di(ctx))
-					return -2;
-				break;
-			case 'o': /* octal */
-			case 'u': /* decimal */
-			case 'x': /* hexadecimal */
-			case 'X':
-			case 'p': /* pointer */
-				if (_fmt_ouxXp(ctx))
-					return -2;
-				break;
-			case 'c': /* character */
-			case 's': /* string */
-				if (_fmt_cs(ctx))
-					return -2;
-				break;
-			case 'e': /* floating */
-			case 'E':
-			case 'f':
-			case 'F':
-			case 'g':
-			case 'G':
-			case 'a':
-			case 'A':
+				/* output */
 				if (_fmt_f(ctx))
 					return -2;
 				break;

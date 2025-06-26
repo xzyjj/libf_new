@@ -8,7 +8,8 @@
 #include <libf/al/ed25519_fast.h>
 
 
-/* @def: ed25519_fast */
+/* @def: ed25519_fast
+* P1..P15 = q * (1..15) */
 static const uint32 _w_BPO[16][8] = {
 	{ 0, 0, 0, 0, 0, 0, 0, 0 },
 	{ 0x5cf5d3ed, 0x5812631a, 0xa2f79cd6, 0x14def9de, 0, 0, 0, 0x10000000 },
@@ -28,6 +29,8 @@ static const uint32 _w_BPO[16][8] = {
 	{ 0x72676ae3, 0x2913ce8b, 0x8c82308f, 0x3910a40b, 1, 0, 0, 0xf0000000 }
 	};
 
+/* -R = q - (2**256) % q
+*       443877084437957656573631004654138375888 */
 static const uint32 _w_minusR[8] = {
 	0xcf5d3ed0, 0x812631a5, 0x2f79cd65, 0x4def9dea, 1, 0, 0, 0
 	};
@@ -37,7 +40,7 @@ static const uint32 _w_minusR[8] = {
 *                                  modular reduction
 * @param1: uint32 [8]       # result
 * @param2: const uint32 [8] # number
-* @param3: uint32           # base high-bit
+* @param3: uint32           # high-bit
 * @return: void
 */
 static void _ed25519_modw(uint32 r[8], const uint32 a[8], uint32 b) {
@@ -45,6 +48,7 @@ static void _ed25519_modw(uint32 r[8], const uint32 a[8], uint32 b) {
 	uint32 rr[8];
 	uint32 carry = 0;
 	uint64L tmp = 0;
+	/* (a + (b * R)) % q === (a - (b * (-R))) % q */
 
 	/* rr = r * minusR */
 	for (int32 i = 0; i < 8; i++) {
@@ -210,40 +214,32 @@ void FSYMBOL(ed25519_fast_private_key)(const uint8 *key, uint32 pri[8],
 */
 void FSYMBOL(ed25519_fast_public_key)(const uint8 *pri, uint8 *pub) {
 	uint32 _pri[8], _ran[8];
-	struct ed25519_point xyz1, xyz2;
-	XSYMBOL(memcpy)(xyz1.x, ED25519_FAST_BX, ED25519_LEN);
-	XSYMBOL(memcpy)(xyz1.y, ED25519_FAST_BY, ED25519_LEN);
-	XSYMBOL(memcpy)(xyz1.z, ED25519_FAST_BZ, ED25519_LEN);
-	XSYMBOL(memcpy)(xyz1.t, ED25519_FAST_BT, ED25519_LEN);
+	struct ed25519_point xyz2;
 
 	FSYMBOL(ed25519_fast_private_key)(pri, _pri, _ran);
 
-	/* pub = compress(scalar(pri, xyz1)) */
-	FSYMBOL(ed25519_fast_scalar_mul)(_pri, &xyz1, &xyz2);
+	/* pub = compress(scalar(pri, ED25519_FAST_BASE)) */
+	FSYMBOL(ed25519_fast_scalar_mul)(_pri, &(ED25519_FAST_BASE), &xyz2);
 	FSYMBOL(ed25519_fast_point_compress)(&xyz2, (uint32 *)pub);
 } /* end */
 
 /* @func: ed25519_fast_sign - ed25519 signature function
 * @param1: const uint8 * # private key (length: ED25519_LEN)
 * @param2: const uint8 * # input message
-* @param3: uint32        # message length
+* @param3: uint64        # message length
 * @param4: uint8 *       # signature (length: ED25519_SIGN_LEN)
 * @return: void
 */
 void FSYMBOL(ed25519_fast_sign)(const uint8 *pri, const uint8 *mesg,
-		uint32 len, uint8 *sign) {
+		uint64 len, uint8 *sign) {
 	uint32 _pri[8], _ran[8], _pub[8], r[8], Rs[8], h[8], s[8];
-	struct ed25519_point xyz1, xyz2;
+	struct ed25519_point xyz2;
 	SHA512_NEW(sha_ctx);
-	XSYMBOL(memcpy)(xyz1.x, ED25519_FAST_BX, ED25519_LEN);
-	XSYMBOL(memcpy)(xyz1.y, ED25519_FAST_BY, ED25519_LEN);
-	XSYMBOL(memcpy)(xyz1.z, ED25519_FAST_BZ, ED25519_LEN);
-	XSYMBOL(memcpy)(xyz1.t, ED25519_FAST_BT, ED25519_LEN);
 
 	FSYMBOL(ed25519_fast_private_key)(pri, _pri, _ran);
 	FSYMBOL(ed25519_fast_public_key)(pri, (uint8 *)_pub);
 
-	/* sh = sha(ran + mesg) */
+	/* sh = sha(_ran + mesg) */
 	FSYMBOL(sha512_init)(&sha_ctx);
 	FSYMBOL(sha512_process)(&sha_ctx, (uint8 *)_ran, ED25519_LEN);
 	FSYMBOL(sha512_process)(&sha_ctx, mesg, len);
@@ -253,11 +249,11 @@ void FSYMBOL(ed25519_fast_sign)(const uint8 *pri, const uint8 *mesg,
 	_ed25519_digest(&(SHA512_STATE(&sha_ctx, 0)), r);
 	_ed25519_mod(r);
 
-	/* Rs = compress(scalar(r, xyz1)) */
-	FSYMBOL(ed25519_fast_scalar_mul)(r, &xyz1, &xyz2);
+	/* Rs = compress(scalar(r, ED25519_FAST_BASE)) */
+	FSYMBOL(ed25519_fast_scalar_mul)(r, &(ED25519_FAST_BASE), &xyz2);
 	FSYMBOL(ed25519_fast_point_compress)(&xyz2, Rs);
 
-	/* sh = sha(Rs + pub + mesg) */
+	/* sh = sha(Rs + _pub + mesg) */
 	FSYMBOL(sha512_init)(&sha_ctx);
 	FSYMBOL(sha512_process)(&sha_ctx, (uint8 *)Rs, ED25519_LEN);
 	FSYMBOL(sha512_process)(&sha_ctx, (uint8 *)_pub, ED25519_LEN);
@@ -280,18 +276,14 @@ void FSYMBOL(ed25519_fast_sign)(const uint8 *pri, const uint8 *mesg,
 * @param1: const uint8 * # public key (length: ED25519_LEN)
 * @param2: const uint8 * # signature (length: ED25519_SIGN_LEN)
 * @param3: const uint8 * # input message
-* @param4: uint32        # message length
+* @param4: uint64        # message length
 * @return: int32         # 0: success, 1: fail
 */
 int32 FSYMBOL(ed25519_fast_verify)(const uint8 *pub, const uint8 *sign,
-		const uint8 *mesg, uint32 len) {
+		const uint8 *mesg, uint64 len) {
 	uint32 Rs[8], s[8], h[8];
-	struct ed25519_point A, R, hA, sB, xyz1;
+	struct ed25519_point A, R, hA, sB;
 	SHA512_NEW(sha_ctx);
-	XSYMBOL(memcpy)(xyz1.x, ED25519_FAST_BX, ED25519_LEN);
-	XSYMBOL(memcpy)(xyz1.y, ED25519_FAST_BY, ED25519_LEN);
-	XSYMBOL(memcpy)(xyz1.z, ED25519_FAST_BZ, ED25519_LEN);
-	XSYMBOL(memcpy)(xyz1.t, ED25519_FAST_BT, ED25519_LEN);
 
 	XSYMBOL(memcpy)(Rs, sign, ED25519_LEN);
 	XSYMBOL(memcpy)(s, sign + ED25519_LEN, ED25519_LEN);
@@ -317,8 +309,8 @@ int32 FSYMBOL(ed25519_fast_verify)(const uint8 *pub, const uint8 *sign,
 	/* hA = add(R, hA) */
 	FSYMBOL(ed25519_fast_point_add)(&R, &hA, &hA);
 
-	/* sB = scalar(s, xyz1) */
-	FSYMBOL(ed25519_fast_scalar_mul)(s, &xyz1, &sB);
+	/* sB = scalar(s, ED25519_FAST_BASE) */
+	FSYMBOL(ed25519_fast_scalar_mul)(s, &(ED25519_FAST_BASE), &sB);
 
 	return FSYMBOL(ed25519_fast_point_equal)(&hA, &sB);
 } /* end */

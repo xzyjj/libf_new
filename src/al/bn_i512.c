@@ -30,6 +30,7 @@ uint32 FSYMBOL(bn_int512_bits)(const bn_int512_t n) {
 */
 void FSYMBOL(bn_int512_move)(bn_int512_t t, const bn_int512_t s) {
 	XSYMBOL(memcpy)(t, s, sizeof(uint32) * (BN_512_SIZE + 2));
+	t[BN_512_SIZE] = 0;
 } /* end */
 
 /* @func: bn_int512_moveu - big number move (signed to unsigned)
@@ -53,6 +54,7 @@ void FSYMBOL(bn_int512_moveu)(bn_uint512_t t, const bn_int512_t s) {
 */
 void FSYMBOL(bn_int512_movei)(bn_int512_t t, const bn_uint512_t s) {
 	XSYMBOL(memcpy)(t, s, sizeof(uint32) * (BN_512_SIZE + 2));
+	t[BN_512_SIZE] = 0;
 	t[BN_512_SIG] = 0;
 } /* end */
 

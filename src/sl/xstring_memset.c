@@ -13,19 +13,22 @@
 */
 void *XSYMBOL(memset)(void *s, int8 c, uint64 len) {
 	int8 cc[4] = { c, c, c, c };
-	volatile uint32 *_s = s;
-	for (; len > (sizeof(uint32) * 4 - 1);
-			len -= (sizeof(uint32) * 4)) {
-		*_s++ = *((uint32 *)cc);
-		*_s++ = *((uint32 *)cc);
-		*_s++ = *((uint32 *)cc);
-		*_s++ = *((uint32 *)cc);
-	}
-	for (; len > (sizeof(uint32) - 1);
-			len -= sizeof(uint32))
-		*_s++ = *((uint32 *)cc);
 
-	for (volatile uint8 *_s1 = (uint8 *)_s; len--; )
+	volatile uint32 *_s = s;
+	while (len > (sizeof(uint32) * 4 - 1)) {
+		*_s++ = *((uint32 *)cc);
+		*_s++ = *((uint32 *)cc);
+		*_s++ = *((uint32 *)cc);
+		*_s++ = *((uint32 *)cc);
+		len -= sizeof(uint32) * 4;
+	}
+	while (len > (sizeof(uint32) - 1)) {
+		*_s++ = *((uint32 *)cc);
+		len -= sizeof(uint32);
+	}
+
+	volatile uint8 *_s1 = (uint8 *)_s;
+	while (len--)
 		*_s1++ = c;
 
 	return s;

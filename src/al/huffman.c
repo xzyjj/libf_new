@@ -29,7 +29,7 @@ int32 FSYMBOL(huf_insert)(struct huf_head *head, struct huf_node *node) {
 	return FSYMBOL(minheap_insert)(&head->heap, node, _huf_cmp);
 } /* end */
 
-/* @func: huf_build - huffman tree building
+/* @func: huf_build - huffman tree building (no fixed order)
 * @param1: struct huf_head * # huffman head
 * @return: struct huf_node * # huffman root / NULL pointer
 *         $ 5        'Hello'

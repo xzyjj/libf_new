@@ -52,7 +52,8 @@ uint32 FSYMBOL(bn_uint1024_bits)(const bn_uint1024_t n) {
 * @return: void
 */
 void FSYMBOL(bn_uint1024_move)(bn_uint1024_t t, const bn_uint1024_t s) {
-	XSYMBOL(memcpy)(t, s, sizeof(uint32) * (BN_1024_SIZE + 1));
+	XSYMBOL(memcpy)(t, s, sizeof(uint32) * BN_1024_SIZE);
+	t[BN_1024_SIZE] = 0;
 } /* end */
 
 /* @func: bn_uint1024_cmp - big number compare

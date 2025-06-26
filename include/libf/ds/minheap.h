@@ -31,6 +31,7 @@
 #undef MINHEAP_SIZEOF
 #define MINHEAP_SIZEOF (sizeof(void *))
 
+#undef minheap_head
 struct minheap_head {
 	void **array;
 	uint64 size;

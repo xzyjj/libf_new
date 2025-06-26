@@ -69,11 +69,11 @@ void FSYMBOL(ed25519_sign_public)(struct ed25519_sign_ctx *ctx) {
 /* @func: ed25519_sign - ed25519 signature function
 * @param1: struct ed25519_sign_ctx # ed25519-sign struct context
 * @param2: const uint8 * # input message
-* @param3: uint32        # message length
+* @param3: uint64        # message length
 * @return: void
 */
 void FSYMBOL(ed25519_sign)(struct ed25519_sign_ctx *ctx,
-		const uint8 *mesg, uint32 len) {
+		const uint8 *mesg, uint64 len) {
 	bn_int512_t t, r, Rs, h, s;
 	struct ed25519_point R;
 	SHA512_NEW(sha_ctx);
@@ -119,12 +119,12 @@ void FSYMBOL(ed25519_sign)(struct ed25519_sign_ctx *ctx,
 * @param2: const uint8 * # public key (length: ED25519_LEN)
 * @param3: const uint8 * # signature (rs + ss, length: ED25519_LEN * 2)
 * @param4: const uint8 * # input message
-* @param5: uint32        # message length
+* @param5: uint64        # message length
 * @return: int32         # 0: success, 1: fail
 */
 int32 FSYMBOL(ed25519_sign_verify)(struct ed25519_sign_ctx *ctx,
 		const uint8 *key, const uint8 *sign,
-		const uint8 *mesg, uint32 len) {
+		const uint8 *mesg, uint64 len) {
 	bn_int512_t Rs, s, h, t, pub;
 	struct ed25519_point A, R, sB, hA;
 	SHA512_NEW(sha_ctx);

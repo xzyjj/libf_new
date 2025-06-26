@@ -107,10 +107,10 @@ extern void FSYMBOL(ed25519_sign_private)(struct ed25519_sign_ctx *ctx,
 		const uint8 *key);
 extern void FSYMBOL(ed25519_sign_public)(struct ed25519_sign_ctx *ctx);
 extern void FSYMBOL(ed25519_sign)(struct ed25519_sign_ctx *ctx,
-		const uint8 *mesg, uint32 len);
+		const uint8 *mesg, uint64 len);
 extern int32 FSYMBOL(ed25519_sign_verify)(struct ed25519_sign_ctx *ctx,
 		const uint8 *key, const uint8 *sign,
-		const uint8 *mesg, uint32 len);
+		const uint8 *mesg, uint64 len);
 
 #ifdef __cplusplus
 }

@@ -23,20 +23,20 @@ void *XSYMBOL(memcpy)(void *t, const void *s, uint64 len) {
 #	else
 
 	volatile uint64 *_t = t, *_s = (uint64 *)s;
-	for (; len > (sizeof(uint64) * 4 - 1);
-			len -= (sizeof(uint64) * 4)) {
+	while (len > (sizeof(uint64) * 4 - 1)) {
 		*_t++ = *_s++;
 		*_t++ = *_s++;
 		*_t++ = *_s++;
 		*_t++ = *_s++;
+		len -= sizeof(uint64) * 4;
 	}
-	for (; len > (sizeof(uint64) - 1);
-			len -= sizeof(uint64))
+	while (len > (sizeof(uint64) - 1)) {
 		*_t++ = *_s++;
+		len -= sizeof(uint64);
+	}
 
-	for (volatile uint8 *_t1 = (uint8 *)_t,
-			*_s1 = (uint8 *)_s;
-			len--; )
+	volatile uint8 *_t1 = (uint8 *)_t, *_s1 = (uint8 *)_s;
+	while (len--)
 		*_t1++ = *_s1++;
 
 	return t;
@@ -96,20 +96,20 @@ void *XSYMBOL(memmove)(void *t, const void *s, uint64 len) {
 
 	volatile uint64 *_t = (uint64 *)((char *)t + len),
 		*_s = (uint64 *)((char *)s + len);
-	for (; len > (sizeof(uint64) * 4 - 1);
-			len -= (sizeof(uint64) * 4)) {
+	while (len > (sizeof(uint64) * 4 - 1)) {
 		*--_t = *--_s;
 		*--_t = *--_s;
 		*--_t = *--_s;
 		*--_t = *--_s;
+		len -= sizeof(uint64) * 4;
 	}
-	for (; len > (sizeof(uint64) - 1);
-			len -= sizeof(uint64))
+	while (len > (sizeof(uint64) - 1)) {
 		*--_t = *--_s;
+		len -= sizeof(uint64);
+	}
 
-	for (volatile uint8 *_t1 = (uint8 *)_t,
-			*_s1 = (uint8 *)_s;
-			len--; )
+	volatile uint8 *_t1 = (uint8 *)_t, *_s1 = (uint8 *)_s;
+	while (len--)
 		*--_t1 = *--_s1;
 
 	return t;

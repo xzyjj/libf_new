@@ -6,10 +6,10 @@
 
 
 /* @func: iconv_utf8_ucode - get utf8 unicode code
-* @param1: const uint8 * # utf8 character
-* @return: int32         # unicode code
+* @param1: const uint8 [4] # utf8 character
+* @return: int32           # unicode code
 */
-int32 XSYMBOL(iconv_utf8_ucode)(const uint8 *c) {
+int32 XSYMBOL(iconv_utf8_ucode)(const uint8 c[4]) {
 	int32 n = -1;
 	if (c[0] < 128) {
 		n = c[0];
@@ -31,11 +31,11 @@ int32 XSYMBOL(iconv_utf8_ucode)(const uint8 *c) {
 } /* end */
 
 /* @func: iconv_ucode_utf8 - unicode code to utf8 character
-* @param1: uint8 * # character buffer
-* @param2: int32   # unicode code
-* @return: int32   # character length
+* @param1: uint8 [4] # character buffer
+* @param2: int32     # unicode code
+* @return: int32     # character length
 */
-int32 XSYMBOL(iconv_ucode_utf8)(uint8 *p, int32 u) {
+int32 XSYMBOL(iconv_ucode_utf8)(uint8 p[4], int32 u) {
 	int32 n = 0;
 	if (u < 128) {
 		p[0] = u;

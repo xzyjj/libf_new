@@ -15,8 +15,9 @@ int main(void) {
 		};
 	uint8 sign[ED25519_SIGN_LEN];
 
-	char *s = "Hello, World!";
-	uint32 s_len = XSYMBOL(strlen)(s);
+	uint32 s_len = 1 << 16;
+	char s[1<<17];
+	XSYMBOL(memset)(s, 'A', s_len);
 
 	start = clock();
 	for (int32 i = 0; i < 1000; i++) {
@@ -24,7 +25,16 @@ int main(void) {
 	}
 	end = clock();
 	time = (double)(end - start) / CLOCKS_PER_SEC;
-	printf("time: %.6f\n", time / 1000);
+	printf("sign time: %.6f\n", time / 1000);
+
+	start = clock();
+	for (int32 i = 0; i < 1000; i++) {
+		FSYMBOL(ed25519_fast_verify)((uint8 *)p, sign, (uint8 *)s, s_len);
+	}
+	end = clock();
+	time = (double)(end - start) / CLOCKS_PER_SEC;
+	printf("verify time: %.6f\n", time / 1000);
+
 
 	return 0;
 }

@@ -51,7 +51,7 @@ static float64 _sqrt(float64 x) {
 */
 static float64 _sqrt(float64 x) {
 	union float64_i u = { x };
-	u.i = 0x1ff7a3bea91d9b1b + (u.i >> 1);
+	u.i = 0x1ff7a3bea91d9b1bULL + (u.i >> 1);
 	float64 m = u.f;
 	m = 0.5 * (m + x / m);
 	m = 0.5 * (m + x / m);

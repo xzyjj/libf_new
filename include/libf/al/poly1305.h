@@ -44,6 +44,7 @@ extern void FSYMBOL(poly1305_process)(struct poly1305_ctx *ctx, const uint8 *s,
 		uint64 len);
 extern void FSYMBOL(poly1305_finish)(struct poly1305_ctx *ctx);
 extern void FSYMBOL(poly1305)(struct poly1305_ctx *ctx, const uint8 *s, uint64 len);
+extern int32 FSYMBOL(poly1305_tag_auth)(const uint8 *a, const uint8 *b);
 
 #ifdef __cplusplus
 }

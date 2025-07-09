@@ -1,4 +1,4 @@
-/* internal_fmt.c - format value to string conversion implementations */
+/* internal_printf.c - format value to string conversion implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstddef.h>
@@ -10,7 +10,7 @@
 #include <libf/sl/internal.h>
 
 
-/* @def: fmt */
+/* @def: fmt_printf */
 #undef FG_LONG
 #define FG_LONG 0x01
 #undef FG_LONG_LONG
@@ -33,12 +33,12 @@
 #define FG_POSITIVE_NEGATIVE 0x200
 /* end */
 
-/* @func: _fmt_di (static) - output formatted value (d, i)
-* @param1: struct fmt_ctx * # fmt context struct
-* @return: int32            # 0: no error, <0: error
+/* @func: _fmt_printf_di (static) - printf output number
+* @param1: struct fmt_printf_ctx * # fmt-printf struct context
+* @return: int32                   # 0: no error, <0: error
 */
-static int32 _fmt_di(struct fmt_ctx *ctx) {
-	char buf[64];
+static int32 _fmt_printf_di(struct fmt_printf_ctx *ctx) {
+	char buf[32];
 	int32 len, len_s, neg,
 		pre_len = 0, ar_len = 0,
 		arz_len = 0, al_len = 0;
@@ -89,33 +89,26 @@ static int32 _fmt_di(struct fmt_ctx *ctx) {
 	return 0;
 } /* end */
 
-/* @func: _fmt_ouxXp (static) - output formatted value (o, u, x, X, p)
-* @param1: struct fmt_ctx * # fmt context struct
-* @return: int32            # 0: no error, <0: error
+/* @func: _fmt_printf_ouxXp (static) - printf output number
+* @param1: struct fmt_printf_ctx * # fmt-printf struct context
+* @return: int32                   # 0: no error, <0: error
 */
-static int32 _fmt_ouxXp(struct fmt_ctx *ctx) {
+static int32 _fmt_printf_ouxXp(struct fmt_printf_ctx *ctx) {
 	const char *bp_str = NULL;
-	char buf[64];
+	char buf[32];
 	int32 len, len_s,
 		pre_len = 0, ar_len = 0,
 		arz_len = 0, al_len = 0;
 	uint64L v = ctx->va._u64L;
 
 	switch (ctx->specifiers) {
-		case 'x':
-		case 'p':
-			if (ctx->flags & FG_BASE_PREFIX)
-				bp_str = "0x";
+		case 'x': case 'p':
 			len = len_s = XSYMBOL(internal_ulltostr_x)(0, buf, v); 
 			break;
 		case 'X':
-			if (ctx->flags & FG_BASE_PREFIX)
-				bp_str = "0X";
 			len = len_s = XSYMBOL(internal_ulltostr_X)(0, buf, v);
 			break;
 		case 'o':
-			if (ctx->flags & FG_BASE_PREFIX)
-				bp_str = "0";
 			len = len_s = XSYMBOL(internal_ulltostr_o)(0, buf, v);
 			break;
 		case 'u':
@@ -129,10 +122,17 @@ static int32 _fmt_ouxXp(struct fmt_ctx *ctx) {
 		pre_len = ctx->precise - len;
 	if (ctx->flags & FG_BASE_PREFIX) {
 		switch (ctx->specifiers) {
-			case 'x': case 'p': case 'X':
-				len++;
+			case 'x': case 'p':
+				bp_str = "0x";
+				len += 2;
+				break;
+			case 'X':
+				bp_str = "0X";
+				len += 2;
+				break;
 			case 'o':
-				len++;
+				bp_str = "0";
+				len += 1;
 				break;
 			default:
 				break;
@@ -172,11 +172,11 @@ static int32 _fmt_ouxXp(struct fmt_ctx *ctx) {
 	return 0;
 } /* end */
 
-/* @func: _fmt_cs (static) - output formatted value (c, s)
-* @param1: struct fmt_ctx * # fmt context struct
-* @return: int32            # 0: no error, <0: error
+/* @func: _fmt_printf_cs (static) - printf output char/string
+* @param1: struct fmt_printf_ctx * # fmt-printf struct context
+* @return: int32                   # 0: no error, <0: error
 */
-static int32 _fmt_cs(struct fmt_ctx *ctx) {
+static int32 _fmt_printf_cs(struct fmt_printf_ctx *ctx) {
 	const char *bp_str = NULL;
 	char buf[12];
 	int32 len, len_s, ar_len = 0,
@@ -222,11 +222,11 @@ static int32 _fmt_cs(struct fmt_ctx *ctx) {
 	return 0;
 } /* end */
 
-/* @func: _fmt_f (static) - output formatted value (eE, fF, gG, aA)
-* @param1: struct fmt_ctx * # fmt context struct
-* @return: int32            # 0: no error, <0: error
+/* @func: _fmt_printf_f (static) - printf output floating
+* @param1: struct fmt_printf_ctx * # fmt-printf struct context
+* @return: int32                   # 0: no error, <0: error
 */
-static int32 _fmt_f(struct fmt_ctx *ctx) {
+static int32 _fmt_printf_f(struct fmt_printf_ctx *ctx) {
 	char buf[FLTO_LENMAX];
 	int32 len, len_s, neg,
 		pre_len = 0, ar_len = 0,
@@ -235,14 +235,9 @@ static int32 _fmt_f(struct fmt_ctx *ctx) {
 
 	neg = (v < 0) ? 1 : 0;
 	switch (ctx->specifiers) {
-		case 'e':
-		case 'E':
-		case 'g':
-		case 'G':
-		case 'a':
-		case 'A':
-		case 'f':
-		case 'F':
+		case 'e': case 'E': case 'g':
+		case 'G': case 'a': case 'A':
+		case 'f': case 'F':
 			len = len_s = XSYMBOL(internal_fltostr_num)(0, buf, v,
 				ctx->precise);
 			break;
@@ -291,14 +286,14 @@ static int32 _fmt_f(struct fmt_ctx *ctx) {
 	return 0;
 } /* end */
 
-/* @func: internal_fmt - formatted value parse and convert string
-* @param1: struct fmt_ctx * # fmt context struct
-* @param2: const char *     # formatted string
-* @param3: va_list          # variable argument list
-* @return: int32            # 0: no error, <0: error
+/* @func: internal_fmt_printf - formatted value parse and convert string
+* @param1: struct fmt_printf_ctx * # fmt struct context
+* @param2: const char *            # formatted string
+* @param3: va_list                 # variable argument list
+* @return: int32                   # 0: no error, <0: error
 */
-int32 XSYMBOL(internal_fmt)(struct fmt_ctx *ctx, const char *fmt,
-		va_list ap) {
+int32 XSYMBOL(internal_fmt_printf)(struct fmt_printf_ctx *ctx,
+		const char *fmt, va_list ap) {
 	for (; *fmt != '\0'; fmt++) {
 		if (*fmt == '%') {
 			fmt++;
@@ -340,6 +335,9 @@ int32 XSYMBOL(internal_fmt)(struct fmt_ctx *ctx, const char *fmt,
 		}
 e:
 
+#undef MAX
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+
 		/* align left and right */
 		if (*fmt == '*' || (*fmt >= '0' && *fmt <= '9')) {
 			if (ctx->flags & FG_ALIGN_LEFT) {
@@ -351,36 +349,26 @@ e:
 				ctx->flags &= ~FG_ALIGN_RIGHT;
 
 			if (*fmt == '*') { /* dynamic */
-				ctx->align = va_arg(ap, int64);
+				ctx->align = va_arg(ap, int32);
 				fmt++;
 			} else {
-				for (; *fmt == '0'; fmt++);
-				for (int32 i = 0; *fmt != '\0' && i < 19;
-						fmt++, i++) {
-					if (!(*fmt >= '0' && *fmt <= '9'))
-						break;
-					ctx->align = (ctx->align * 10)
-						+ (*fmt - '0');
-				}
+				ctx->align = XSYMBOL(strtol)(fmt,
+					(char **)&fmt, 10);
 			}
+			ctx->align = MAX(ctx->align, 0);
 		}
 
 		/* precise */
 		if (*fmt == '.') {
 			fmt++;
 			if (*fmt == '*') { /* dynamic */
-				ctx->precise = va_arg(ap, int64);
+				ctx->precise = va_arg(ap, int32);
 				fmt++;
 			} else {
-				for (; *fmt == '0'; fmt++);
-				for (int32 i = 0; *fmt != '\0' && i < 19;
-						fmt++, i++) {
-					if (!(*fmt >= '0' && *fmt <= '9'))
-						break;
-					ctx->precise = (ctx->precise * 10)
-						+ (*fmt - '0');
-				}
+				ctx->precise = XSYMBOL(strtol)(fmt,
+					(char **)&fmt, 10);
 			}
+			ctx->precise = MAX(ctx->precise, 0);
 		}
 
 		/* length modifier */
@@ -430,16 +418,14 @@ e:
 				} else if (ctx->flags & FG_LONG_LONG) {
 					ctx->va._i64L = va_arg(ap, int64L);
 				} else if (ctx->flags & FG_SHORT) {
-					ctx->va._i64L = (int16)va_arg(ap, int32);
+					ctx->va._i64L =
+						(int16)va_arg(ap, int32);
 				} else if (ctx->flags & FG_CHAR) {
-					ctx->va._i64L = (int8)va_arg(ap, int32);
+					ctx->va._i64L =
+						(int8)va_arg(ap, int32);
 				} else {
 					ctx->va._i64L = va_arg(ap, int32);
 				}
-
-				/* output */
-				if (_fmt_di(ctx))
-					return -2;
 				break;
 			case 'o': /* octal */
 			case 'u': /* decimal */
@@ -451,45 +437,59 @@ e:
 				} else if (ctx->flags & FG_LONG_LONG) {
 					ctx->va._u64L = va_arg(ap, uint64L);
 				} else if (ctx->flags & FG_SHORT) {
-					ctx->va._u64L = (uint16)va_arg(ap, uint32);
+					ctx->va._u64L =
+						(uint16)va_arg(ap, uint32);
 				} else if (ctx->flags & FG_CHAR) {
-					ctx->va._u64L = (uint8)va_arg(ap, uint32);
+					ctx->va._u64L =
+						(uint8)va_arg(ap, uint32);
 				} else {
 					ctx->va._u64L = va_arg(ap, uint32);
 				}
-
-				/* output */
-				if (_fmt_ouxXp(ctx))
-					return -2;
 				break;
 			case 'c': /* character */
 				ctx->va._char = (char)va_arg(ap, uint32);
-
-				/* output */
-				if (_fmt_cs(ctx))
-					return -2;
 				break;
 			case 's': /* string */
 				ctx->va._str = va_arg(ap, char *);
+				break;
+			case 'e': /* floating-point */
+			case 'E':
+			case 'f': case 'F': case 'g':
+			case 'G': case 'a': case 'A':
+				if (!ctx->precise)
+					ctx->precise = 6;
+				ctx->va._f64 = va_arg(ap, float64);
+				break;
+			default:
+				return -1;
+		}
 
-				/* output */
-				if (_fmt_cs(ctx))
+		switch (ctx->specifiers) {
+			case 'n':
+				return -1;
+			case 'd': /* decimal */
+			case 'i':
+				if (_fmt_printf_di(ctx))
+					return -2;
+				break;
+			case 'o': /* octal */
+			case 'u': /* decimal */
+			case 'x': /* hexadecimal */
+			case 'X':
+			case 'p': /* pointer */
+				if (_fmt_printf_ouxXp(ctx))
+					return -2;
+				break;
+			case 'c': /* character */
+			case 's': /* string */
+				if (_fmt_printf_cs(ctx))
 					return -2;
 				break;
 			case 'e': /* floating-point */
 			case 'E':
-			case 'f':
-			case 'F':
-			case 'g':
-			case 'G':
-			case 'a':
-			case 'A':
-				if (!ctx->precise)
-					ctx->precise = 6;
-				ctx->va._f64 = va_arg(ap, float64);
-
-				/* output */
-				if (_fmt_f(ctx))
+			case 'f': case 'F': case 'g':
+			case 'G': case 'a': case 'A':
+				if (_fmt_printf_f(ctx))
 					return -2;
 				break;
 			default:

@@ -3,7 +3,6 @@
 #include <libf/sl/xstdint.h>
 #include <libf/sl/xfloat.h>
 #include <libf/sl/xstring.h>
-#include <libf/sl/xstdio.h>
 #include <libf/sl/xstdio_sys.h>
 
 
@@ -136,15 +135,8 @@ int main(void) {
 	printf("s: %33s ω %s-\n", "Hello, World ω", NULL);
 	XSYMBOL(printf)("s: %33s ω %s-\n", "Hello, World ω", NULL);
 
-	/* snprintf */
-	char buf[128];
-	XSYMBOL(memset)(buf, 'A', 128);
-
-	snprintf(buf, 108, "h%99dh ωω\xe3\n", 123);
-	printf("%s\n", buf);
-
-	XSYMBOL(snprintf)(buf, 108, "h%99dh ωω\xe3\n", 123);
-	printf("%s\n", buf);
+	printf("s: %*s ω %s-\n", -33, "Hello, World ω", NULL);
+	XSYMBOL(printf)("s: %*s ω %s-\n", -33, "Hello, World ω", NULL);
 
 	return 0;
 }

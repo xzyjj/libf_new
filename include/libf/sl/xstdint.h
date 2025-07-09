@@ -69,9 +69,9 @@ typedef unsigned long long uint64L;
 #endif
 
 #undef INT64L_MIN
-#define INT64L_MIN (-0x8000000000000000ULL)
+#define INT64L_MIN (-0x8000000000000000LL)
 #undef INT64L_MAX
-#define INT64L_MAX 0x7fffffffffffffffULL
+#define INT64L_MAX 0x7fffffffffffffffLL
 #undef UINT64L_MAX
 #define UINT64L_MAX 0xffffffffffffffffULL
 /* end */

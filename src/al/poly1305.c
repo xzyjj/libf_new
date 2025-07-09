@@ -92,7 +92,7 @@ void FSYMBOL(poly1305_block)(struct poly1305_ctx *ctx, const uint8 *s,
 		+ ((uint64L)h[3] * r[1])
 		+ ((uint64L)h[4] * r[0]);
 
-	/* h = d % p */
+	/* h = d % p modular reduction */
 	h[0] = (uint32)d[0] & 0x3ffffff;
 	h[1] = (uint32)d[1] & 0x3ffffff;
 	h[2] = (uint32)d[2] & 0x3ffffff;
@@ -151,6 +151,7 @@ void FSYMBOL(poly1305_finish)(struct poly1305_ctx *ctx) {
 	h[2] &= 0x3ffffff;
 	h[4] += h[3] >> 26;
 	h[3] &= 0x3ffffff;
+
 	h[0] += 5 * (h[4] >> 26);
 	h[4] &= 0x3ffffff;
 	h[1] += h[0] >> 26;
@@ -176,13 +177,13 @@ void FSYMBOL(poly1305_finish)(struct poly1305_ctx *ctx) {
 	h[3] = (h[3] & h_mask) | (t[3] & t_mask);
 	h[4] = (h[4] & h_mask) | (t[4] & t_mask);
 
-	/* h = h % 2**128 */
+	/* merge limbs */
 	h[0] |= h[1] << 26;
 	h[1] = (h[1] >> 6) | (h[2] << 20);
 	h[2] = (h[2] >> 12) | (h[3] << 14);
 	h[3] = (h[3] >> 18) | (h[4] << 8);
 
-	/* tag = (h + s) % 2**128 */
+	/* h = h + s */
 	uint64L tt = (uint64L)h[0] + ctx->s[0];
 	h[0] = (uint32)tt;
 	tt = (uint64L)h[1] + ctx->s[1] + (tt >> 32);
@@ -205,4 +206,17 @@ void FSYMBOL(poly1305_finish)(struct poly1305_ctx *ctx) {
 void FSYMBOL(poly1305)(struct poly1305_ctx *ctx, const uint8 *s, uint64 len) {
 	FSYMBOL(poly1305_process)(ctx, s, len);
 	FSYMBOL(poly1305_finish)(ctx);
+} /* end */
+
+/* @func: poly1305_tag_auth - poly1305 tag comparison is equal
+* @param1: const uint8 * # poly1305 tag
+* @param2: const uint8 * # poly1305 tag
+* @return: int32         # 0: a == b, 1: a != b
+*/
+int32 FSYMBOL(poly1305_tag_auth)(const uint8 *a, const uint8 *b) {
+	uint32 r = 0;
+	for (int32 i = 0; i < POLY1305_TAGLEN; i++)
+		r |= a[i] ^ b[i];
+
+	return ~((r - 1) >> 31) & 1;
 } /* end */

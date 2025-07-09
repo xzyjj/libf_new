@@ -129,11 +129,9 @@ extern "C" {
 
 /* ed25519_fast.c */
 extern void FSYMBOL(ed25519_fast_point_add)(const struct ed25519_point *xyz1,
-		const struct ed25519_point *xyz2,
-		struct ed25519_point *xyz3);
+		const struct ed25519_point *xyz2, struct ed25519_point *xyz3);
 extern void FSYMBOL(ed25519_fast_scalar_mul)(const uint32 k[8],
-		const struct ed25519_point *xyz1,
-		struct ed25519_point *xyz2);
+		const struct ed25519_point *xyz1, struct ed25519_point *xyz2);
 extern int32 FSYMBOL(ed25519_fast_point_equal)(const struct ed25519_point *xyz1,
 		const struct ed25519_point *xyz2);
 extern void FSYMBOL(ed25519_fast_point_recover_x)(const uint32 y[8], uint32 sign,

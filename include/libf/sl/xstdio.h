@@ -17,6 +17,10 @@ extern int32 XSYMBOL(vsnprintf)(char *buf, uint64 len, const char *fmt,
 		va_list ap);
 extern int32 XSYMBOL(snprintf)(char *buf, uint64 len, const char *fmt, ...);
 
+/* xstdio_sscanf.c */
+extern int32 XSYMBOL(vsscanf)(const char *s, const char *fmt, va_list ap);
+extern int32 XSYMBOL(sscanf)(const char *s, const char *fmt, ...);
+
 #ifdef __cplusplus
 }
 #endif

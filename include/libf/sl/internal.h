@@ -18,11 +18,11 @@
 #define FLTO_LENMAX 680
 /* end */
 
-/* @def: fmt  */
-#undef fmt_ctx
-struct fmt_ctx {
-	int64 align;
-	int64 precise;
+/* @def: fmt_printf */
+#undef fmt_printf_ctx
+struct fmt_printf_ctx {
+	int32 align;
+	int32 precise;
 	int32 flags;
 	char specifiers;
 	union {
@@ -39,19 +39,47 @@ struct fmt_ctx {
 	int32 (*call_out)(const char *, uint64, void *);
 };
 
-#undef FMT_NEW
-#define FMT_NEW(name, _call_pad, _call_out, _arg) \
-	struct fmt_ctx name = { \
+#undef FMT_PRINTF_NEW
+#define FMT_PRINTF_NEW(name, _call_pad, _call_out, _arg) \
+	struct fmt_printf_ctx name = { \
 		.call_pad = _call_pad, \
 		.call_out = _call_out, \
 		.arg = _arg \
 	}
 
-#undef FMT_INIT
-#define FMT_INIT(name, _call_pad, _call_out, _arg) \
+#undef FMT_PRINTF_INIT
+#define FMT_PRINTF_INIT(name, _call_pad, _call_out, _arg) \
 	(name)->call_pad = _call_pad; \
 	(name)->call_out = _call_out; \
 	(name)->arg = _arg
+/* end */
+
+/* @def: fmt_scanf */
+#undef fmt_scanf_ctx
+struct fmt_scanf_ctx {
+	int32 flags;
+	char specifiers;
+	union {
+		int8 *_i8;
+		int16 *_i16;
+		int32 *_i32;
+		int64 *_i64;
+		int64L *_i64L;
+		uint8 *_u8;
+		uint16 *_u16;
+		uint32 *_u32;
+		uint64 *_u64;
+		uint64L *_u64L;
+		float64 *_f64;
+		void **_void;
+		char *_char;
+	} va;
+	int64 buf_size;
+	const char *s;
+};
+
+#undef FMT_SCANF_NEW
+#define FMT_SCANF_NEW(name) struct fmt_scanf_ctx name
 /* end */
 
 /* @def: umalloc
@@ -101,9 +129,9 @@ struct umalloc_ctx {
 extern "C" {
 #endif
 
-/* internal_fmt.c */
-extern int32 XSYMBOL(internal_fmt)(struct fmt_ctx *ctx, const char *fmt,
-		va_list ap);
+/* internal_atoi.c */
+extern uint64L XSYMBOL(internal_strtoull)(const char *s, char **e, uint64L *m,
+		int32 b);
 
 /* internal_ftoa.c */
 extern int32 XSYMBOL(internal_fltostr_num)(int32 n, char *p, float64 v, int32 pre);
@@ -113,6 +141,14 @@ extern int32 XSYMBOL(internal_ulltostr_o)(int32 n, char *p, uint64L v);
 extern int32 XSYMBOL(internal_ulltostr_d)(int32 n, char *p, uint64L v);
 extern int32 XSYMBOL(internal_ulltostr_x)(int32 n, char *p, uint64L v);
 extern int32 XSYMBOL(internal_ulltostr_X)(int32 n, char *p, uint64L v);
+
+/* internal_printf.c */
+extern int32 XSYMBOL(internal_fmt_printf)(struct fmt_printf_ctx *ctx,
+		const char *fmt, va_list ap);
+
+/* internal_scanf.c */
+extern int32 XSYMBOL(internal_fmt_scanf)(struct fmt_scanf_ctx *ctx, const char *s,
+		const char *fmt, va_list ap);
 
 /* internal_umalloc.c */
 extern void *XSYMBOL(internal_umalloc)(struct umalloc_ctx *ctx, uint64 size);

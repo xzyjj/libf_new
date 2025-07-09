@@ -11,15 +11,22 @@
 /* @func: hmac_sha3_init - hmac-sha3 key init
 * @param1: struct hmac_sha3_ctx * # hmac-sha3 struct context
 * @param2: const uint8 *          # input key
-* @param2: int32                  # digest type
-* @param4: uint32                 # key length
-* @param5: uint32                 # SHAKE digest length (byte)
-* @return: int32                  # 0: no error, -1: sha3 init error
+* @param3: uint32                 # key length
+* @param4: int32                  # digest type
+* @return: int32                  # 0: no error, -1: type or init error
 */
 int32 FSYMBOL(hmac_sha3_init)(struct hmac_sha3_ctx *ctx, const uint8 *key,
-		uint32 key_len, int32 type, uint32 dsize) {
+		uint32 key_len, int32 type) {
 	SHA3_NEW(sha3_ctx);
-	if (FSYMBOL(sha3_init)(&sha3_ctx, type, dsize))
+
+	switch (type) {
+		case SHA3_224_TYPE: case SHA3_256_TYPE:
+		case SHA3_384_TYPE: case SHA3_512_TYPE:
+			break;
+		default:
+			return -1;
+	}
+	if (FSYMBOL(sha3_init)(&sha3_ctx, type, 0))
 		return -1;
 
 	if (key_len > SHA3_GETRATE(&sha3_ctx)) {
@@ -35,9 +42,9 @@ int32 FSYMBOL(hmac_sha3_init)(struct hmac_sha3_ctx *ctx, const uint8 *key,
 		ctx->opad[i] ^= key[i];
 	}
 
-	if (FSYMBOL(sha3_init)(&ctx->ipad_ctx, type, dsize))
+	if (FSYMBOL(sha3_init)(&ctx->ipad_ctx, type, 0))
 		return -1;
-	if (FSYMBOL(sha3_init)(&ctx->opad_ctx, type, dsize))
+	if (FSYMBOL(sha3_init)(&ctx->opad_ctx, type, 0))
 		return -1;
 	FSYMBOL(sha3_process)(&ctx->ipad_ctx, ctx->ipad,
 		SHA3_GETRATE(&ctx->ipad_ctx));

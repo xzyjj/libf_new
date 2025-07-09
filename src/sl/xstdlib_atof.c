@@ -45,7 +45,7 @@ static float64 _strtod_num(const char *s, char **e, int32 b) {
 * @return: float64 # string to double
 */
 static float64 _strtod(const char *s, char **e) {
-	for (; *s == ' '; s++);
+	for (; *s == ' ' || *s == '\t'; s++);
 
 	int32 neg = 0, b = 10; /* negative */
 	if (*s == '-' || *s == '+')

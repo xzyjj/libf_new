@@ -20,7 +20,7 @@ int main(void) {
 	}
 	end = clock();
 	time = (double)(end - start) / CLOCKS_PER_SEC;
-	printf("time: %.6f\n", time / 1000);
+	printf("time: %.6f (%.2f/s)\n", time / 1000, 1000 / time);
 
 	return 0;
 }

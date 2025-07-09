@@ -54,7 +54,7 @@ int32 XSYMBOL(memcmp)(const void *s1, const void *s2, uint64 len) {
 
 /* @func: strlen - calculate the length of a string
 * @param1: const char * # string pointer
-* @return: uint64       # >= 0: string length
+* @return: uint64       # string length
 */
 uint64 XSYMBOL(strlen)(const char *s) {
 	const char *a = s;
@@ -64,13 +64,13 @@ uint64 XSYMBOL(strlen)(const char *s) {
 } /* end */
 
 /* @func: strnlen - calculate the length of a string
-* @param1: const char * # source pointer
-* @param2: uint64       # source length-max
-* @return: uint64       # >= 0: string length
+* @param1: const char * # string pointer
+* @param2: uint64       # string length-max
+* @return: uint64       # string length
 */
 uint64 XSYMBOL(strnlen)(const char *s, uint64 len) {
 	const char *a = s;
-	for (; len-- && *s != '\0'; s++);
+	for (; len && *s != '\0'; s++, len--);
 
 	return (uint64)(s - a);
 } /* end */
@@ -82,12 +82,11 @@ uint64 XSYMBOL(strnlen)(const char *s, uint64 len) {
 */
 char *XSYMBOL(strcpy)(char *t, const char *s) {
 	char *a = t;
-	for (; *s != '\0'; )
+	while (*s != '\0')
 		*t++ = *s++;
 	*t = '\0';
 
 	return a;
-
 } /* end */
 
 /* @func: strncpy - copy the string into the buffer and zero the rest
@@ -124,6 +123,7 @@ char *XSYMBOL(strcat)(char *t, const char *s) {
 */
 char *XSYMBOL(strncat)(char *t, const char *s, uint64 len) {
 	char *a = t;
+
 	t += XSYMBOL(strlen)(t);
 	for (; len && *s != '\0'; len--)
 		*t++ = *s++;
@@ -133,32 +133,32 @@ char *XSYMBOL(strncat)(char *t, const char *s, uint64 len) {
 } /* end */
 
 /* @func: strchr - locate character in string
-* @param1: char * # string pointer
-* @param2: uint8  # character
-* @return: char * # string pointer
+* @param1: const char * # string pointer
+* @param2: uint8        # character
+* @return: char *       # string pointer
 */
-char *XSYMBOL(strchr)(const char *s, const uint8 c) {
+char *XSYMBOL(strchr)(const char *s, uint8 c) {
 	for (; *s != '\0'; s++) {
 		if (*((uint8 *)s) == c)
 			return (char *)s;
 	}
 
-	return NULL;
+	return (*((uint8 *)s) == c) ? (char *)s : NULL;
 } /* end */
 
 /* @func: strrchr - locate the character in the string from the end
 * @param1: const char * # string pointer
-* @param2: const uint8  # character
+* @param2: uint8        # character
 * @return: char *       # string pointer
 */
-char *XSYMBOL(strrchr)(const char *s, const uint8 c) {
+char *XSYMBOL(strrchr)(const char *s, uint8 c) {
 	return XSYMBOL(memrchr)(s, c, XSYMBOL(strlen)(s) + 1);
 } /* end */
 
 /* @func: strcmp - compare two string
 * @param1: const char * # string1 pointer
 * @param2: const char * # string2 pointer
-* @return: int32        # 0: no error, 0<N>0: *s1 - *s2
+* @return: int32        # 0<N>0: *s1 - *s2
 */
 int32 XSYMBOL(strcmp)(const char *s1, const char *s2) {
 	for (; *s1 == *s2 && *s1 != '\0'; s1++, s2++);
@@ -170,7 +170,7 @@ int32 XSYMBOL(strcmp)(const char *s1, const char *s2) {
 * @param1: const char * # string1 pointer
 * @param2: const char * # string2 pointer
 * @param3: uint64       # length
-* @return: int32        # 0: no error, 0<N>0: *s1 - *s2
+* @return: int32        # 0<N>0: *s1 - *s2
 */
 int32 XSYMBOL(strncmp)(const char *s1, const char *s2, uint64 len) {
 	if (!len)
@@ -187,8 +187,7 @@ int32 XSYMBOL(strncmp)(const char *s1, const char *s2, uint64 len) {
 * @return: char *       # string1 location / NULL pointer
 */
 char *XSYMBOL(strstr)(const char *s1, const char *s2) {
-	uint64 n1 = XSYMBOL(strlen)(s1),
-		n2 = XSYMBOL(strlen)(s2);
+	uint64 n1 = XSYMBOL(strlen)(s1), n2 = XSYMBOL(strlen)(s2);
 	for (uint64 n = 0; (n1 - n) >= n2; s1++, n++) {
 		if (!XSYMBOL(memcmp)(s2, s1, n2))
 			return (char *)s1;
@@ -203,12 +202,8 @@ char *XSYMBOL(strstr)(const char *s1, const char *s2) {
 * @return: char *       # string location / NULL pointer
 */
 char *XSYMBOL(strpbrk)(const char *s, const char *cs) {
-	uint32 csn = XSYMBOL(strlen)(cs);
-	if (!csn)
-		return NULL;
-
 	for (; *s != '\0'; s++) {
-		if (XSYMBOL(memchr)(cs, *s, csn))
+		if (XSYMBOL(strchr)(cs, *s))
 			return (char *)s;
 	}
 
@@ -222,13 +217,9 @@ char *XSYMBOL(strpbrk)(const char *s, const char *cs) {
 * @return: uint64       # string location length
 */
 uint64 XSYMBOL(strspn)(const char *s, const char *cs) {
-	uint32 csn = XSYMBOL(strlen)(cs);
-	if (!csn)
-		return 0;
-
 	uint64 n = 0;
 	for (; *s != '\0'; s++, n++) {
-		if (!XSYMBOL(memchr)(cs, *s, csn))
+		if (!XSYMBOL(strchr)(cs, *s))
 			break;
 	}
 
@@ -242,13 +233,9 @@ uint64 XSYMBOL(strspn)(const char *s, const char *cs) {
 * @return: uint64       # string location length
 */
 uint64 XSYMBOL(strcspn)(const char *s, const char *cs) {
-	uint32 csn = XSYMBOL(strlen)(cs);
-	if (!csn)
-		return 0;
-
 	uint64 n = 0;
 	for (; *s != '\0'; s++, n++) {
-		if (XSYMBOL(memchr)(cs, *s, csn))
+		if (XSYMBOL(strchr)(cs, *s))
 			return n;
 	}
 
@@ -269,9 +256,8 @@ char *XSYMBOL(strtok_r)(char *s, const char *sp, char **sl) {
 	if (*tmp == '\0')
 		return NULL;
 
-	uint32 spn = XSYMBOL(strlen)(sp);
 	for (; *tmp != '\0'; tmp++) {
-		if (XSYMBOL(memchr)(sp, *tmp, spn)) {
+		if (XSYMBOL(strchr)(sp, *tmp)) {
 			*sl = tmp + 1;
 			*tmp = '\0';
 			return s;

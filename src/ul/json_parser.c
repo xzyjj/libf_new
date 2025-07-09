@@ -52,7 +52,7 @@ static int32 _json_object(struct json_ctx *ctx);
 static int32 _json_array(struct json_ctx *ctx);
 
 #undef BREAK_CHARACTER
-#define BREAK_CHARACTER(x) (x == ' ' || x == '\n' || x == '\t')
+#define BREAK_CHARACTER(x) ((x) == ' ' || (x) == '\n' || (x) == '\t')
 #undef INVALID_CHARACTER
 #define INVALID_CHARACTER(x) ((uint8)(x) < 0x20)
 /* end */

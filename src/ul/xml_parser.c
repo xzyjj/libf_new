@@ -54,7 +54,7 @@ static const uint8 xml_name_table[256] = {
 	};
 
 #undef BREAK_CHARACTER
-#define BREAK_CHARACTER(x) (x == ' ' || x == '\n' || x == '\t')
+#define BREAK_CHARACTER(x) ((x) == ' ' || (x) == '\n' || (x) == '\t')
 #undef INVALID_CHARACTER
 #define INVALID_CHARACTER(x) ((uint8)(x) < 0x20)
 /* end */
@@ -634,7 +634,7 @@ static int32 _xml_element_attr(struct xml_ctx *ctx) {
 
 /* @func: _xml_element_start (static) - parsing xml element
 * @param1: struct xml_ctx * # xml struct context
-* @return: int32            # 0: no error, 1: empty element,  -1: error, \
+* @return: int32            # 0: no error, 1: empty element, -1: error, \
 *                             -2: call error
 */
 static int32 _xml_element_start(struct xml_ctx *ctx) {

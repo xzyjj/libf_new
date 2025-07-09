@@ -84,3 +84,8 @@
 ## cSHAKE, KMAC, TupleHash and ParallelHash Algorithms
 
 	- [NIST.SP.800-185.pdf](http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf)
+
+## HMAC-based Extract-and-Expand Key Derivation Function (HKDF)
+
+	- [rfc-5869.txt](https://www.rfc-editor.org/rfc/rfc5869.txt)
+	- [rfc-5869.html](https://www.rfc-editor.org/rfc/rfc5869.html)

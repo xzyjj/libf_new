@@ -2,7 +2,7 @@
 #include <time.h>
 #include <libf/sl/xstdint.h>
 #include <libf/sl/xstring.h>
-#include <libf/al/huffman.h>
+#include <libf/al/huf_ref.h>
 
 
 void each(struct huf_node *node, int32 n, int32 c) {

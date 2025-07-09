@@ -31,7 +31,7 @@ extern "C" {
 
 /* hmac_sha3.c */
 extern int32 FSYMBOL(hmac_sha3_init)(struct hmac_sha3_ctx *ctx, const uint8 *key,
-		uint32 key_len, int32 type, uint32 dsize);
+		uint32 key_len, int32 type);
 extern void FSYMBOL(hmac_sha3_process)(struct hmac_sha3_ctx *ctx, const uint8 *s,
 		uint64 len);
 extern void FSYMBOL(hmac_sha3_finish)(struct hmac_sha3_ctx *ctx);

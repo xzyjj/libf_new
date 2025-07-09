@@ -1,7 +1,6 @@
 /* internal_ftoa.c - floating to string conversion implementations */
 
 #include <libf/config.h>
-#include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
 #include <libf/sl/xfloat.h>
 #include <libf/sl/xstring.h>

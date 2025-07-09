@@ -26,7 +26,7 @@
 
 	riscv_64:
 
-	$ -U__LP64__ -D__LP64__ -Iinclude -Iinclude/asm-mips
+	$ -U__LP64__ -D__LP64__ -Iinclude -Iinclude/asm-riscv
 
 	mips_32:
 

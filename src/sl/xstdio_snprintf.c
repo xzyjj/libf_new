@@ -62,9 +62,9 @@ static int32 _snout(const char *s, uint64 n, void *arg) {
 int32 XSYMBOL(vsnprintf)(char *buf, uint64 len, const char *fmt,
 		va_list ap) {
 	struct _snout_ctx p = { buf, buf + len };
-	FMT_NEW(ctx, _snout_pad, _snout, &p);
+	FMT_PRINTF_NEW(ctx, _snout_pad, _snout, &p);
 
-	int32 r = XSYMBOL(internal_fmt)(&ctx, fmt, ap);
+	int32 r = XSYMBOL(internal_fmt_printf)(&ctx, fmt, ap);
 	*((char *)(p.pbuf)) = '\0';
 
 	return r;
@@ -80,11 +80,6 @@ int32 XSYMBOL(vsnprintf)(char *buf, uint64 len, const char *fmt,
 int32 XSYMBOL(snprintf)(char *buf, uint64 len, const char *fmt, ...) {
 	va_list ap;
 	va_start(ap, fmt);
-	struct _snout_ctx p = { buf, buf + len };
-	FMT_NEW(ctx, _snout_pad, _snout, &p);
 
-	int32 r = XSYMBOL(internal_fmt)(&ctx, fmt, ap);
-	*((char *)(p.pbuf)) = '\0';
-
-	return r;
+	return XSYMBOL(vsnprintf)(buf, len, fmt, ap);
 } /* end */

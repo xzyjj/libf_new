@@ -1,7 +1,7 @@
-/* huffman.h - huffman encode definitions */
+/* huf_ref.h - huffman encode definitions */
 
-#ifndef LIBF_AL_HUFFMAN_H
-#define LIBF_AL_HUFFMAN_H
+#ifndef LIBF_AL_HUF_REF_H
+#define LIBF_AL_HUF_REF_H
 
 #include <libf/config.h>
 #include <libf/sl/xstddef.h>
@@ -9,7 +9,7 @@
 #include <libf/ds/minheap.h>
 
 
-/* @def: huffman */
+/* @def: huf_ref */
 #undef huf_node
 struct huf_node {
 	uint8 data[4];
@@ -44,7 +44,7 @@ struct huf_head {
 extern "C" {
 #endif
 
-/* huffman.c */
+/* huf_ref.c */
 extern int32 FSYMBOL(huf_insert)(struct huf_head *head, struct huf_node *node);
 extern struct huf_node *FSYMBOL(huf_build)(struct huf_head *head);
 extern void FSYMBOL(huf_u8freq)(struct huf_node *node, uint8 *s, uint32 len);

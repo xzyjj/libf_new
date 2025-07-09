@@ -1,11 +1,11 @@
-/* huffman.c - huffman encode implementations */
+/* huf_ref.c - huffman encode implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
 #include <libf/sl/xstring.h>
 #include <libf/ds/minheap.h>
-#include <libf/al/huffman.h>
+#include <libf/al/huf_ref.h>
 
 
 /* @func: _huf_cmp (static) - compare huffman frequencies

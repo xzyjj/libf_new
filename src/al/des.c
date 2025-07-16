@@ -1,7 +1,6 @@
 /* des.c - data encryption standard implementations */
 
 #include <libf/config.h>
-#include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
 #include <libf/sl/xstring.h>
 #include <libf/al/des.h>
@@ -202,46 +201,6 @@ static void _des_permute_pc2(uint8 *key_k, uint8 *key_c, uint8 *key_d) {
 	}
 } /* end */
 
-/* @func: des_init - des key init
-* @param1: struct des_ctx # des context struct
-* @param2: const uint8 *  # key
-* @return: void
-*/
-void FSYMBOL(des_init)(struct des_ctx *ctx, const uint8 *key) {
-	XSYMBOL(memset)(ctx, 0, sizeof(struct des_ctx));
-	uint8 *key_k, *key_c, *key_d;
-	key_k = ctx->key_k[0];
-	key_c = ctx->key_c[0];
-	key_d = ctx->key_d[0];
-
-	_des_permute_pc1(key_k, key);
-
-	for (int32 i = 0; i < 3; i++)
-		key_c[i] = key_k[i];
-	key_c[3] = key_k[3] & 0xf0;
-
-	for (int32 i = 0; i < 3; i++) {
-		key_d[i] = (key_k[i + 3] & 0x0f) << 4;
-		key_d[i] |= (key_k[i + 4] & 0xf0) >> 4;
-	}
-	key_d[3] = (key_k[6] & 0x0f) << 4;
-
-	for (int32 j = 1; j < 17; j++) {
-		key_k = ctx->key_k[j];
-		key_c = ctx->key_c[j];
-		key_d = ctx->key_d[j];
-
-		for (int32 i = 0; i < 4; i++) {
-			key_c[i] = ctx->key_c[j - 1][i];
-			key_d[i] = ctx->key_d[j - 1][i];
-		}
-
-		_des_shiftpcd(key_c, j);
-		_des_shiftpcd(key_d, j);
-		_des_permute_pc2(key_k, key_c, key_d);
-	}
-} /* end */
-
 /* @func: _des_permute_ip (static) - buffer initial permute
 * @param1: uint8 * # output buffer
 * @param2: uint8 * # input buffer
@@ -351,6 +310,46 @@ static void _des_permute_ip1(uint8 *out, uint8 *in) {
 	}
 } /* end */
 
+/* @func: des_init - des key init
+* @param1: struct des_ctx # des context struct
+* @param2: const uint8 *  # key
+* @return: void
+*/
+void FSYMBOL(des_init)(struct des_ctx *ctx, const uint8 *key) {
+	XSYMBOL(memset)(ctx, 0, sizeof(struct des_ctx));
+	uint8 *key_k, *key_c, *key_d;
+	key_k = ctx->key_k[0];
+	key_c = ctx->key_c[0];
+	key_d = ctx->key_d[0];
+
+	_des_permute_pc1(key_k, key);
+
+	for (int32 i = 0; i < 3; i++)
+		key_c[i] = key_k[i];
+	key_c[3] = key_k[3] & 0xf0;
+
+	for (int32 i = 0; i < 3; i++) {
+		key_d[i] = (key_k[i + 3] & 0x0f) << 4;
+		key_d[i] |= (key_k[i + 4] & 0xf0) >> 4;
+	}
+	key_d[3] = (key_k[6] & 0x0f) << 4;
+
+	for (int32 j = 1; j < 17; j++) {
+		key_k = ctx->key_k[j];
+		key_c = ctx->key_c[j];
+		key_d = ctx->key_d[j];
+
+		for (int32 i = 0; i < 4; i++) {
+			key_c[i] = ctx->key_c[j - 1][i];
+			key_d[i] = ctx->key_d[j - 1][i];
+		}
+
+		_des_shiftpcd(key_c, j);
+		_des_shiftpcd(key_d, j);
+		_des_permute_pc2(key_k, key_c, key_d);
+	}
+} /* end */
+
 /* @func: des_crypto - des encrypt and decrypt
 * @param1: struct des_ctx * # des struct context
 * @param2: uint8 *          # buffer
@@ -396,77 +395,4 @@ void FSYMBOL(des_crypto)(struct des_ctx *ctx, uint8 *buf, int32 is_decrypt) {
 
 	XSYMBOL(memset)(buf, 0, 8);
 	_des_permute_ip1(buf, lr);
-} /* end */
-
-/* @func: des_encrypt_process - des encrypt processing buffer
-* @param1: struct des_ctx * # des struct context
-* @param2: int32 (*)(const uint8 *, void *) # output callback
-* @param3: void *           # callback arg
-* @param4: const uint8 *    # input buffer
-* @param5: uint64           # input length
-* @return: int32            # 0: no error, -1: callback error
-*/
-int32 FSYMBOL(des_encrypt_process)(struct des_ctx *ctx,
-		int32 (*call)(const uint8 *, void *), void *arg,
-		const uint8 *s, uint64 len) {
-	int32 n = ctx->count;
-	for (uint64 i = 0; i < len; i++) {
-		ctx->buf[n++] = s[i];
-		if (n == DES_BLOCKSIZE) {
-			FSYMBOL(des_crypto)(ctx, ctx->buf, DES_ENCRYPT);
-			if (call(ctx->buf, arg))
-				return -1;
-			n = 0;
-		}
-	}
-	ctx->count = n;
-
-	return 0;
-} /* end */
-
-/* @func: des_encrypt_finish - des encrypt process the remaining bytes in \
-*                              the buffer and end
-* @param1: struct des_ctx * # des struct context
-* @param2: int32 (*)(const uint8 *, void *) # output callback
-* @param3: void *           # callback arg
-* @return: int32            # 0: no error, -1: callback error
-*/
-int32 FSYMBOL(des_encrypt_finish)(struct des_ctx *ctx,
-		int32 (*call)(const uint8 *, void *), void *arg) {
-	if (!ctx->count)
-		return 0;
-
-	XSYMBOL(memset)(&ctx->buf[ctx->count], 0, DES_BLOCKSIZE - ctx->count);
-	FSYMBOL(des_crypto)(ctx, ctx->buf, DES_ENCRYPT);
-	if (call(ctx->buf, arg))
-		return -1;
-	ctx->count = 0;
-
-	return 0;
-} /* end */
-
-/* @func: des_decrypt_process - des decrypt processing buffer
-* @param1: struct des_ctx * # des struct context
-* @param2: void (*)(const uint8 *, void *) # output callback
-* @param3: void *           # callback arg
-* @param4: const uint8 *    # input buffer
-* @param5: uint64           # input length
-* @return: int32            # 0: no error, -1: callback error
-*/
-int32 FSYMBOL(des_decrypt_process)(struct des_ctx *ctx,
-		int32 (*call)(const uint8 *, void *), void *arg,
-		const uint8 *s, uint64 len) {
-	int32 n = ctx->count;
-	for (uint64 i = 0; i < len; i++) {
-		ctx->buf[n++] = s[i];
-		if (n == DES_BLOCKSIZE) {
-			FSYMBOL(des_crypto)(ctx, ctx->buf, DES_DECRYPT);
-			if (call(ctx->buf, arg))
-				return -1;
-			n = 0;
-		}
-	}
-	ctx->count = n;
-
-	return 0;
 } /* end */

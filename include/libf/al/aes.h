@@ -40,8 +40,6 @@
 #undef aes_ctx
 struct aes_ctx {
 	uint8 keyexp[AES_KEYEXPLEN];
-	uint8 buf[AES_BLOCKSIZE];
-	int32 count;
 	int32 keylen;
 	int32 rounds;
 	int32 type;
@@ -59,14 +57,6 @@ extern "C" {
 extern int32 FSYMBOL(aes_init)(struct aes_ctx *ctx, const uint8 *key, int32 type);
 extern void FSYMBOL(aes_encrypt)(struct aes_ctx *ctx, uint8 *state);
 extern void FSYMBOL(aes_decrypt)(struct aes_ctx *ctx, uint8 *state);
-extern int32 FSYMBOL(aes_encrypt_process)(struct aes_ctx *ctx,
-		int32 (*call)(const uint8 *, void *), void *arg,
-		const uint8 *s, uint64 len);
-extern int32 FSYMBOL(aes_encrypt_finish)(struct aes_ctx *ctx,
-		int32 (*call)(const uint8 *, void *), void *arg);
-extern int32 FSYMBOL(aes_decrypt_process)(struct aes_ctx *ctx,
-		int32 (*call)(const uint8 *, void *), void *arg,
-		const uint8 *s, uint64 len);
 
 #ifdef __cplusplus
 }

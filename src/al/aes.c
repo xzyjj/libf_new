@@ -1,7 +1,6 @@
 /* aes.c - advanced encryption standard implementations */
 
 #include <libf/config.h>
-#include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
 #include <libf/sl/xstring.h>
 #include <libf/al/aes.h>
@@ -333,7 +332,6 @@ int32 FSYMBOL(aes_init)(struct aes_ctx *ctx, const uint8 *key, int32 type) {
 	}
 
 	_aes_keyexp(ctx, key);
-	ctx->count = 0;
 
 	return 0;
 } /* end */
@@ -376,77 +374,4 @@ void FSYMBOL(aes_decrypt)(struct aes_ctx *ctx, uint8 *state) {
 	_aes_invshiftrows(state);
 	_aes_invsubbytes(state);
 	_aes_addroundkey(state, ctx->keyexp);
-} /* end */
-
-/* @func: aes_encrypt_process - aes encrypt processing buffer
-* @param1: struct aes_ctx * # aes struct context
-* @param2: int32 (*)(const uint8 *, void *) # output callback
-* @param3: void *           # callback arg
-* @param4: const uint8 *    # input buffer
-* @param5: uint64           # input length
-* @return: int32            # 0: no error, -1: callback error
-*/
-int32 FSYMBOL(aes_encrypt_process)(struct aes_ctx *ctx,
-		int32 (*call)(const uint8 *, void *), void *arg,
-		const uint8 *s, uint64 len) {
-	int32 n = ctx->count;
-	for (uint64 i = 0; i < len; i++) {
-		ctx->buf[n++] = s[i];
-		if (n == AES_BLOCKSIZE) {
-			FSYMBOL(aes_encrypt)(ctx, ctx->buf);
-			if (call(ctx->buf, arg))
-				return -1;
-			n = 0;
-		}
-	}
-	ctx->count = n;
-
-	return 0;
-} /* end */
-
-/* @func: aes_encrypt_finish - aes encrypt process the remaining bytes in \
-*                              the buffer and end
-* @param1: struct aes_ctx * # aes struct context
-* @param2: int32 (*)(const uint8 *, void *) # output callback
-* @param3: void *           # callback arg
-* @return: int32            # 0: no error, -1: callback error
-*/
-int32 FSYMBOL(aes_encrypt_finish)(struct aes_ctx *ctx,
-		int32 (*call)(const uint8 *, void *), void *arg) {
-	if (!ctx->count)
-		return 0;
-
-	XSYMBOL(memset)(&ctx->buf[ctx->count], 0, AES_BLOCKSIZE - ctx->count);
-	FSYMBOL(aes_encrypt)(ctx, ctx->buf);
-	if (call(ctx->buf, arg))
-		return -1;
-	ctx->count = 0;
-
-	return 0;
-} /* end */
-
-/* @func: aes_decrypt_process - aes decrypt processing buffer
-* @param1: struct aes_ctx * # aes struct context
-* @param2: int32 (*)(const uint8 *, void *) # output callback
-* @param3: void *           # callback arg
-* @param4: const uint8 *    # input buffer
-* @param5: uint64           # input length
-* @return: int32            # 0: no error, -1: callback error
-*/
-int32 FSYMBOL(aes_decrypt_process)(struct aes_ctx *ctx,
-		int32 (*call)(const uint8 *, void *), void *arg,
-		const uint8 *s, uint64 len) {
-	int32 n = ctx->count;
-	for (uint64 i = 0; i < len; i++) {
-		ctx->buf[n++] = s[i];
-		if (n == AES_BLOCKSIZE) {
-			FSYMBOL(aes_decrypt)(ctx, ctx->buf);
-			if (call(ctx->buf, arg))
-				return -1;
-			n = 0;
-		}
-	}
-	ctx->count = n;
-
-	return 0;
 } /* end */

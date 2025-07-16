@@ -26,7 +26,8 @@ static void _ed25519_swap(uint32 a[8], uint32 b[8], uint32 bit) {
 * @param3: const uint32 [8] # addend
 * @return: void
 */
-static void _ed25519_add(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
+static void _ed25519_add(uint32 r[8],
+		const uint32 a[8], const uint32 b[8]) {
 	uint32 carry = 0;
 	uint64L tmp = 0;
 
@@ -36,6 +37,8 @@ static void _ed25519_add(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
 		r[i] = tmp & 0xffffffff;
 		carry = tmp >> 32;
 	}
+
+	/* NOTE: (2**256) % (2**255-19) = 38 */
 
 	/* r = r % p modular reduction */
 	carry *= 38;
@@ -59,7 +62,8 @@ static void _ed25519_add(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
 * @param3: const uint32 [8] # subtract
 * @return: void
 */
-static void _ed25519_sub(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
+static void _ed25519_sub(uint32 r[8],
+		const uint32 a[8], const uint32 b[8]) {
 	uint32 carry = 0;
 	uint64L tmp = 0;
 
@@ -69,6 +73,8 @@ static void _ed25519_sub(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
 		r[i] = tmp & 0xffffffff;
 		carry = tmp >> 32;
 	}
+
+	/* NOTE: (2**256) % (2**255-19) = 38 */
 
 	/* r = r % p modular reduction */
 	tmp = (uint64L)r[0] - (carry & 38);
@@ -96,7 +102,8 @@ static void _ed25519_sub(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
 * @param3: const uint32 [8] # multiplier
 * @return: void
 */
-static void _ed25519_mul(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
+static void _ed25519_mul(uint32 r[8],
+		const uint32 a[8], const uint32 b[8]) {
 	uint32 rr[16];
 	uint32 carry = 0;
 	uint64L tmp = 0;
@@ -122,31 +129,29 @@ static void _ed25519_mul(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
 		rr[i + 8] = carry;
 	}
 
+	/* NOTE: (2**256) % (2**255-19) = 38 */
+
+	/* r = rr % p modular reduction */
 	carry = 0;
 	for (int32 i = 0; i < 8; i++) {
 		tmp = (uint64L)rr[i + 8] * 38 + rr[i] + carry;
-		rr[i] = tmp & 0xffffffff;
-		carry = tmp >> 32;
-	}
-
-	/* rr = rr % p modular reduction */
-	carry *= 38;
-	for (int32 i = 0; i < 8; i++) {
-		tmp = (uint64L)rr[i] + carry;
-		rr[i] = tmp & 0xffffffff;
+		r[i] = tmp & 0xffffffff;
 		carry = tmp >> 32;
 	}
 
 	carry *= 38;
 	for (int32 i = 0; i < 8; i++) {
-		tmp = (uint64L)rr[i] + carry;
-		rr[i] = tmp & 0xffffffff;
+		tmp = (uint64L)r[i] + carry;
+		r[i] = tmp & 0xffffffff;
 		carry = tmp >> 32;
 	}
 
-	/* r = rr */
-	for (int32 i = 0; i < 8; i++)
-		r[i] = rr[i];
+	carry *= 38;
+	for (int32 i = 0; i < 8; i++) {
+		tmp = (uint64L)r[i] + carry;
+		r[i] = tmp & 0xffffffff;
+		carry = tmp >> 32;
+	}
 } /* end */
 
 /* @func: _ed25519_inv (static) - modular inversion based on fermat's \
@@ -274,7 +279,7 @@ static void _ed25519_inv(uint32 r[8], const uint32 z[8]) {
 	_ed25519_mul(r, t1, z11);
 } /* end */
 
-/* @func: _ed25519_mod (static) - curve25519 modular reduction
+/* @func: _ed25519_mod (static) - curve25519 modular reduction (norm)
 * @param1: uint32 [8] # number
 * @return: void
 */
@@ -314,7 +319,8 @@ static void _ed25519_mod(uint32 r[8]) {
 * @param3: const uint32 [8] # exponential
 * @return: void
 */
-static void _ed25519_pow(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
+static void _ed25519_pow(uint32 r[8],
+		const uint32 a[8], const uint32 b[8]) {
 	const uint32 *p = ED25519_FAST_ONE;
 	uint32 x[8], t[8], e[8];
 	for (int32 i = 0; i < 8; i++) {
@@ -600,7 +606,7 @@ void FSYMBOL(ed25519_fast_point_decompress)(const uint32 k[8],
 		y[i] = k[i];
 	y[7] &= (1U << 31) - 1;
 
-	/* x = rec_x(y, (k >> 255) - 1) */
+	/* x = rec_x(y, k >> 255) */
 	FSYMBOL(ed25519_fast_point_recover_x)(y, k[7] >> 31, x);
 
 	/* t = x * y */

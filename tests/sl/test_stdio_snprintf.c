@@ -11,10 +11,10 @@ int main(void) {
 	XSYMBOL(memset)(buf, 'A', 128);
 
 	snprintf(buf, 108, "h%99dh ωω\xe3\n", 123);
-	printf("%s\n", buf);
+	printf("libc: %s\n", buf);
 
 	XSYMBOL(snprintf)(buf, 108, "h%99dh ωω\xe3\n", 123);
-	printf("%s\n", buf);
+	printf("libf: %s\n", buf);
 
 	return 0;
 }

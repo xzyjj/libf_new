@@ -38,15 +38,16 @@ static const uint32 md5_number[64] = {
 
 #undef ROL
 #define ROL(x, n) (((x) << (n)) | ((x) >> (32 - (n))))
+
 /* round functions */
 #undef FF
-#define FF(b, c, d) (d ^ (b & (c ^ d)))
+#define FF(b, c, d) ((d) ^ ((b) & ((c) ^ (d))))
 #undef FG
 #define FG(b, c, d) FF(d, b, c)
 #undef FH
-#define FH(b, c, d) (b ^ c ^ d)
+#define FH(b, c, d) ((b) ^ (c) ^ (d))
 #undef FI
-#define FI(b, c, d) (c ^ (b | ~d))
+#define FI(b, c, d) ((c) ^ ((b) | ~(d)))
 /* end */
 
 /* @func: _md5_compress (static) - md5 compress function

@@ -22,22 +22,124 @@ void *XSYMBOL(memcpy)(void *t, const void *s, uint64 len) {
 
 #	else
 
-	volatile uint64 *_t = t, *_s = (uint64 *)s;
-	while (len > (sizeof(uint64) * 4 - 1)) {
+#if 1 /* little endian */
+#	define LS >>
+#	define RS <<
+#else
+#	define LS <<
+#	define RS >>
+#endif
+
+	volatile uint8 *_t = t, *_s = (uint8 *)s;
+	uint32 w, x;
+
+	for (; ((uint64)_s & 3) && len; len--)
 		*_t++ = *_s++;
-		*_t++ = *_s++;
-		*_t++ = *_s++;
-		*_t++ = *_s++;
-		len -= sizeof(uint64) * 4;
-	}
-	while (len > (sizeof(uint64) - 1)) {
-		*_t++ = *_s++;
-		len -= sizeof(uint64);
+
+	switch ((uint64)_t & 3) {
+		case 0:
+			for (; len > 15; len -= 16) {
+				((uint32 *)_t)[0] = ((uint32 *)_s)[0];
+				((uint32 *)_t)[1] = ((uint32 *)_s)[1];
+				((uint32 *)_t)[2] = ((uint32 *)_s)[2];
+				((uint32 *)_t)[3] = ((uint32 *)_s)[3];
+				_t += 16;
+				_s += 16;
+			}
+			for (; len > 3; len -= 4) {
+				((uint32 *)_t)[0] = ((uint32 *)_s)[0];
+				_t += 4;
+				_s += 4;
+			}
+			break;
+		case 1:
+			if (len < 32)
+				break;
+
+			w = *((uint32 *)_s);
+			*_t++ = *_s++;
+			*_t++ = *_s++;
+			*_t++ = *_s++;
+			len -= 3;
+
+			for (; len > 16; len -= 16) {
+				x = *((uint32 *)(_s + 1));
+				((uint32 *)_t)[0] = (w LS 24) | (x RS 8);
+				w = *((uint32 *)(_s + 5));
+				((uint32 *)_t)[1] = (x LS 24) | (w RS 8);
+				x = *((uint32 *)(_s + 9));
+				((uint32 *)_t)[2] = (w LS 24) | (x RS 8);
+				w = *((uint32 *)(_s + 13));
+				((uint32 *)_t)[3] = (x LS 24) | (w RS 8);
+				_t += 16;
+				_s += 16;
+			}
+			break;
+		case 2:
+			if (len < 32)
+				break;
+
+			w = *((uint32 *)_s);
+			*_t++ = *_s++;
+			*_t++ = *_s++;
+			len -= 2;
+
+			for (; len > 17; len -= 16) {
+				x = *((uint32 *)(_s + 2));
+				((uint32 *)_t)[0] = (w LS 16) | (x RS 16);
+				w = *((uint32 *)(_s + 6));
+				((uint32 *)_t)[1] = (x LS 16) | (w RS 16);
+				x = *((uint32 *)(_s + 10));
+				((uint32 *)_t)[2] = (w LS 16) | (x RS 16);
+				w = *((uint32 *)(_s + 14));
+				((uint32 *)_t)[3] = (x LS 16) | (w RS 16);
+				_t += 16;
+				_s += 16;
+			}
+			break;
+		case 3:
+			if (len < 32)
+				break;
+
+			w = *((uint32 *)_s);
+			*_t++ = *_s++;
+			len -= 1;
+
+			for (; len > 18; len -= 16) {
+				x = *((uint32 *)(_s + 3));
+				((uint32 *)_t)[0] = (w LS 8) | (x RS 24);
+				w = *((uint32 *)(_s + 7));
+				((uint32 *)_t)[1] = (x LS 8) | (w RS 24);
+				x = *((uint32 *)(_s + 11));
+				((uint32 *)_t)[2] = (w LS 8) | (x RS 24);
+				w = *((uint32 *)(_s + 15));
+				((uint32 *)_t)[3] = (x LS 8) | (w RS 24);
+				_t += 16;
+				_s += 16;
+			}
+			break;
+		default:
+			break;
 	}
 
-	volatile uint8 *_t1 = (uint8 *)_t, *_s1 = (uint8 *)_s;
-	while (len--)
-		*_t1++ = *_s1++;
+	if (len & 16) {
+		*_t++ = *_s++; *_t++ = *_s++; *_t++ = *_s++; *_t++ = *_s++;
+		*_t++ = *_s++; *_t++ = *_s++; *_t++ = *_s++; *_t++ = *_s++;
+		*_t++ = *_s++; *_t++ = *_s++; *_t++ = *_s++; *_t++ = *_s++;
+		*_t++ = *_s++; *_t++ = *_s++; *_t++ = *_s++; *_t++ = *_s++;
+	}
+	if (len & 8) {
+		*_t++ = *_s++; *_t++ = *_s++; *_t++ = *_s++; *_t++ = *_s++;
+		*_t++ = *_s++; *_t++ = *_s++; *_t++ = *_s++; *_t++ = *_s++;
+	}
+	if (len & 4) {
+		*_t++ = *_s++; *_t++ = *_s++; *_t++ = *_s++; *_t++ = *_s++;
+	}
+	if (len & 2) {
+		*_t++ = *_s++; *_t++ = *_s++;
+	}
+	if (len & 1)
+		*_t++ = *_s++;
 
 	return t;
 
@@ -83,36 +185,10 @@ void *XSYMBOL(memmove)(void *t, const void *s, uint64 len) {
 	if (t <= s)
 		return XSYMBOL(memcpy)(t, s, len);
 
-#if 0
-
-	for (char *tmp1 = (char *)t + len,
-			*tmp2 = (char *)s + len;
-			len--; )
-		*--tmp1 = *--tmp2;
-
-	return t;
-
-#else
-
-	volatile uint64 *_t = (uint64 *)((char *)t + len),
-		*_s = (uint64 *)((char *)s + len);
-	while (len > (sizeof(uint64) * 4 - 1)) {
-		*--_t = *--_s;
-		*--_t = *--_s;
-		*--_t = *--_s;
-		*--_t = *--_s;
-		len -= sizeof(uint64) * 4;
-	}
-	while (len > (sizeof(uint64) - 1)) {
-		*--_t = *--_s;
-		len -= sizeof(uint64);
-	}
-
-	volatile uint8 *_t1 = (uint8 *)_t, *_s1 = (uint8 *)_s;
+	volatile uint8 *_t = (uint8 *)t + len,
+		*_s = (uint8 *)s + len;
 	while (len--)
-		*--_t1 = *--_s1;
+		*--_t = *--_s;
 
 	return t;
-
-#endif
 } /* end */

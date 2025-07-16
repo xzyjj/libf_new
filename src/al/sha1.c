@@ -13,13 +13,13 @@
 
 /* round functions */
 #undef F1
-#define F1(b, c, d) (d ^ (b & (c ^ d)))
+#define F1(b, c, d) ((d) ^ ((b) & ((c) ^ (d))))
 #undef F2
-#define F2(b, c, d) (b ^ c ^ d)
+#define F2(b, c, d) ((b) ^ (c) ^ (d))
 #undef F3
-#define F3(b, c, d) ((b & c) | (d & (b | c)))
+#define F3(b, c, d) (((b) & (c)) | ((d) & ((b) | (c))))
 #undef F4
-#define F4(b, c, d) (b ^ c ^ d)
+#define F4(b, c, d) ((b) ^ (c) ^ (d))
 
 /* round constants */
 #undef K1
@@ -99,7 +99,7 @@ void FSYMBOL(sha1_process)(struct sha1_ctx *ctx, const uint8 *s,
 	uint32 n = ctx->count;
 	for (uint64 i = 0; i < len; i++) {
 		ctx->buf[n++] = s[i];
-		if (n == 64) {
+		if (n == SHA1_BLOCKSIZE) {
 			_sha1_compress(ctx);
 			n = 0;
 		}
@@ -115,7 +115,7 @@ void FSYMBOL(sha1_process)(struct sha1_ctx *ctx, const uint8 *s,
 */
 void FSYMBOL(sha1_finish)(struct sha1_ctx *ctx, uint64L len) {
 	/* padding */
-	uint8 padbuf[64];
+	uint8 padbuf[SHA1_BLOCKSIZE];
 	XSYMBOL(memset)(padbuf, 0, sizeof(padbuf));
 	padbuf[0] = 0x80;
 	FSYMBOL(sha1_process)(ctx, padbuf, 1 + ((119 - (len % 64)) % 64));

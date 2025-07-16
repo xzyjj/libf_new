@@ -166,6 +166,7 @@ static int32 _xml_comment(struct xml_ctx *ctx) {
 			case 0: /* start */
 				if (XSYMBOL(strncmp)("<!--", ctx->str, 4))
 					return -1;
+
 				ctx->str += 3;
 				ctx->len += 3;
 				st = 1;
@@ -175,6 +176,7 @@ static int32 _xml_comment(struct xml_ctx *ctx) {
 					break;
 				if (XSYMBOL(strncmp)("-->", ctx->str, 3))
 					break;
+
 				ctx->str += 3;
 				ctx->len += 3;
 				return ctx->len - len;
@@ -198,6 +200,7 @@ static int32 _xml_cdata(struct xml_ctx *ctx) {
 			case 0: /* start */
 				if (XSYMBOL(strncmp)("<![CDATA[", ctx->str, 9))
 					return -1;
+
 				ctx->str += 8;
 				ctx->len += 8;
 				st = 1;
@@ -207,6 +210,7 @@ static int32 _xml_cdata(struct xml_ctx *ctx) {
 					break;
 				if (XSYMBOL(strncmp)("]]>", ctx->str, 3))
 					break;
+
 				ctx->str += 3;
 				ctx->len += 3;
 				return ctx->len - len;
@@ -224,15 +228,17 @@ static int32 _xml_cdata(struct xml_ctx *ctx) {
 */
 static int32 _xml_statement_attr(struct xml_ctx *ctx) {
 	int32 st = 0, k = 0, len = 0;
-	const char *e = NULL;
 	for (; *(ctx->str) != '\0'; ctx->str++, ctx->len++) {
 		char c = *(ctx->str);
 		switch (st) {
 			case 0: /* name start, or end */
 				if (BREAK_CHARACTER(c))
 					break;
-				if (!XSYMBOL(strncmp)("?>", ctx->str, 2)) /* end */
+				if (!XSYMBOL(strncmp)("?>", ctx->str, 2)) { /* end */
+					ctx->str += 2;
+					ctx->len += 2;
 					return 0;
+				}
 
 				/* invalid character */
 				if (xml_name_table[(uint8)c]) {
@@ -252,14 +258,13 @@ static int32 _xml_statement_attr(struct xml_ctx *ctx) {
 						break;
 				}
 
-				e = ctx->str;
 				len++;
 				st = 1;
 				break;
 			case 1: /* name */
 				if (c == '=') { /* value */
 					if (ctx->call(XML_STATEMENT_ATTR_NAME,
-							e,
+							ctx->str - len,
 							len,
 							ctx->arg))
 						return -2;
@@ -305,8 +310,7 @@ static int32 _xml_statement_attr(struct xml_ctx *ctx) {
 * @return: int32            # 0: no error, -1: error, -2: call error
 */
 static int32 _xml_statement(struct xml_ctx *ctx) {
-	int32 st = 0, k = 0, len = 0;
-	const char *e = NULL;
+	int32 st = 0, len = 0;
 	for (; *(ctx->str) != '\0'; ctx->str++, ctx->len++) {
 		char c = *(ctx->str);
 		switch (st) {
@@ -347,14 +351,13 @@ static int32 _xml_statement(struct xml_ctx *ctx) {
 						break;
 				}
 
-				e = ctx->str;
 				len++;
 				st = 2;
 				break;
 			case 2: /* name, attribute or end */
 				if (BREAK_CHARACTER(c)) { /* attribute */
 					if (ctx->call(XML_STATEMENT_START,
-							e,
+							ctx->str - len,
 							len,
 							ctx->arg))
 						return -2;
@@ -362,7 +365,7 @@ static int32 _xml_statement(struct xml_ctx *ctx) {
 					break;
 				} else if (!XSYMBOL(strncmp)("?>", ctx->str, 2)) { /* end */
 					if (ctx->call(XML_STATEMENT_START,
-							e,
+							ctx->str - len,
 							len,
 							ctx->arg))
 						return -2;
@@ -380,13 +383,7 @@ static int32 _xml_statement(struct xml_ctx *ctx) {
 				len++;
 				break;
 			case 3: /* attribute and end */
-				k = _xml_statement_attr(ctx); /* attribute */
-				if (k < 0)
-					return k;
-
-				ctx->str += 2;
-				ctx->len += 2;
-				return 0;
+				return _xml_statement_attr(ctx);
 			default:
 				return -1;
 		}
@@ -424,7 +421,6 @@ static int32 _xml_doctype(struct xml_ctx *ctx) {
 	*/
 
 	int32 st = 0, k = 0, len = 0;
-	const char *e = NULL;
 	for (; *(ctx->str) != '\0'; ctx->str++, ctx->len++) {
 		char c = *(ctx->str);
 		switch (st) {
@@ -457,6 +453,7 @@ static int32 _xml_doctype(struct xml_ctx *ctx) {
 			case 1: /* name start, string or end */
 				if (BREAK_CHARACTER(c))
 					break;
+
 				if (c == '>') { /* end */
 					ctx->str++;
 					ctx->len++;
@@ -472,6 +469,7 @@ static int32 _xml_doctype(struct xml_ctx *ctx) {
 							k - 2,
 							ctx->arg))
 						return -2;
+
 					ctx->str--;
 					ctx->len--;
 					st = 3;
@@ -496,14 +494,13 @@ static int32 _xml_doctype(struct xml_ctx *ctx) {
 						break;
 				}
 
-				e = ctx->str;
 				len++;
 				st = 2;
 				break;
 			case 2: /* name, next or end */
 				if (BREAK_CHARACTER(c)) { /* next */
 					if (ctx->call(XML_DOCTYPE_NAME,
-							e,
+							ctx->str - len,
 							len,
 							ctx->arg))
 						return -2;
@@ -511,7 +508,7 @@ static int32 _xml_doctype(struct xml_ctx *ctx) {
 					break;
 				} else if (c == '>') { /* end */
 					if (ctx->call(XML_DOCTYPE_NAME,
-							e,
+							ctx->str - len,
 							len,
 							ctx->arg))
 						return -2;
@@ -531,6 +528,7 @@ static int32 _xml_doctype(struct xml_ctx *ctx) {
 			case 3: /* next or end */
 				if (BREAK_CHARACTER(c))
 					break;
+
 				if (c == '>') { /* end */
 					ctx->str++;
 					ctx->len++;
@@ -556,13 +554,13 @@ static int32 _xml_doctype(struct xml_ctx *ctx) {
 */
 static int32 _xml_element_attr(struct xml_ctx *ctx) {
 	int32 st = 0, k = 0, len = 0;
-	const char *e = NULL;
 	for (; *(ctx->str) != '\0'; ctx->str++, ctx->len++) {
 		char c = *(ctx->str);
 		switch (st) {
 			case 0: /* name start, or end */
 				if (BREAK_CHARACTER(c))
 					break;
+
 				if (c == '/' || c == '>') /* end */
 					return 0;
 
@@ -584,14 +582,13 @@ static int32 _xml_element_attr(struct xml_ctx *ctx) {
 						break;
 				}
 
-				e = ctx->str;
 				len++;
 				st = 1;
 				break;
 			case 1: /* name */
 				if (c == '=') { /* value */
 					if (ctx->call(XML_ELEMENT_ATTR_NAME,
-							e,
+							ctx->str - len,
 							len,
 							ctx->arg))
 						return -2;
@@ -661,7 +658,6 @@ static int32 _xml_element_start(struct xml_ctx *ctx) {
 	*/
 
 	int32 st = 0, k = 0, len = 0;
-	const char *e = NULL;
 	for (; *(ctx->str) != '\0'; ctx->str++, ctx->len++) {
 		char c = *(ctx->str);
 		switch (st) {
@@ -694,14 +690,13 @@ static int32 _xml_element_start(struct xml_ctx *ctx) {
 						break;
 				}
 
-				e = ctx->str;
 				len++;
 				st = 2;
 				break;
 			case 2: /* name, attribute, empty or end */
 				if (BREAK_CHARACTER(c)) { /* attribute */
 					if (ctx->call(XML_ELEMENT_START,
-							e,
+							ctx->str - len,
 							len,
 							ctx->arg))
 						return -2;
@@ -709,7 +704,7 @@ static int32 _xml_element_start(struct xml_ctx *ctx) {
 					break;
 				} else if (c == '>') { /* end */
 					if (ctx->call(XML_ELEMENT_START,
-							e,
+							ctx->str - len,
 							len,
 							ctx->arg))
 						return -2;
@@ -718,7 +713,7 @@ static int32 _xml_element_start(struct xml_ctx *ctx) {
 					return 0;
 				} else if (c == '/') { /* empty */
 					if (ctx->call(XML_ELEMENT_START,
-							e,
+							ctx->str - len,
 							len,
 							ctx->arg))
 						return -2;
@@ -749,17 +744,18 @@ static int32 _xml_element_start(struct xml_ctx *ctx) {
 			case 4: /* empty element end */
 				if (BREAK_CHARACTER(c))
 					break;
+
 				if (c != '>') {
 					ctx->err = XML_ERR_ELEMENT_EMPTY_END;
 					return -1;
 				}
-
 				/* empty end */
 				if (ctx->call_end(XML_ELEMENT_EMPTY_END,
 						NULL,
 						0,
 						ctx->arg))
 					return -2;
+
 				ctx->str++;
 				ctx->len++;
 				return 1;
@@ -777,7 +773,6 @@ static int32 _xml_element_start(struct xml_ctx *ctx) {
 */
 static int32 _xml_element_end(struct xml_ctx *ctx) {
 	int32 st = 0, len = 0;
-	const char *e = NULL;
 	for (; *(ctx->str) != '\0'; ctx->str++, ctx->len++) {
 		char c = *(ctx->str);
 		switch (st) {
@@ -791,6 +786,7 @@ static int32 _xml_element_end(struct xml_ctx *ctx) {
 			case 1:
 				if (BREAK_CHARACTER(c))
 					break;
+
 				if (c != '/') {
 					ctx->err = XML_ERR_END_ELEMENT_START;
 					return -1;
@@ -819,14 +815,13 @@ static int32 _xml_element_end(struct xml_ctx *ctx) {
 						break;
 				}
 
-				e = ctx->str;
 				len++;
 				st = 3;
 				break;
 			case 3: /* name or end */
 				if (BREAK_CHARACTER(c)) {
 					if (ctx->call_end(XML_ELEMENT_END,
-							e,
+							ctx->str - len,
 							len,
 							ctx->arg))
 						return -2;
@@ -834,7 +829,7 @@ static int32 _xml_element_end(struct xml_ctx *ctx) {
 					break;
 				} else if (c == '>') { /* end */
 					if (ctx->call_end(XML_ELEMENT_END,
-							e,
+							ctx->str - len,
 							len,
 							ctx->arg))
 						return -2;
@@ -887,6 +882,7 @@ static int32 _xml_element(struct xml_ctx *ctx) {
 					return k;
 				if (k == 1) /* empty */
 					return 0;
+
 				ctx->str--;
 				ctx->len--;
 				st = 1;
@@ -900,18 +896,16 @@ static int32 _xml_element(struct xml_ctx *ctx) {
 						return -2;
 
 					switch (_xml_token(ctx->str)) {
+						case TOKEN_ELEMENT_END: /* end */
+							return _xml_element_end(ctx);
 						case TOKEN_ELEMENT: /* embed element */
 							k = _xml_element(ctx);
 							if (k < 0)
 								return k;
+
 							ctx->str--;
 							ctx->len--;
 							break;
-						case TOKEN_ELEMENT_END: /* end */
-							k = _xml_element_end(ctx);
-							if (k < 0)
-								return k;
-							return 0;
 						case TOKEN_COMMENT: /* comment */
 							k = _xml_comment(ctx);
 							if (k < 0) {
@@ -919,10 +913,11 @@ static int32 _xml_element(struct xml_ctx *ctx) {
 								return k;
 							}
 							if (ctx->call(XML_COMMENT,
-									ctx->str - k,
-									k,
+									ctx->str - k + 4,
+									k - 7,
 									ctx->arg))
 								return -2;
+
 							ctx->str--;
 							ctx->len--;
 							break;
@@ -933,10 +928,11 @@ static int32 _xml_element(struct xml_ctx *ctx) {
 								return k;
 							}
 							if (ctx->call(XML_CDATA,
-									ctx->str - k,
-									k,
+									ctx->str - k + 9,
+									k - 12,
 									ctx->arg))
 								return -2;
+
 							ctx->str--;
 							ctx->len--;
 							break;
@@ -982,6 +978,7 @@ int32 FSYMBOL(xml_parser)(struct xml_ctx *ctx, const char *s) {
 				k = _xml_statement(ctx);
 				if (k < 0)
 					return k;
+
 				ctx->str--;
 				ctx->len--;
 				break;
@@ -992,10 +989,11 @@ int32 FSYMBOL(xml_parser)(struct xml_ctx *ctx, const char *s) {
 					return k;
 				}
 				if (ctx->call(XML_COMMENT,
-						ctx->str - k,
-						k,
+						ctx->str - k + 4,
+						k - 7,
 						ctx->arg))
 					return -2;
+
 				ctx->str--;
 				ctx->len--;
 				break;
@@ -1003,6 +1001,7 @@ int32 FSYMBOL(xml_parser)(struct xml_ctx *ctx, const char *s) {
 				k = _xml_doctype(ctx);
 				if (k < 0)
 					return k;
+
 				ctx->str--;
 				ctx->len--;
 				break;
@@ -1013,10 +1012,11 @@ int32 FSYMBOL(xml_parser)(struct xml_ctx *ctx, const char *s) {
 					return k;
 				}
 				if (ctx->call(XML_CDATA,
-						ctx->str - k,
-						k,
+						ctx->str - k + 9,
+						k - 12,
 						ctx->arg))
 					return -2;
+
 				ctx->str--;
 				ctx->len--;
 				break;
@@ -1024,6 +1024,7 @@ int32 FSYMBOL(xml_parser)(struct xml_ctx *ctx, const char *s) {
 				k = _xml_element(ctx);
 				if (k < 0)
 					return k;
+
 				ctx->str--;
 				ctx->len--;
 				break;

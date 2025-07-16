@@ -84,14 +84,14 @@ static int32 _call(int32 type, const char *s, int32 len, void *arg) {
 			printf("\"\n");
 			break;
 		case XML_COMMENT:
-			printf("%*s", t->lev, "");
+			printf("%*s<!--", t->lev, "");
 			fwrite(s, 1, len, stdout);
-			printf("\n");
+			printf("-->\n");
 			break;
 		case XML_CDATA:
-			printf("%*s", t->lev, "");
+			printf("%*s<![CDATA[", t->lev, "");
 			fwrite(s, 1, len, stdout);
-			printf("\n");
+			printf("]]>\n");
 			break;
 		default:
 			return -1;

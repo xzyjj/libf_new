@@ -222,7 +222,7 @@ void FSYMBOL(x448_scalar_mul)(const bn_int1024_t p, const bn_int1024_t a,
 	FSYMBOL(bn_int1024_zero)(_xz3.z);
 	_xz3.z[0] = 1; /* x3, z3 = (b, 1) */
 
-	for (int32 i = 448; i >= 0; i--) {
+	for (int32 i = 447; i >= 0; i--) {
 		int32 k_t = (k[i / 32] >> (i % 32)) & 1;
 		if (k_t) {
 			FSYMBOL(bn_int1024_move)(_t, _xz1.x);

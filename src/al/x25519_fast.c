@@ -27,7 +27,8 @@ static void _x25519_swap(uint32 a[8], uint32 b[8], uint32 bit) {
 * @param3: const uint32 [8] # addend
 * @return: void
 */
-static void _x25519_add(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
+static void _x25519_add(uint32 r[8],
+		const uint32 a[8], const uint32 b[8]) {
 	uint32 carry = 0;
 	uint64L tmp = 0;
 
@@ -37,6 +38,8 @@ static void _x25519_add(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
 		r[i] = tmp & 0xffffffff;
 		carry = tmp >> 32;
 	}
+
+	/* NOTE: (2**256) % (2**255-19) = 38 */
 
 	/* r = r % p modular reduction */
 	carry *= 38;
@@ -60,7 +63,8 @@ static void _x25519_add(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
 * @param3: const uint32 [8] # subtract
 * @return: void
 */
-static void _x25519_sub(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
+static void _x25519_sub(uint32 r[8],
+		const uint32 a[8], const uint32 b[8]) {
 	uint32 carry = 0;
 	uint64L tmp = 0;
 
@@ -70,6 +74,8 @@ static void _x25519_sub(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
 		r[i] = tmp & 0xffffffff;
 		carry = tmp >> 32;
 	}
+
+	/* NOTE: (2**256) % (2**255-19) = 38 */
 
 	/* r = r % p modular reduction */
 	tmp = (uint64L)r[0] - (carry & 38);
@@ -97,7 +103,8 @@ static void _x25519_sub(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
 * @param3: const uint32 [8] # multiplier
 * @return: void
 */
-static void _x25519_mul(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
+static void _x25519_mul(uint32 r[8],
+		const uint32 a[8], const uint32 b[8]) {
 	uint32 rr[16];
 	uint32 carry = 0;
 	uint64L tmp = 0;
@@ -123,31 +130,29 @@ static void _x25519_mul(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
 		rr[i + 8] = carry;
 	}
 
+	/* NOTE: (2**256) % (2**255-19) = 38 */
+
+	/* r = rr % p modular reduction */
 	carry = 0;
 	for (int32 i = 0; i < 8; i++) {
 		tmp = (uint64L)rr[i + 8] * 38 + rr[i] + carry;
-		rr[i] = tmp & 0xffffffff;
-		carry = tmp >> 32;
-	}
-
-	/* rr = rr % p modular reduction */
-	carry *= 38;
-	for (int32 i = 0; i < 8; i++) {
-		tmp = (uint64L)rr[i] + carry;
-		rr[i] = tmp & 0xffffffff;
+		r[i] = tmp & 0xffffffff;
 		carry = tmp >> 32;
 	}
 
 	carry *= 38;
 	for (int32 i = 0; i < 8; i++) {
-		tmp = (uint64L)rr[i] + carry;
-		rr[i] = tmp & 0xffffffff;
+		tmp = (uint64L)r[i] + carry;
+		r[i] = tmp & 0xffffffff;
 		carry = tmp >> 32;
 	}
 
-	/* r = rr */
-	for (int32 i = 0; i < 8; i++)
-		r[i] = rr[i];
+	carry *= 38;
+	for (int32 i = 0; i < 8; i++) {
+		tmp = (uint64L)r[i] + carry;
+		r[i] = tmp & 0xffffffff;
+		carry = tmp >> 32;
+	}
 } /* end */
 
 /* @func: _x25519_mul121665 (static) - curve25519 '(486662 - 2) / 4 = 121665' \
@@ -157,7 +162,8 @@ static void _x25519_mul(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
 * @param2: const uint32 [8] # addend
 * @return: void
 */
-static void _x25519_mul121665(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
+static void _x25519_mul121665(uint32 r[8],
+		const uint32 a[8], const uint32 b[8]) {
 	uint32 carry = 0;
 	uint64L tmp = 0;
 
@@ -168,7 +174,9 @@ static void _x25519_mul121665(uint32 r[8], const uint32 a[8], const uint32 b[8])
 		carry = tmp >> 32;
 	}
 
-	/* r = r % p (modular reduction) */
+	/* NOTE: (2**256) % (2**255-19) = 38 */
+
+	/* r = r % p modular reduction */
 	carry *= 38;
 	for (int32 i = 0; i < 8; i++) {
 		tmp = (uint64L)r[i] + carry;
@@ -309,7 +317,7 @@ static void _x25519_inv(uint32 r[8], const uint32 z[8]) {
 	_x25519_mul(r, t1, z11);
 } /* end */
 
-/* @func: _x25519_mod (static) - curve25519 modular reduction
+/* @func: _x25519_mod (static) - curve25519 modular reduction (norm)
 * @param1: uint32 [8] # number
 * @return: void
 */

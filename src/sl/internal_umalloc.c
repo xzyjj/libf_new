@@ -102,6 +102,7 @@ static void *_umalloc_new_big_node(struct umalloc_ctx *ctx, uint64 size) {
 static void _umalloc_chunk_merge(struct umalloc_chunk *chunk) {
 	struct umalloc_chunk *next = NULL;
 	uint32 size = 0;
+
 	for (struct umalloc_chunk *pos = chunk;
 			!GET_INUSE(pos);
 			pos = NEXT_CHUNK(pos)) {
@@ -149,6 +150,7 @@ static void *_umalloc_chunk(struct umalloc_ctx *ctx,
 		struct umalloc_chunk *chunk, uint32 size) {
 	size = CHUNK_ALIGNED_SIZE(size);
 	struct umalloc_chunk *next = NULL;
+
 	for (struct umalloc_chunk *pos = chunk;
 			pos;
 			pos = NEXT_CHUNK(pos)) {
@@ -202,6 +204,7 @@ static void *_umalloc_chunk(struct umalloc_ctx *ctx,
 void *XSYMBOL(internal_umalloc)(struct umalloc_ctx *ctx, uint64 size) {
 	struct umalloc_chunk_node *node;
 	struct umalloc_chunk *chunk;
+
 	if (size >= ALLOC_SIZE_MAX) { /* big-block */
 		node = _umalloc_new_big_node(ctx, size);
 		if (!node)
@@ -245,6 +248,7 @@ void XSYMBOL(internal_ufree)(struct umalloc_ctx *ctx, void *p) {
 	struct umalloc_chunk_node *node;
 	struct umalloc_chunk *chunk = p;
 	chunk--;
+
 	if (!GET_INUSE(chunk))
 		return;
 
@@ -294,6 +298,7 @@ uint64 XSYMBOL(internal_umalloc_idle)(struct umalloc_ctx *ctx, int32 type) {
 	uint64 n = 0;
 	struct umalloc_chunk_node *node;
 	struct umalloc_chunk *chunk;
+
 	LIST_FOR_EACH(ctx->chunk.node, pos) {
 		node = container_of(pos,
 			struct umalloc_chunk_node, list);

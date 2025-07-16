@@ -15,16 +15,20 @@ int main(void) {
 	r = sscanf("-99999999999999999999999999999999 123"
 		" 0777 Hello, world!",
 		"%u %o %i %3[^,]%3[^!]", &i, &j, &k, &buf, &buf2);
-	XSYMBOL(printf)("%d: %d %d %d '%s' '%s'\n", r, i, j, k, buf, buf2);
+	printf("libc: %d: %d %d %d '%s' '%s'\n", r, i, j, k, buf, buf2);
 
 	r = XSYMBOL(sscanf)("-99999999999999999999999999999999 123"
 		" 0777 Hello, world!",
 		"%u %o %i %2[^,]%2[^!]", &i, &j, &k, &buf, &buf2);
-	XSYMBOL(printf)("%d: %d %d %d '%s' '%s'\n", r, i, j, k, buf, buf2);
+	printf("libf: %d: %d %d %d '%s' '%s'\n", r, i, j, k, buf, buf2);
+
+	r = sscanf("123.314 Hello 0xff00",
+		"%f %4s %i", &f, &buf, &i);
+	printf("libc: %d: %f '%s' %x\n", r, f, buf, i);
 
 	r = XSYMBOL(sscanf)("123.314e+10 Hello 0xff00",
 		"%f %4s %i", &f, &buf, &i);
-	XSYMBOL(printf)("%d: %f '%s' %x\n", r, f, buf, i);
+	printf("libf: %d: %f '%s' %x\n", r, f, buf, i);
 
 	return 0;
 }

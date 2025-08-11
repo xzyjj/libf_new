@@ -84,7 +84,7 @@ void FSYMBOL(xxhash64_process)(struct xxhash64_ctx *ctx, const uint8 *s,
 *                           buffer and end
 * @param1: struct xxhash64_ctx * # xxh64 struct context
 * @param2: uint64L               # total length
-* @return: uint64L               # return hash value
+* @return: uint64L               # return hash digest
 */
 uint64L FSYMBOL(xxhash64_finish)(struct xxhash64_ctx *ctx, uint64L len) {
 	uint64L a = ctx->state[0];
@@ -156,9 +156,10 @@ uint64L FSYMBOL(xxhash64_finish)(struct xxhash64_ctx *ctx, uint64L len) {
 * @param1: struct xxhash64_ctx * # xxh64 struct context
 * @param2: const uint8 *         # input buffer
 * @param3: uint64                # input length
-* @return: void
+* @return: uint64L               # return hash digest
 */
-void FSYMBOL(xxhash64)(struct xxhash64_ctx *ctx, const uint8 *s, uint64 len) {
+uint64L FSYMBOL(xxhash64)(struct xxhash64_ctx *ctx, const uint8 *s,
+		uint64 len) {
 	FSYMBOL(xxhash64_process)(ctx, s, len);
-	FSYMBOL(xxhash64_finish)(ctx, len);
+	return FSYMBOL(xxhash64_finish)(ctx, len);
 } /* end */

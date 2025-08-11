@@ -4,7 +4,6 @@
 #define LIBF_UL_INI_PARSER_H
 
 #include <libf/config.h>
-#include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
 
 

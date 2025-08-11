@@ -12,8 +12,12 @@
   < element-2 attribute="xxx"> String < /element-2>String
 </element>
 <element attribute="xxx" />
-<![CDATA[......]]>
-
+<element>
+  <![CDATA[
+       ......
+  ]]>
+  String
+</element>
 
 <document>
   <description>
@@ -23,3 +27,5 @@
     ]]>
   </description>
 </document>
+
+<xml>1<!-- -->2<xml>4<!-- -->5<!-- -->6<xml>78</xml></xml><!-- --><![CDATA[..]]><!-- -->2<![CDATA[...]]><!-- -->0<xml><!-- --></xml></xml>

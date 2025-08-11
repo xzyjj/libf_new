@@ -356,7 +356,12 @@ void FSYMBOL(x448_fast_clamp_key)(uint32 k[14]) {
 * @return: void
 */
 void FSYMBOL(x448_fast_private_key)(uint8 *pri) {
-	FSYMBOL(x448_fast_clamp_key)((uint32 *)pri);
+	uint32 _pri[14];
+	XSYMBOL(memcpy)(_pri, pri, X448_LEN);
+
+	FSYMBOL(x448_fast_clamp_key)(_pri);
+
+	XSYMBOL(memcpy)(pri, _pri, X448_LEN);
 } /* end */
 
 /* @func: x448_fast_public_key - x448 public key create function
@@ -365,8 +370,13 @@ void FSYMBOL(x448_fast_private_key)(uint8 *pri) {
 * @return: void
 */
 void FSYMBOL(x448_fast_public_key)(const uint8 *pri, uint8 *pub) {
-	FSYMBOL(x448_fast_scalar_mul)((uint32 *)pri, X448_FAST_B,
-		(uint32 *)pub);
+	uint32 _pri[14], _pub[14];
+	XSYMBOL(memcpy)(_pri, pri, X448_LEN);
+	XSYMBOL(memcpy)(_pub, pub, X448_LEN);
+
+	FSYMBOL(x448_fast_scalar_mul)(_pri, X448_FAST_B, _pub);
+
+	XSYMBOL(memcpy)(pub, _pub, X448_LEN);
 } /* end */
 
 /* @func: x448_fast_shared_key - x448 shared key create function
@@ -377,9 +387,12 @@ void FSYMBOL(x448_fast_public_key)(const uint8 *pri, uint8 *pub) {
 */
 void FSYMBOL(x448_fast_shared_key)(const uint8 *pri, const uint8 *pub,
 		uint8 *key) {
-	uint32 _pub[14];
+	uint32 _pri[14], _pub[14], _key[14];
+	XSYMBOL(memcpy)(_pri, pri, X448_LEN);
 	XSYMBOL(memcpy)(_pub, pub, X448_LEN);
+	XSYMBOL(memcpy)(_key, key, X448_LEN);
 
-	FSYMBOL(x448_fast_scalar_mul)((uint32 *)pri, _pub,
-		(uint32 *)key);
+	FSYMBOL(x448_fast_scalar_mul)(_pri, _pub, _key);
+
+	XSYMBOL(memcpy)(key, _key, X448_LEN);
 } /* end */

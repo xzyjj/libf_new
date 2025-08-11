@@ -19,14 +19,14 @@ void *XSYMBOL(memset)(void *t, int8 c, uint64 len) {
 		*_t++ = c;
 
 	for (; len > 15; len -= 16) {
-		((uint32 *)_t)[0] = *((uint32 *)cc);
-		((uint32 *)_t)[1] = *((uint32 *)cc);
-		((uint32 *)_t)[2] = *((uint32 *)cc);
-		((uint32 *)_t)[3] = *((uint32 *)cc);
+		((volatile uint32 *)_t)[0] = *((uint32 *)cc);
+		((volatile uint32 *)_t)[1] = *((uint32 *)cc);
+		((volatile uint32 *)_t)[2] = *((uint32 *)cc);
+		((volatile uint32 *)_t)[3] = *((uint32 *)cc);
 		_t += 16;
 	}
 	for (; len > 3; len -= 4) {
-		*((uint32 *)_t) = *((uint32 *)cc);
+		*((volatile uint32 *)_t) = *((uint32 *)cc);
 		_t += 4;
 	}
 

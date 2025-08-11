@@ -2,7 +2,7 @@
 #include <libf/sl/xstdint.h>
 #include <libf/sl/xstring.h>
 #include <libf/al/base64.h>
-#include <libf/al/rsa.h>
+#include <libf/al/rsa_ref.h>
 
 
 static void print(const char *s, const bn_int8192_t v) {

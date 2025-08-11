@@ -21,7 +21,7 @@ struct list_head {
 
 #undef LIST_NEW
 #define LIST_NEW(x) \
-	struct list_head x = { .node = NULL }
+	struct list_head x = { NULL }
 
 #undef LIST_INIT
 #define LIST_INIT(x) ((x)->node = NULL)
@@ -31,6 +31,14 @@ struct list_head {
 	for (struct list *name = (node); \
 			name; \
 			name = name->next)
+
+#undef LIST_PREV
+#define LIST_PREV(x) ((x)->prev ? \
+	((x)->prev->next ? (x)->prev : NULL) \
+	: NULL)
+
+#undef LIST_NEXT
+#define LIST_NEXT(x) ((x)->next)
 /* end */
 
 #ifdef __cplusplus

@@ -46,6 +46,10 @@
 	- [riscv-unprivileged.html](https://github.com/riscv/riscv-isa-manual/releases/download/riscv-isa-release-129a2f9-2025-03-27/riscv-unprivileged.html)
 	- [riscv-privileged.html](https://github.com/riscv/riscv-isa-manual/releases/download/riscv-isa-release-129a2f9-2025-03-27/riscv-privileged.html)
 
+== Intel 64 and IA-32 Architectures Software Developer Manuals
+
+	- [x86-253666-088-sdm-vol-2a.pdf](https://cdrdv2.intel.com/v1/dl/getContent/671199)
+
 == curve25519 & curve448 (Elliptic Curves)
 
 	- [rfc7748.txt](https://www.rfc-editor.org/rfc/rfc7748.txt)
@@ -98,3 +102,18 @@
 
 	- [rfc-7914.txt](https://www.rfc-editor.org/rfc/rfc7914.txt)
 	- [rfc-7914.html](https://www.rfc-editor.org/rfc/rfc7914.html)
+
+== Internet Protocol (IPv4)
+
+	- [rfc-791.txt](https://www.rfc-editor.org/rfc/rfc791.txt)
+	- [rfc-791.html](https://www.rfc-editor.org/rfc/rfc791.html)
+
+== Differentiated Services Field (DS Field)
+
+	- [rfc-2474.txt](https://www.rfc-editor.org/rfc/rfc2474.txt)
+	- [rfc-2474.html](https://www.rfc-editor.org/rfc/rfc2474.html)
+
+== Explicit Congestion Notification (ECN)
+
+	- [rfc-3168.txt](https://www.rfc-editor.org/rfc/rfc3168.txt)
+	- [rfc-3168.html](https://www.rfc-editor.org/rfc/rfc3168.html)

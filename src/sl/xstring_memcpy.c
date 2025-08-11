@@ -39,17 +39,12 @@ void *XSYMBOL(memcpy)(void *t, const void *s, uint64 len) {
 	switch ((uint64)_t & 3) {
 		case 0:
 			for (; len > 15; len -= 16) {
-				((uint32 *)_t)[0] = ((uint32 *)_s)[0];
-				((uint32 *)_t)[1] = ((uint32 *)_s)[1];
-				((uint32 *)_t)[2] = ((uint32 *)_s)[2];
-				((uint32 *)_t)[3] = ((uint32 *)_s)[3];
+				((volatile uint32 *)_t)[0] = ((uint32 *)_s)[0];
+				((volatile uint32 *)_t)[1] = ((uint32 *)_s)[1];
+				((volatile uint32 *)_t)[2] = ((uint32 *)_s)[2];
+				((volatile uint32 *)_t)[3] = ((uint32 *)_s)[3];
 				_t += 16;
 				_s += 16;
-			}
-			for (; len > 3; len -= 4) {
-				((uint32 *)_t)[0] = ((uint32 *)_s)[0];
-				_t += 4;
-				_s += 4;
 			}
 			break;
 		case 1:

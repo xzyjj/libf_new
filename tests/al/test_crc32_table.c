@@ -44,6 +44,13 @@ static void crc32_table_print(char *s1, char *s2) {
 }
 
 int main(void) {
+	/*
+	* RefIn == false, not reversed
+	* RefIn == true, after reversed
+	*
+	* Binary: 00000011 after 11000000
+	*/
+
 	crc32_table_msb(0x04c11db7);
 	crc32_table_print("crc32 not reversed: 0x04c11db7 (msb)", "_m");
 	crc32_table_lsb(0xedb88320);

@@ -32,7 +32,8 @@ extern void FSYMBOL(xxhash32_init)(struct xxhash32_ctx *ctx, uint32 seed);
 extern void FSYMBOL(xxhash32_process)(struct xxhash32_ctx *ctx, const uint8 *s,
 		uint64 len);
 extern uint32 FSYMBOL(xxhash32_finish)(struct xxhash32_ctx *ctx, uint64 len);
-extern void FSYMBOL(xxhash32)(struct xxhash32_ctx *ctx, const uint8 *s, uint64 len);
+extern uint32 FSYMBOL(xxhash32)(struct xxhash32_ctx *ctx, const uint8 *s,
+		uint64 len);
 
 #ifdef __cplusplus
 }

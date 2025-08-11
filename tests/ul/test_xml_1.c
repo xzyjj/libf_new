@@ -127,6 +127,9 @@ static int32 _call_end(int32 type, const char *s, int32 len, void *arg) {
 
 			printf("/\n");
 			break;
+		case XML_DOCTYPE_END:
+		case XML_STATEMENT_END:
+			break;
 		default:
 			return -1;
 	}

@@ -1,8 +1,9 @@
-/* rsa.c - rsa (rivest–shamir–adleman) cryptosystem implementations */
+/* rsa_ref.c - rsa (rivest–shamir–adleman) cryptosystem implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstdint.h>
 #include <libf/al/bn_8192.h>
+#include <libf/al/rsa_ref.h>
 
 
 /* @func: _rsa4096_extended_gcd (static) - extended euclidean algorithm

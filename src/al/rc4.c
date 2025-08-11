@@ -7,7 +7,7 @@
 
 /* @func: rc4_init - rc4 key init
 * @param1: struct rc4_ctx * # rc4 context struct
-* @param2: const uint8 *    # key
+* @param2: const uint8 *    # input key
 * @param3: uint32           # key length
 * @return: void
 */

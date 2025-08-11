@@ -22,7 +22,12 @@
 *   < element-2 attribute="xxx"> String < /element-2>String
 * </element>
 * <element attribute="xxx" />
-* <![CDATA[......]]>
+* <element>
+*   <![CDATA[
+*        ......
+*   ]]>
+*   String
+* </element>
 */
 
 enum {
@@ -234,6 +239,7 @@ static int32 _xml_statement_attr(struct xml_ctx *ctx) {
 			case 0: /* name start, or end */
 				if (BREAK_CHARACTER(c))
 					break;
+
 				if (!XSYMBOL(strncmp)("?>", ctx->str, 2)) { /* end */
 					ctx->str += 2;
 					ctx->len += 2;
@@ -294,8 +300,7 @@ static int32 _xml_statement_attr(struct xml_ctx *ctx) {
 
 				ctx->str--;
 				ctx->len--;
-				len = 0;
-				st = 0;
+				len = st = 0;
 				break;
 			default:
 				return -1;
@@ -310,7 +315,7 @@ static int32 _xml_statement_attr(struct xml_ctx *ctx) {
 * @return: int32            # 0: no error, -1: error, -2: call error
 */
 static int32 _xml_statement(struct xml_ctx *ctx) {
-	int32 st = 0, len = 0;
+	int32 st = 0, k = 0, len = 0;
 	for (; *(ctx->str) != '\0'; ctx->str++, ctx->len++) {
 		char c = *(ctx->str);
 		switch (st) {
@@ -327,6 +332,7 @@ static int32 _xml_statement(struct xml_ctx *ctx) {
 			case 1: /* name start, or end */
 				if (BREAK_CHARACTER(c))
 					break;
+
 				if (!XSYMBOL(strncmp)("?>", ctx->str, 2)) { /* end */
 					ctx->str += 2;
 					ctx->len += 2;
@@ -369,6 +375,11 @@ static int32 _xml_statement(struct xml_ctx *ctx) {
 							len,
 							ctx->arg))
 						return -2;
+					if (ctx->call_end(XML_STATEMENT_END,
+							NULL,
+							0,
+							ctx->arg))
+						return -2;
 					ctx->str += 2;
 					ctx->len += 2;
 					return 0;
@@ -383,7 +394,16 @@ static int32 _xml_statement(struct xml_ctx *ctx) {
 				len++;
 				break;
 			case 3: /* attribute and end */
-				return _xml_statement_attr(ctx);
+				k = _xml_statement_attr(ctx);
+				if (k < 0)
+					return -1;
+				if (ctx->call_end(XML_STATEMENT_END,
+						NULL,
+						0,
+						ctx->arg))
+					return -2;
+
+				return 0;
 			default:
 				return -1;
 		}
@@ -439,6 +459,11 @@ static int32 _xml_doctype(struct xml_ctx *ctx) {
 				ctx->len += 9;
 				c = *(ctx->str);
 				if (c == '>') { /* end */
+					if (ctx->call_end(XML_DOCTYPE_END,
+							NULL,
+							0,
+							ctx->arg))
+						return -2;
 					ctx->str++;
 					ctx->len++;
 					return 0;
@@ -455,6 +480,11 @@ static int32 _xml_doctype(struct xml_ctx *ctx) {
 					break;
 
 				if (c == '>') { /* end */
+					if (ctx->call_end(XML_DOCTYPE_END,
+							NULL,
+							0,
+							ctx->arg))
+						return -2;
 					ctx->str++;
 					ctx->len++;
 					return 0;
@@ -512,6 +542,11 @@ static int32 _xml_doctype(struct xml_ctx *ctx) {
 							len,
 							ctx->arg))
 						return -2;
+					if (ctx->call_end(XML_DOCTYPE_END,
+							NULL,
+							0,
+							ctx->arg))
+						return -2;
 					ctx->str++;
 					ctx->len++;
 					return 0;
@@ -530,6 +565,11 @@ static int32 _xml_doctype(struct xml_ctx *ctx) {
 					break;
 
 				if (c == '>') { /* end */
+					if (ctx->call_end(XML_DOCTYPE_END,
+							NULL,
+							0,
+							ctx->arg))
+						return -2;
 					ctx->str++;
 					ctx->len++;
 					return 0;
@@ -550,7 +590,8 @@ static int32 _xml_doctype(struct xml_ctx *ctx) {
 
 /* @func: _xml_element_attr (static) - parsing xml element attributes
 * @param1: struct xml_ctx * # xml struct context
-* @return: int32            # 0: no error, -1: error, -2: call error
+* @return: int32            # 0: no error, 1: empty element, -1: error, \
+*                             -2: call error
 */
 static int32 _xml_element_attr(struct xml_ctx *ctx) {
 	int32 st = 0, k = 0, len = 0;
@@ -561,8 +602,10 @@ static int32 _xml_element_attr(struct xml_ctx *ctx) {
 				if (BREAK_CHARACTER(c))
 					break;
 
-				if (c == '/' || c == '>') /* end */
+				if (c == '>') /* end */
 					return 0;
+				if (c == '/') /* empty */
+					return 1;
 
 				/* invalid character */
 				if (xml_name_table[(uint8)c]) {
@@ -618,8 +661,7 @@ static int32 _xml_element_attr(struct xml_ctx *ctx) {
 
 				ctx->str--;
 				ctx->len--;
-				len = 0;
-				st = 0;
+				len = st = 0;
 				break;
 			default:
 				return -1;
@@ -733,7 +775,7 @@ static int32 _xml_element_start(struct xml_ctx *ctx) {
 				k = _xml_element_attr(ctx); /* attribute */
 				if (k < 0)
 					return k;
-				if (*(ctx->str) == '/') { /* empty */
+				if (k == 1) { /* empty */
 					st = 4;
 					break;
 				} /* end */
@@ -1005,6 +1047,9 @@ int32 FSYMBOL(xml_parser)(struct xml_ctx *ctx, const char *s) {
 				ctx->str--;
 				ctx->len--;
 				break;
+
+#if 0
+
 			case TOKEN_CDATA:
 				k = _xml_cdata(ctx);
 				if (k < 0) {
@@ -1020,6 +1065,9 @@ int32 FSYMBOL(xml_parser)(struct xml_ctx *ctx, const char *s) {
 				ctx->str--;
 				ctx->len--;
 				break;
+
+#endif
+
 			case TOKEN_ELEMENT:
 				k = _xml_element(ctx);
 				if (k < 0)

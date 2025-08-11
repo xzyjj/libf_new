@@ -63,9 +63,58 @@
 #endif
 
 
-/* @def: linux */
+/* @def: linux
+* unistd */
+#undef XSYS_exit
+#define XSYS_exit (__NR_exit)
+#undef XSYS_clone
+#define XSYS_clone (__NR_clone)
+#undef XSYS_execve
+#define XSYS_execve (__NR_execve)
+
+/* mman */
+#undef XSYS_mmap
+#define XSYS_mmap (__NR_mmap)
+#undef XSYS_munmap
+#define XSYS_munmap (__NR_munmap)
+#undef XSYS_mlock
+#define XSYS_mlock (__NR_mlock)
+#undef XSYS_munlock
+#define XSYS_munlock (__NR_munlock)
+#undef XSYS_mlockall
+#define XSYS_mlockall (__NR_mlockall)
+#undef XSYS_munlockall
+#define XSYS_munlockall (__NR_munlockall)
+#undef XSYS_mprotect
+#define XSYS_mprotect (__NR_mprotect)
+#undef XSYS_msync
+#define XSYS_msync (__NR_msync)
+
+/* shm */
+#undef XSYS_shmget
+#define XSYS_shmget (__NR_shmget)
+#undef XSYS_shmat
+#define XSYS_shmat (__NR_shmat)
+#undef XSYS_shmdt
+#define XSYS_shmdt (__NR_shmdt)
+#undef XSYS_shmctl
+#define XSYS_shmctl (__NR_shmctl)
+
+/* signal */
 #undef XSYS_kill
-#define XSYS_kill __NR_kill
+#define XSYS_kill (__NR_kill)
+#undef XSYS_tkill
+#define XSYS_tkill (__NR_tkill)
+#undef XSYS_sigaltstack
+#define XSYS_sigaltstack (__NR_sigaltstack)
+#undef XSYS_sigaction
+#define XSYS_sigaction (__NR_rt_sigaction)
+#undef XSYS_sigprocmask
+#define XSYS_sigprocmask (__NR_rt_sigprocmask)
+#undef XSYS_sigtimedwait
+#define XSYS_sigtimedwait (__NR_rt_sigtimedwait)
+#undef XSYS_sigreturn
+#define XSYS_sigreturn (__NR_rt_sigreturn)
 /* end */
 
 

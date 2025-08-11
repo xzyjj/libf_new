@@ -81,8 +81,8 @@ static void *_umalloc_new_node(struct umalloc_ctx *ctx, uint32 size) {
 */
 static void *_umalloc_new_big_node(struct umalloc_ctx *ctx, uint64 size) {
 	size = CHUNK_NODE_ALIGNED_SIZE(size);
-	struct umalloc_chunk_node *node = ctx->call_alloc(size
-		+ CHUNK_NODE_SIZE, ctx->arg);
+	struct umalloc_chunk_node *node = ctx->call_alloc(
+		size + CHUNK_NODE_SIZE, ctx->arg);
 	if (!node)
 		return NULL;
 
@@ -212,7 +212,7 @@ void *XSYMBOL(internal_umalloc)(struct umalloc_ctx *ctx, uint64 size) {
 		chunk = &node->chunk;
 		return ++chunk;
 	} else if (!size) {
-		return NULL;
+		size = 1;
 	}
 
 	LIST_FOR_EACH(ctx->chunk.node, pos) {
@@ -255,6 +255,7 @@ void XSYMBOL(internal_ufree)(struct umalloc_ctx *ctx, void *p) {
 	if (GET_BIG(chunk)) {
 		node = container_of(chunk,
 			struct umalloc_chunk_node, chunk);
+		FSYMBOL(list_del)(&ctx->chunk, &node->list);
 		ctx->call_free(node, node->size, ctx->arg);
 		return;
 	}
@@ -291,7 +292,7 @@ void XSYMBOL(internal_ufree_all)(struct umalloc_ctx *ctx) {
 
 /* @func: internal_umalloc_idle - count idle chunk
 * @param1: struct umalloc_ctx * # umalloc context struct
-* @param2: int32                # 0: chunk, 1: size
+* @param2: int32                # 0: chunk, 1: size, 2: inuse, 3: inuse size
 * @return: uint64               # count size
 */
 uint64 XSYMBOL(internal_umalloc_idle)(struct umalloc_ctx *ctx, int32 type) {
@@ -306,14 +307,41 @@ uint64 XSYMBOL(internal_umalloc_idle)(struct umalloc_ctx *ctx, int32 type) {
 		if (GET_BIG(chunk))
 			continue;
 
+		switch (type) {
+			case 2: case 3:
+				goto e;
+			default:
+				break;
+		}
+
 		for (struct umalloc_chunk *pos = chunk;
 				pos;
 				pos = NEXT_CHUNK(pos)) {
-			if (GET_END(pos))
+			if (GET_END(pos)) {
+				if (GET_INUSE(pos))
+					break;
+				n += type ? GET_SIZE(pos) : 1;
 				break;
+			}
 			if (GET_INUSE(pos))
 				continue;
 			n += type ? GET_SIZE(pos) : 1;
+		}
+		continue;
+
+e:
+		for (struct umalloc_chunk *pos = chunk;
+				pos;
+				pos = NEXT_CHUNK(pos)) {
+			if (GET_END(pos)) {
+				if (!GET_INUSE(pos))
+					break;
+				n += (type == 3) ? GET_SIZE(pos) : 1;
+				break;
+			}
+			if (!GET_INUSE(pos))
+				continue;
+			n += (type == 3) ? GET_SIZE(pos) : 1;
 		}
 	}
 

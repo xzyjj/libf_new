@@ -10,17 +10,17 @@
 
 
 /* @func: kill - send a signal to a process or process group
-* @param1: pid32_t # process id (-N: group)
+* @param1: pid32_t # process id
 * @param2: int32   # signal value
 * @return: int32   # 0: no error, -1: errno
 */
 int32 XSYMBOL(kill)(pid32_t pid, int32 sig) {
-	pid32_t ret = -1;
+	int32 ret = -1;
 
 #ifdef LIBF_PLATFORM_TYPE
 #	if (LIBF_PLATFORM_TYPE == LIBF_PLATFORM_TYPE_LINUX)
 
-	ret = (pid32_t)XSYMBOL(syscall_linux)(XSYS_kill, pid, sig);
+	ret = (int32)XSYMBOL(syscall_linux)(XSYS_kill, pid, sig);
 
 #	elif (LIBF_PLATFORM_TYPE == LIBF_PLATFORM_TYPE_FREEBSD)
 #		error "!!!unimplemente LIBF_PLATFORM_TYPE_FREEBSD!!!"

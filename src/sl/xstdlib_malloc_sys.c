@@ -26,6 +26,8 @@ static volatile int32 _lock = 0;
 * @return: void * # mapping addr
 */
 static void *_mmap(uint64 size, void *arg) {
+	(void)arg;
+
 	size = ((size + 4095) / 4096) * 4096;
 	void *p = mmap(NULL, size, PROT_READ | PROT_WRITE,
 		MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
@@ -40,6 +42,8 @@ static void *_mmap(uint64 size, void *arg) {
 * @return: void
 */
 static void _munmap(void *p, uint64 size, void *arg) {
+	(void)arg;
+
 	size = ((size + 4095) / 4096) * 4096;
 	munmap(p, size);
 } /* end */
@@ -89,7 +93,7 @@ void XSYMBOL(free_all)(void) {
 } /* end */
 
 /* @func: malloc_idle - count idle chunk
-* @param1: int32  # 0: chunk, 1: size
+* @param2: int32  # 0: chunk, 1: size, 2: inuse, 3: inuse size
 * @return: uint64 # count size
 */
 uint64 XSYMBOL(malloc_idle)(int32 type) {

@@ -6,7 +6,8 @@
 #include <libf/al/crc32.h>
 
 
-/* crc32 not reversed: 0x04c11db7 (msb) */
+/* @def: crc32
+* crc32 not reversed: 0x04c11db7 (msb) */
 static const uint32 crc32_table_m[256] = {
 	0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9,
 	0x130476dc, 0x17c56b6b, 0x1a864db2, 0x1e475005,
@@ -417,7 +418,7 @@ static const uint32 crc32_table_lk[256] = {
 
 /* @func: crc32_table - get crc32 table
 * @param3: int32          # crc32 type
-* @return: const uint32 * # crc32 table pointer
+* @return: const uint32 * # crc32 table
 */
 const uint32 *FSYMBOL(crc32_table)(int32 type) {
 	switch (type) {
@@ -445,12 +446,14 @@ const uint32 *FSYMBOL(crc32_table)(int32 type) {
 /* @func: crc32_msb - crc32 msb cyclic redundancy
 * @param1: const uint32 * # crc32 table
 * @param2: uint32         # init value
-* @param3: const char *   # input buffer
+* @param3: const uint8 *  # input buffer
 * @param3: uint32         # input length
 * @return: uint32         # crc32 value
 */
-uint32 FSYMBOL(crc32_msb)(const uint32 *t, uint32 c, const char *s, uint32 len) {
-	for (uint32 i = 0, k = 0; i < len; i++) {
+uint32 FSYMBOL(crc32_msb)(const uint32 *t, uint32 c, const uint8 *s,
+		uint32 len) {
+	uint8 k = 0;
+	for (uint32 i = 0; i < len; i++) {
 		k = s[i] ^ (c >> 24);
 		c = t[k] ^ (c << 8);
 	}
@@ -461,12 +464,14 @@ uint32 FSYMBOL(crc32_msb)(const uint32 *t, uint32 c, const char *s, uint32 len) 
 /* @func: crc32_lsb - crc32 lsb cyclic redundancy
 * @param1: const uint32 * # crc32 table
 * @param2: uint32         # init value
-* @param3: const char *   # input buffer
+* @param3: const uint8 *  # input buffer
 * @param3: uint32         # input length
 * @return: uint32         # crc32 value
 */
-uint32 FSYMBOL(crc32_lsb)(const uint32 *t, uint32 c, const char *s, uint32 len) {
-	for (uint32 i = 0, k = 0; i < len; i++) {
+uint32 FSYMBOL(crc32_lsb)(const uint32 *t, uint32 c, const uint8 *s,
+		uint32 len) {
+	uint8 k = 0;
+	for (uint32 i = 0; i < len; i++) {
 		k = s[i] ^ (c & 0xff);
 		c = t[k] ^ (c >> 8);
 	}
@@ -480,8 +485,10 @@ uint32 FSYMBOL(crc32_lsb)(const uint32 *t, uint32 c, const char *s, uint32 len) 
 * @param3: uint32         # length
 * @return: uint32         # crc32 value
 */
-uint32 FSYMBOL(crc32_cksum_size_msb)(const uint32 *t, uint32 c, uint32 len) {
-	for (uint32 i = len, k = 0; i; i >>= 8) {
+uint32 FSYMBOL(crc32_cksum_size_msb)(const uint32 *t, uint32 c,
+		uint32 len) {
+	uint8 k = 0;
+	for (uint32 i = len; i; i >>= 8) {
 		k = (i ^ (c >> 24)) & 0xff;
 		c = t[k] ^ (c << 8);
 	}
@@ -490,12 +497,12 @@ uint32 FSYMBOL(crc32_cksum_size_msb)(const uint32 *t, uint32 c, uint32 len) {
 } /* end */
 
 /* @func: crc32 - crc32 cyclic redundancy check
-* @param1: const char * # input buffer
-* @param2: uint32       # input length
-* @param3: int32        # crc32 type
-* @return: uint32       # crc32 value
+* @param1: const uint8 * # input buffer
+* @param2: uint32        # input length
+* @param3: int32         # crc32 type
+* @return: uint32        # crc32 value
 */
-uint32 FSYMBOL(crc32)(const char *s, uint32 len, int32 type) {
+uint32 FSYMBOL(crc32)(const uint8 *s, uint32 len, int32 type) {
 	uint32 b = 0xffffffff, e = 0xffffffff, c = 0;
 
 	switch (type) {
@@ -519,7 +526,8 @@ uint32 FSYMBOL(crc32)(const char *s, uint32 len, int32 type) {
 			return c ^ e;
 		case CRC32_CKSUM_MSB_TYPE:
 			c = FSYMBOL(crc32_msb)(crc32_table_m, 0, s, len);
-			return FSYMBOL(crc32_cksum_size_msb)(crc32_table_m, c, len);
+			return FSYMBOL(crc32_cksum_size_msb)(crc32_table_m,
+				c, len);
 		default:
 			return 0;
 	}

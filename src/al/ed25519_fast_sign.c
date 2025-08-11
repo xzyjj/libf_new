@@ -1,7 +1,6 @@
 //* ed25519_fast_sign.c - edwards-curve digital signature algorithm (eddsa) implementations */
 
 #include <libf/config.h>
-#include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
 #include <libf/sl/xstring.h>
 #include <libf/al/sha512.h>
@@ -9,7 +8,8 @@
 
 
 /* @def: ed25519_fast
-* P1..P15 = q * (1..15) */
+* Base Point Order
+*   P1..P15 = q * (1..15) */
 static const uint32 _w_BPO[16][8] = {
 	{ 0, 0, 0, 0, 0, 0, 0, 0 },
 	{ 0x5cf5d3ed, 0x5812631a, 0xa2f79cd6, 0x14def9de, 0, 0, 0, 0x10000000 },
@@ -43,12 +43,14 @@ static const uint32 _w_minusR[8] = {
 * @param3: uint32           # high-bit
 * @return: void
 */
-static void _ed25519_modw(uint32 r[8], const uint32 a[8], uint32 b) {
-	const uint32 *p = NULL;
+static void _ed25519_modw(uint32 r[8],
+		const uint32 a[8], uint32 b) {
+	const uint32 *p;
 	uint32 rr[8];
 	uint32 carry = 0;
 	uint64L tmp = 0;
-	/* (a + (b * R)) % q === (a - (b * (-R))) % q */
+
+	/* NOTE: (a + (b * R)) % q === (a - (b * (-R))) % q */
 
 	/* rr = r * minusR */
 	for (int32 i = 0; i < 8; i++) {
@@ -80,7 +82,7 @@ static void _ed25519_modw(uint32 r[8], const uint32 a[8], uint32 b) {
 * @return: void
 */
 static void _ed25519_mod(uint32 r[8]) {
-	const uint32 *p = _w_BPO[r[7] >> 28];
+	const uint32 *p = _w_BPO[r[7] >> 28]; /* 256 - 252 = 4 */
 	uint32 carry = 0;
 	uint64L tmp = 0;
 
@@ -107,7 +109,8 @@ static void _ed25519_mod(uint32 r[8]) {
 * @param3: const uint32 [8] # multiplier
 * @return: void
 */
-static void _ed25519_mul(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
+static void _ed25519_mul(uint32 r[8],
+		const uint32 a[8], const uint32 b[8]) {
 	uint32 rr[16];
 	uint32 carry = 0;
 	uint64L tmp = 0;
@@ -150,7 +153,8 @@ static void _ed25519_mul(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
 * @param3: const uint32 [8] # addend
 * @return: void
 */
-static void _ed25519_add(uint32 r[8], const uint32 a[8], const uint32 b[8]) {
+static void _ed25519_add(uint32 r[8],
+		const uint32 a[8], const uint32 b[8]) {
 	uint32 carry = 0;
 	uint64L tmp = 0;
 

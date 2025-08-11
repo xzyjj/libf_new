@@ -4,7 +4,6 @@
 #define LIBF_UL_XML_PARSER_H
 
 #include <libf/config.h>
-#include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
 
 
@@ -30,18 +29,22 @@
 #define XML_DOCTYPE_NAME 8
 #undef XML_DOCTYPE_STRING
 #define XML_DOCTYPE_STRING 9
+#undef XML_DOCTYPE_END
+#define XML_DOCTYPE_END 10
 
 #undef XML_STATEMENT_START
-#define XML_STATEMENT_START 10
+#define XML_STATEMENT_START 11
 #undef XML_STATEMENT_ATTR_NAME
-#define XML_STATEMENT_ATTR_NAME 11
+#define XML_STATEMENT_ATTR_NAME 12
 #undef XML_STATEMENT_ATTR_VALUE
-#define XML_STATEMENT_ATTR_VALUE 12
+#define XML_STATEMENT_ATTR_VALUE 13
+#undef XML_STATEMENT_END
+#define XML_STATEMENT_END 14
 
 #undef XML_COMMENT
-#define XML_COMMENT 13
+#define XML_COMMENT 15
 #undef XML_CDATA
-#define XML_CDATA 14
+#define XML_CDATA 16
 
 /* xml error code */
 #undef XML_ERR_TOKEN

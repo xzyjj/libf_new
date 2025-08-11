@@ -22,11 +22,19 @@ int main(void) {
 	int32 n = 0;
 	for (; n < 806596; n++) {
 		FSYMBOL(aes_encrypt)(&ctx, state);
-/*		FSYMBOL(aes_decrypt)(&ctx, state); */
 	}
 	end = clock();
 	time = (double)(end - start) / CLOCKS_PER_SEC;
-	printf("%.6fs (%.2fMiB/s)\n", time, ((double)(16 * n) / time) / 1024 / 1024);
+	printf("en: %.6fs (%.2fMiB/s)\n", time, ((double)(16 * n) / time) / 1024 / 1024);
+
+	start = clock();
+	n = 0;
+	for (; n < 806596; n++) {
+		FSYMBOL(aes_decrypt)(&ctx, state);
+	}
+	end = clock();
+	time = (double)(end - start) / CLOCKS_PER_SEC;
+	printf("de: %.6fs (%.2fMiB/s)\n", time, ((double)(16 * n) / time) / 1024 / 1024);
 
 	return 0;
 }

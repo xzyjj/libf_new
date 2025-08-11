@@ -1,7 +1,7 @@
-/* rsa.h - rsa (rivest–shamir–adleman) cryptosystem definitions */
+/* rsa_ref.h - rsa (rivest–shamir–adleman) cryptosystem definitions */
 
-#ifndef LIBF_AL_RSA_H
-#define LIBF_AL_RSA_H
+#ifndef LIBF_AL_RSA_REF_H
+#define LIBF_AL_RSA_REF_H
 
 #include <libf/config.h>
 #include <libf/sl/xstdint.h>
@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-/* rsa.c */
+/* rsa_ref.c */
 extern int32 FSYMBOL(rsa4096_mod_inverse)(const bn_int8192_t a, const bn_int8192_t m,
 		bn_int8192_t r);
 extern void FSYMBOL(rsa4096_mod_pow)(const bn_int8192_t a, const bn_int8192_t b,

@@ -418,6 +418,62 @@ void FSYMBOL(ed25519_fast_point_add)(const struct ed25519_point *xyz1,
 	_ed25519_mul(xyz3->z, f1, g1);
 } /* end */
 
+/* @func: ed25519_fast_point_double - edwards curve point doubling
+* @param1: const struct ed25519_point * # addend curve point
+* @param2: struct ed25519_point *       # result curve point
+* @return: void
+*/
+void FSYMBOL(ed25519_fast_point_double)(const struct ed25519_point *xyz1,
+		struct ed25519_point *xyz3) {
+	uint32 a1[8], b1[8], c1[8], h1[8], e1[8], g1[8], f1[8];
+	/*
+	* a1 = (x1 ** 2) % p
+	* b1 = (y1 ** 2) % p
+	* c1 = ((z1 ** 2) % p) << 1
+	* h1 = (a1 + b1) % p
+	* e1 = ((x1 + y1) ** 2) % p
+	* e1 = (h1 - e1) % p
+	* g1 = (a1 - b1) % p
+	* f1 = (c1 + g1) % p
+	* x3 = (e1 * f1) % p
+	* y3 = (g1 * h1) % p
+	* t3 = (e1 * h1) % p
+	* z3 = (f1 * g1) % p
+	*/
+
+	/* a1 = x1 ** 2 */
+	_ed25519_mul(a1, xyz1->x, xyz1->x);
+	/* b1 = y1 ** 2 */
+	_ed25519_mul(b1, xyz1->y, xyz1->y);
+
+	/* c1 = (z1 ** 2) * 2 */
+	_ed25519_mul(c1, xyz1->z, xyz1->z);
+	_ed25519_add(c1, c1, c1);
+
+	/* h1 = a1 + b1 */
+	_ed25519_add(h1, a1, b1);
+
+	/* e1 = h1 - ((x1 + y1) ** 2) */
+	_ed25519_add(e1, xyz1->x, xyz1->y);
+	_ed25519_mul(e1, e1, e1);
+	_ed25519_sub(e1, h1, e1);
+
+	/* g1 = a1 - b1 */
+	_ed25519_sub(g1, a1, b1);
+
+	/* f1 = c1 + g1 */
+	_ed25519_add(f1, c1, g1);
+
+	/* x3 = e1 * f1 */
+	_ed25519_mul(xyz3->x, e1, f1);
+	/* y3 = g1 * h1 */
+	_ed25519_mul(xyz3->y, g1, h1);
+	/* t3 = e1 * h1 */
+	_ed25519_mul(xyz3->t, e1, h1);
+	/* z3 = f1 * g1 */
+	_ed25519_mul(xyz3->z, f1, g1);
+} /* end */
+
 /* @func: ed25519_fast_scalar_mul - montgomery ladder scalar multiplication
 * @param3: const uint32 [8]             # private key
 * @param4: const struct ed25519_point * # base curve point
@@ -453,7 +509,8 @@ void FSYMBOL(ed25519_fast_scalar_mul)(const uint32 k[8],
 		_ed25519_swap(_xyz1.z, _xyz3.z, k_t);
 		_ed25519_swap(_xyz1.t, _xyz3.t, k_t);
 
-		FSYMBOL(ed25519_fast_point_add)(&_xyz2, &_xyz2, &_xyz2);
+		/* FSYMBOL(ed25519_fast_point_add)(&_xyz2, &_xyz2, &_xyz2); */
+		FSYMBOL(ed25519_fast_point_double)(&_xyz2, &_xyz2);
 	}
 
 	for (int32 i = 0; i < 8; i++) {

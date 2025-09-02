@@ -1,4 +1,4 @@
-/* avltree.h - avl tree definitions */
+/* avltree.h - avl self-balancing binary tree definitions */
 
 #ifndef LIBF_DS_AVLTREE_H
 #define LIBF_DS_AVLTREE_H
@@ -23,7 +23,7 @@ struct avl_root {
 #undef AVL_ROOT_NEW
 #define AVL_ROOT_NEW(x) struct avl_root x = { NULL }
 #undef AVL_ROOT_INIT
-#define AVL_ROOT_INIT(x) ((x)->node = NULL)
+#define AVL_ROOT_INIT(x) (x)->node = NULL
 
 #undef AVL_HEIGHT
 #define AVL_HEIGHT(x) ((x) ? (x)->bf : 0)

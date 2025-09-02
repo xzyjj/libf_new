@@ -22,7 +22,7 @@ struct bst_root {
 #undef BST_ROOT_NEW
 #define BST_ROOT_NEW(x) struct bst_root x = { NULL }
 #undef BST_ROOT_INIT
-#define BST_ROOT_INIT(x) ((x)->node = NULL)
+#define BST_ROOT_INIT(x) (x)->node = NULL
 
 #undef BST_LEFT
 #define BST_LEFT (-1)

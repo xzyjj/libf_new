@@ -8,6 +8,13 @@
 
 
 /* @def: minheap */
+#undef minheap_head
+struct minheap_head {
+	void **array;
+	uint64 size;
+	uint64 total_size;
+};
+
 #undef MINHEAP_NEW
 #define MINHEAP_NEW(name, _array, _total_size) \
 	struct minheap_head name = { \
@@ -30,13 +37,6 @@
 #define MINHEAP_RIGHT(x) ((x) * 2 + 2)
 #undef MINHEAP_SIZEOF
 #define MINHEAP_SIZEOF (sizeof(void *))
-
-#undef minheap_head
-struct minheap_head {
-	void **array;
-	uint64 size;
-	uint64 total_size;
-};
 
 #undef MINHEAP_SIZE
 #define MINHEAP_SIZE(x) ((x)->size)

@@ -28,6 +28,19 @@ struct bfifo_ctx {
 	(x)->size = len; \
 	(x)->in = 0; \
 	(x)->out = 0
+
+#undef BFIFO_USED
+#define BFIFO_USED(x) ((x)->in - (x)->out)
+#undef BFIFO_AVAIL
+#define BFIFO_AVAIL(x) ((x)->size - ((x)->in - (x)->out))
+
+#undef BFIFO_IS_EMPTY
+#define BFIFO_IS_EMPTY(x) ((x)->in == (x)->out)
+#undef BFIFO_IS_FULL
+#define BFIFO_IS_FULL(x) ((x)->size == ((x)->in - (x)->out))
+
+#undef BFIFO_RESET
+#define BFIFO_RESET(x) (x)->in = (x)->out = 0
 /* end */
 
 #ifdef __cplusplus
@@ -35,11 +48,6 @@ extern "C" {
 #endif
 
 /* bfifi.c */
-extern uint32 FSYMBOL(bfifo_used)(struct bfifo_ctx *ctx);
-extern uint32 FSYMBOL(bfifo_avail)(struct bfifo_ctx *ctx);
-extern int32 FSYMBOL(bfifo_is_empty)(struct bfifo_ctx *ctx);
-extern int32 FSYMBOL(bfifo_is_full)(struct bfifo_ctx *ctx);
-extern void FSYMBOL(bfifo_reset)(struct bfifo_ctx *ctx);
 extern uint32 FSYMBOL(bfifo_in)(struct bfifo_ctx *ctx, const void *buf, uint32 len);
 extern uint32 FSYMBOL(bfifo_out)(struct bfifo_ctx *ctx, void *buf, uint32 len);
 extern uint32 FSYMBOL(bfifo_out_peek)(struct bfifo_ctx *ctx, void *buf, uint32 len,

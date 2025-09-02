@@ -1,4 +1,4 @@
-/* avltree.c - avl tree implementations */
+/* avltree.c - avl self-balancing binary tree implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstddef.h>

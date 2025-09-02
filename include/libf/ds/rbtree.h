@@ -1,4 +1,4 @@
-/* rbtree.h - red-black tree definitions */
+/* rbtree.h - red-black self-balancing binary tree definitions */
 
 #ifndef LIBF_DS_RBTREE_H
 #define LIBF_DS_RBTREE_H
@@ -9,11 +9,13 @@
 
 
 /* @def: rbtree */
+#undef rb_node
 struct rb_node {
 	int32 color;
 	struct rb_node *parent, *left, *right;
 };
 
+#undef rb_root
 struct rb_root {
 	struct rb_node *node;
 };
@@ -21,7 +23,7 @@ struct rb_root {
 #undef RB_ROOT_NEW
 #define RB_ROOT_NEW(x) struct rb_root x = { NULL }
 #undef RB_ROOT_INIT
-#define RB_ROOT_INIT(x) ((x)->node = NULL)
+#define RB_ROOT_INIT(x) (x)->node = NULL
 
 #undef RB_RED
 #define RB_RED 0

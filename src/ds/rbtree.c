@@ -1,4 +1,4 @@
-/* rbtree.c - red-black tree implementations */
+/* rbtree.c - red-black self-balancing binary tree implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstddef.h>
@@ -215,7 +215,7 @@ static struct rb_node *_rb_erase(struct rb_root *root, struct rb_node *node) {
 	*/
 	if (!left) { /* no left child */
 		FSYMBOL(rb_change_child)(root, parent, node, right);
-		if (right) { /* only-right child */
+		if (right) { /* only right child */
 			/* 'node right' becomes 'node' */
 			right->parent = parent;
 			right->color = node->color;
@@ -232,7 +232,7 @@ static struct rb_node *_rb_erase(struct rb_root *root, struct rb_node *node) {
 	*   / \
 	* (l)  nil
 	*/
-	if (!right) { /* only-left child */
+	if (!right) { /* only left child */
 		/* 'node left' becomes 'node' */
 		FSYMBOL(rb_change_child)(root, parent, node, left);
 		left->parent = parent;

@@ -5,7 +5,8 @@
 #include <libf/ds/bits_add.h>
 
 
-/* @func: bits_add - add bits to the buffer
+/* @func: bits_add - add bits to the buffer (keep processing remaining \
+*                    after flush)
 * @param1: struct bits_add_ctx * # bits-add struct context
 * @param2: uint32                # bits value
 * @param3: uint32                # bits length
@@ -13,8 +14,8 @@
 */
 int32 FSYMBOL(bits_add)(struct bits_add_ctx *ctx, uint32 v, uint32 len) {
 	uint32 n = ctx->count;
-	uint32 b = ctx->blen;
-	uint32 c = ctx->brem;
+	uint32 b = ctx->blen; /* current bits of the buf byte */
+	uint32 c = ctx->brem; /* input remaining bits */
 
 	if (n == BITS_ADD_BUFSIZE)
 		return 1;
@@ -23,12 +24,18 @@ int32 FSYMBOL(bits_add)(struct bits_add_ctx *ctx, uint32 v, uint32 len) {
 		len = c;
 	}
 
+	static uint8 mask[9] = {
+		0x00,
+		0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, 0xff
+		};
+
 #undef MIN
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
 	while (n != BITS_ADD_BUFSIZE && len) {
 		c = 8 - b;
-		ctx->buf[n] |= (v & ((1 << c) - 1)) << b;
+		ctx->buf[n] &= mask[b];
+		ctx->buf[n] |= (v & mask[c]) << b;
 		b += c = MIN(c, len);
 		if (b == 8) {
 			b = 0;

@@ -1,4 +1,4 @@
-//* ed25519_sign_ref.c - edwards-curve digital signature algorithm (eddsa) implementations */
+/* ed25519_sign_ref.c - edwards-curve digital signature algorithm (eddsa) implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstdint.h>

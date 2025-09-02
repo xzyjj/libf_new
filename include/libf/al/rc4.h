@@ -8,6 +8,7 @@
 
 
 /* @def: rc4 */
+#undef rc4_ctx
 struct rc4_ctx {
 	uint8 s[256];
 	int32 i, j;

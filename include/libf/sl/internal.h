@@ -134,7 +134,8 @@ extern uint64L XSYMBOL(internal_strtoull)(const char *s, char **e, uint64L *m,
 		int32 b);
 
 /* internal_ftoa.c */
-extern int32 XSYMBOL(internal_fltostr_num)(int32 n, char *p, float64 v, int32 pre);
+extern int32 XSYMBOL(internal_fltostr_num)(int32 n, char *p, float64 v,
+		int32 pre);
 
 /* internal_itoa.c */
 extern int32 XSYMBOL(internal_ulltostr_o)(int32 n, char *p, uint64L v);
@@ -147,8 +148,8 @@ extern int32 XSYMBOL(internal_fmt_printf)(struct fmt_printf_ctx *ctx,
 		const char *fmt, va_list ap);
 
 /* internal_scanf.c */
-extern int32 XSYMBOL(internal_fmt_scanf)(struct fmt_scanf_ctx *ctx, const char *s,
-		const char *fmt, va_list ap);
+extern int32 XSYMBOL(internal_fmt_scanf)(struct fmt_scanf_ctx *ctx,
+		const char *s, const char *fmt, va_list ap);
 
 /* internal_umalloc.c */
 extern void *XSYMBOL(internal_umalloc)(struct umalloc_ctx *ctx, uint64 size);

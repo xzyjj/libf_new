@@ -34,7 +34,8 @@ static int32 _aes_encrypt_finish(struct T_ctx *ctx,
 	if (!ctx->count)
 		return 0;
 
-	XSYMBOL(memset)(&ctx->buf[ctx->count], 0, AES_BLOCKSIZE - ctx->count);
+	XSYMBOL(memset)(&ctx->buf[ctx->count], 0,
+		AES_BLOCKSIZE - ctx->count);
 	FSYMBOL(aes_encrypt)(&ctx->aes_ctx, ctx->buf);
 	if (call(ctx->buf, arg))
 		return -1;

@@ -15,8 +15,8 @@
 struct bits_add_ctx {
 	uint8 buf[BITS_ADD_BUFSIZE];
 	uint32 count;
-	uint16 blen; /* bit length */
-	uint16 brem; /* remaining bit length */
+	uint16 blen; /* current bits of the buf byte */
+	uint16 brem; /* input remaining bits */
 };
 
 #undef BITS_ADD_NEW
@@ -44,6 +44,12 @@ struct bits_add_ctx {
 #define BITS_ADD_BLEN(x) ((x)->blen)
 #undef BITS_ADD_BREM
 #define BITS_ADD_BREM(x) ((x)->brem)
+
+#undef BITS_ADD_GETBITS
+#define BITS_ADD_GETBITS(x) \
+	((BITS_ADD_GETSIZE(x) << 3) + BITS_ADD_BLEN(x))
+#undef BITS_ADD_BTASIZE
+#define BITS_ADD_BTASIZE(x) ((((x) + 7) & ~7) / 8)
 /* end */
 
 #ifdef __cplusplus

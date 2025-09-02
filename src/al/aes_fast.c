@@ -414,7 +414,8 @@ static void _aes_keyexp(struct aes_ctx *ctx, const uint8 *key) {
 * @param3: int32            # aes type
 * @return: int32            # 0: no error, -1: type error
 */
-int32 FSYMBOL(aes_init)(struct aes_ctx *ctx, const uint8 *key, int32 type) {
+int32 FSYMBOL(aes_init)(struct aes_ctx *ctx, const uint8 *key,
+		int32 type) {
 	if (type == 0) { /* aes128 */
 		ctx->type = AES_128_TYPE;
 		ctx->keylen = AES_128_KEYLEN;
@@ -474,4 +475,130 @@ void FSYMBOL(aes_decrypt)(struct aes_ctx *ctx, uint8 *state) {
 	_aes_invshiftrows(state);
 	_aes_invsubbytes(state);
 	_aes_addroundkey(state, ctx->keyexp);
+} /* end */
+
+/* @func: aes_encrypt_cbc - aes encrypt cbc (cipher block chaining)
+* @param1: struct aes_ctx * # aes struct context
+* @param2: uint8 *          # invector
+* @param3: uint8 *          # state buffer (length: AES_BLOCKSIZE)
+* @return: void
+*/
+void FSYMBOL(aes_encrypt_cbc)(struct aes_ctx *ctx, uint8 *iv,
+		uint8 *state) {
+	for (int32 i = 0; i < AES_BLOCKSIZE; i++)
+		state[i] ^= iv[i];
+
+	FSYMBOL(aes_encrypt)(ctx, state);
+
+	for (int32 i = 0; i < AES_BLOCKSIZE; i++)
+		iv[i] = state[i];
+} /* end */
+
+/* @func: aes_decrypt_cbc - aes decrypt cbc (cipher block chaining)
+* @param1: struct aes_ctx * # aes struct context
+* @param2: uint8 *          # invector
+* @param3: uint8 *          # state buffer (length: AES_BLOCKSIZE)
+* @return: void
+*/
+void FSYMBOL(aes_decrypt_cbc)(struct aes_ctx *ctx, uint8 *iv,
+		uint8 *state) {
+	uint8 tmp[AES_BLOCKSIZE];
+	for (int32 i = 0; i < AES_BLOCKSIZE; i++)
+		tmp[i] = state[i];
+
+	FSYMBOL(aes_decrypt)(ctx, state);
+
+	for (int32 i = 0; i < AES_BLOCKSIZE; i++) {
+		state[i] ^= iv[i];
+		iv[i] = tmp[i];
+	}
+} /* end */
+
+/* @func: aes_encrypt_cfb - aes encrypt cfb (cipher feedback)
+* @param1: struct aes_ctx * # aes struct context
+* @param2: uint8 *          # invector
+* @param3: uint8 *          # state buffer (length: AES_BLOCKSIZE)
+* @return: void
+*/
+void FSYMBOL(aes_encrypt_cfb)(struct aes_ctx *ctx, uint8 *iv,
+		uint8 *state) {
+	FSYMBOL(aes_encrypt)(ctx, iv);
+
+	for (int32 i = 0; i < AES_BLOCKSIZE; i++) {
+		state[i] ^= iv[i];
+		iv[i] = state[i];
+	}
+} /* end */
+
+/* @func: aes_decrypt_cfb - aes decrypt cfb (cipher feedback)
+* @param1: struct aes_ctx * # aes struct context
+* @param2: uint8 *          # invector
+* @param3: uint8 *          # state buffer (length: AES_BLOCKSIZE)
+* @return: void
+*/
+void FSYMBOL(aes_decrypt_cfb)(struct aes_ctx *ctx, uint8 *iv,
+		uint8 *state) {
+	uint8 tmp[AES_BLOCKSIZE];
+	for (int32 i = 0; i < AES_BLOCKSIZE; i++)
+		tmp[i] = state[i];
+
+	FSYMBOL(aes_encrypt)(ctx, iv);
+
+	for (int32 i = 0; i < AES_BLOCKSIZE; i++) {
+		state[i] ^= iv[i];
+		iv[i] = tmp[i];
+	}
+} /* end */
+
+/* @func: aes_crypto_ofb - aes encrypt and decrypt (output feedback, stream)
+* @param1: struct aes_ctx * # aes struct context
+* @param2: uint8 *          # invector (length: AES_BLOCKSIZE)
+* @param3: uint8 *          # buffer
+* @param4: uint64           # length
+* @return: void
+*/
+void FSYMBOL(aes_crypto_ofb)(struct aes_ctx *ctx, uint8 *iv,
+		uint8 *buf, uint64 len) {
+	uint32 n = AES_BLOCKSIZE;
+	while (len) {
+		if (len < n)
+			n = len;
+
+		FSYMBOL(aes_encrypt)(ctx, iv);
+		for (uint32 i = 0; i < n; i++)
+			buf[i] ^= iv[i];
+
+		buf += n;
+		len -= n;
+	}
+} /* end */
+
+/* @func: aes_crypto_ctr - aes encrypt and decrypt (counter, stream)
+* @param1: struct aes_ctx * # aes struct context
+* @param2: uint8 *          # invector (length: AES_BLOCKSIZE)
+* @param3: uint8 *          # buffer
+* @param4: uint64           # length
+* @return: void
+*/
+void FSYMBOL(aes_crypto_ctr)(struct aes_ctx *ctx, uint8 *iv,
+		uint8 *buf, uint64 len) {
+	uint8 count[AES_BLOCKSIZE];
+	for (int32 i = 0; i < AES_BLOCKSIZE; i++)
+		count[i] = iv[i];
+
+	uint32 n = AES_BLOCKSIZE;
+	while (len) {
+		if (len < n)
+			n = len;
+
+		FSYMBOL(aes_encrypt)(ctx, iv);
+		for (uint32 i = 0; i < n; i++)
+			buf[i] ^= iv[i];
+
+		buf += n;
+		len -= n;
+		((uint32 *)count)[0]++;
+		for (int32 i = 0; i < AES_BLOCKSIZE; i++)
+			iv[i] = count[i];
+	}
 } /* end */

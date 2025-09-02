@@ -18,7 +18,7 @@ int main(void) {
 		t1 = sizeof(buf) / 2;
 		do {
 			do {
-				t -= r = FSYMBOL(bfifo_in)(&ctx, buf, t);	
+				t -= r = FSYMBOL(bfifo_in)(&ctx, buf, t);
 			} while (r && t);
 
 			do {

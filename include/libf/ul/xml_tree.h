@@ -35,12 +35,14 @@
 #undef XML_TREE_TYPE_STACK
 #define XML_TREE_TYPE_STACK 4
 
+#undef xml_tree_attr
 struct xml_tree_attr {
 	struct list list;
 	char *name;
 	char *val;
 };
 
+#undef xml_tree_node
 struct xml_tree_node {
 	struct list list;
 	struct list_head embed;
@@ -51,6 +53,7 @@ struct xml_tree_node {
 	int32 flags;
 };
 
+#undef xml_tree_stack
 struct xml_tree_stack {
 	struct list list;
 	struct xml_tree_node *tmp_node;
@@ -58,6 +61,7 @@ struct xml_tree_stack {
 	struct xml_tree_node *tmp_embed;
 };
 
+#undef xml_tree_root
 struct xml_tree_root {
 	struct list_head head;
 	struct list_head stack;

@@ -1,4 +1,4 @@
-//* ed25519_fast_sign.c - edwards-curve digital signature algorithm (eddsa) implementations */
+/* ed25519_fast_sign.c - edwards-curve digital signature algorithm (eddsa) implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstdint.h>
@@ -217,14 +217,16 @@ void FSYMBOL(ed25519_fast_private_key)(const uint8 *key, uint32 pri[8],
 * @return: void
 */
 void FSYMBOL(ed25519_fast_public_key)(const uint8 *pri, uint8 *pub) {
-	uint32 _pri[8], _ran[8];
+	uint32 _pri[8], _pub[8], _ran[8];
 	struct ed25519_point xyz2;
 
 	FSYMBOL(ed25519_fast_private_key)(pri, _pri, _ran);
 
-	/* pub = compress(scalar(pri, ED25519_FAST_BASE)) */
+	/* _pub = compress(scalar(_pri, ED25519_FAST_BASE)) */
 	FSYMBOL(ed25519_fast_scalar_mul)(_pri, &(ED25519_FAST_BASE), &xyz2);
-	FSYMBOL(ed25519_fast_point_compress)(&xyz2, (uint32 *)pub);
+	FSYMBOL(ed25519_fast_point_compress)(&xyz2, _pub);
+
+	XSYMBOL(memcpy)(pub, _pub, ED25519_LEN);
 } /* end */
 
 /* @func: ed25519_fast_sign - ed25519 signature function
@@ -285,22 +287,23 @@ void FSYMBOL(ed25519_fast_sign)(const uint8 *pri, const uint8 *mesg,
 */
 int32 FSYMBOL(ed25519_fast_verify)(const uint8 *pub, const uint8 *sign,
 		const uint8 *mesg, uint64 len) {
-	uint32 Rs[8], s[8], h[8];
+	uint32 _pub[8], Rs[8], s[8], h[8];
 	struct ed25519_point A, R, hA, sB;
 	SHA512_NEW(sha_ctx);
 
+	XSYMBOL(memcpy)(_pub, pub, ED25519_LEN);
 	XSYMBOL(memcpy)(Rs, sign, ED25519_LEN);
 	XSYMBOL(memcpy)(s, sign + ED25519_LEN, ED25519_LEN);
 
-	/* A = decompress(pub) */
-	FSYMBOL(ed25519_fast_point_decompress)((uint32 *)pub, &A);
+	/* A = decompress(_pub) */
+	FSYMBOL(ed25519_fast_point_decompress)(_pub, &A);
 	/* R = decompress(Rs) */
 	FSYMBOL(ed25519_fast_point_decompress)(Rs, &R);
 
-	/* sh = sha(Rs + pub + mesg) */
+	/* sh = sha(Rs + _pub + mesg) */
 	FSYMBOL(sha512_init)(&sha_ctx);
 	FSYMBOL(sha512_process)(&sha_ctx, (uint8 *)Rs, ED25519_LEN);
-	FSYMBOL(sha512_process)(&sha_ctx, (uint8 *)pub, ED25519_LEN);
+	FSYMBOL(sha512_process)(&sha_ctx, (uint8 *)_pub, ED25519_LEN);
 	FSYMBOL(sha512_process)(&sha_ctx, mesg, len);
 	FSYMBOL(sha512_finish)(&sha_ctx, len + (ED25519_LEN * 2));
 

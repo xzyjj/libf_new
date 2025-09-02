@@ -30,7 +30,8 @@ static int32 _out_pad(int32 n, char *p, char c, int32 x) {
 * @param4: int32   # precision (max: FLTO_PREMAX)
 * @return: int32   # string length (+offset)
 */
-int32 XSYMBOL(internal_fltostr_num)(int32 n, char *p, float64 v, int32 pre) {
+int32 XSYMBOL(internal_fltostr_num)(int32 n, char *p, float64 v,
+		int32 pre) {
 	uint32 big[90], *a, *z, *r;
 	XSYMBOL(memset)(big, 0, sizeof(big));
 	int32 e = 0, intlen = 0;

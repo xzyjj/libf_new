@@ -10,7 +10,7 @@
 * @param1: struct swisstable_head * # swisstable head
 * @param2: const void *             # input key
 * @param3: uint64                   # key length
-* @return: void *                   # swisstable member / NULL pointer
+* @return: void *                   # return bucket / NULL pointer
 */
 void *FSYMBOL(swisstable_insert)(struct swisstable_head *head,
 		const void *key, uint64 len) {
@@ -42,7 +42,7 @@ void *FSYMBOL(swisstable_insert)(struct swisstable_head *head,
 * @param1: struct swisstable_head * # swisstable head
 * @param2: const void *             # input key
 * @param3: uint64                   # key length
-* @return: void *                   # swisstable member / NULL pointer
+* @return: void *                   # return bucket / NULL pointer
 */
 void *FSYMBOL(swisstable_find)(struct swisstable_head *head,
 		const void *key, uint64 len) {
@@ -71,7 +71,7 @@ void *FSYMBOL(swisstable_find)(struct swisstable_head *head,
 * @param1: struct swisstable_head * # swisstable head
 * @param2: const void *             # input key
 * @param3: uint64                   # key length
-* @return: void *                   # swisstable member / NULL pointer
+* @return: void *                   # return bucket / NULL pointer
 */
 void *FSYMBOL(swisstable_delete)(struct swisstable_head *head,
 		const void *key, uint64 len) {

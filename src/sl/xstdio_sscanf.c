@@ -1,4 +1,4 @@
-/* xstdio_sscanf.c - implementations */
+/* xstdio_sscanf.c - standard input/output implementations */
 
 #include <libf/config.h>
 #include <libf/sl/xstdint.h>

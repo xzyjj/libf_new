@@ -294,8 +294,8 @@ e:
 * @param4: va_list                # variable argument list
 * @return: int32                  # 0: no error, <0: error
 */
-int32 XSYMBOL(internal_fmt_scanf)(struct fmt_scanf_ctx *ctx, const char *s,
-		const char *fmt, va_list ap) {
+int32 XSYMBOL(internal_fmt_scanf)(struct fmt_scanf_ctx *ctx,
+		const char *s, const char *fmt, va_list ap) {
 	int32 n = 0;
 	ctx->s = s;
 

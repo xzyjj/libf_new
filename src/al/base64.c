@@ -78,7 +78,7 @@ void FSYMBOL(base64_enc)(const char *s, uint32 slen, char *t, uint32 *tlen) {
 * @param2: char *       # output buffer
 * @param3: uint32       # output buffer length
 * @return: int32        # >0: output size, -1: output buffer full, \
-*                         -2: base32 null character error
+*                         -2: base64 null character error
 */
 static int32 _base64_dec_4(const char *s, char *t, uint32 tlen) {
 	uint8 c0, c1, c2, c3;
@@ -121,7 +121,7 @@ static int32 _base64_dec_4(const char *s, char *t, uint32 tlen) {
 * @param4: uint32 *     # remaining length of output buffer
 * @return: int32        # 0: no error, >0: input error location, \
 *                         -1: output buffer full, \
-*                         -2: base32 null character error
+*                         -2: base64 null character error
 */
 int32 FSYMBOL(base64_dec)(const char *s, uint32 slen, char *t, uint32 *tlen) {
 	char buf[4];

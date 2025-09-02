@@ -13,7 +13,7 @@
 #undef X448_FAST_B
 #define X448_FAST_B _x448_fast_b
 
-/* P = 2**448 - 2**224 -1 */
+/* P = 2**448 - 2**224 - 1 */
 static const uint32 _x448_fast_p[14] = {
 	0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
 	0xffffffff, 0xffffffff, 0xffffffff, 0xfffffffe,

@@ -24,7 +24,7 @@ struct list_head {
 	struct list_head x = { NULL }
 
 #undef LIST_INIT
-#define LIST_INIT(x) ((x)->node = NULL)
+#define LIST_INIT(x) (x)->node = NULL
 
 #undef LIST_FOR_EACH
 #define LIST_FOR_EACH(node, name) \

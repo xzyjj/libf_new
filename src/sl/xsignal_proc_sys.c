@@ -1,12 +1,10 @@
 /* xsignal_proc_sys.c - standard library signals implementations */
 
 #include <libf/config.h>
-#include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
-#include <libf/sl/xerrno.h>
 #include <libf/sl/xtype_sys.h>
-#include <libf/sl/xsyscall_sys.h>
 #include <libf/sl/xsignal_sys.h>
+#include <libf/sl/xsyscall_sys.h>
 
 
 /* @func: kill - send a signal to a process or process group

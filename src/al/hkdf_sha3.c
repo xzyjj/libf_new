@@ -8,19 +8,23 @@
 
 
 /* @func: hkdf_sha3 - hkdf-sha3 key derivation function
-* @param1: const uint8 * # hmac-sha3 digest
-* @param2: int32         # digest type
-* @param3: const uint8 * # info (optional)
-* @param4: uint32        # info length
-* @param5: uint8 *       # output key
-* @param6: uint32        # key length
-* @return: int32         # 0: no error, -1: digest type error,
-*                          -2: key length error
+* @param1: const uint8 * # ikm
+* @param2: uint32        # ikm length
+* @param3: const uint8 * # salt
+* @param4: uint32        # salt length
+* @param5: const uint8 * # info
+* @param6: uint32        # info length
+* @param7: uint8 *       # output key
+* @param8: uint32        # key length
+* @param9: int32         # digest type
+* @return: int32         # 0: no error, -1: key length error,
+*                          -2: digest type error
 */
-int32 FSYMBOL(hkdf_sha3)(const uint8 *prk, int32 type, const uint8 *info,
-		uint32 info_len, uint8 *okm, uint32 len) {
+int32 FSYMBOL(hkdf_sha3)(const uint8 *ikm, uint32 ikm_len,
+		const uint8 *salt, uint32 salt_len, const uint8 *info,
+		uint32 info_len, uint8 *okm, uint32 len, int32 type) {
 	HMAC_SHA3_NEW(ctx);
-	uint8 tmp[SHA3_512_LEN];
+	uint8 tmp[SHA3_512_LEN], prk[SHA3_512_LEN];
 	uint32 f = 0, tmp_len = 0, dsize = 0;
 
 	switch (type) {
@@ -37,10 +41,15 @@ int32 FSYMBOL(hkdf_sha3)(const uint8 *prk, int32 type, const uint8 *info,
 			dsize = SHA3_512_LEN;
 			break;
 		default:
-			return -1;
+			return -2;
 	}
 	if (len < 1 || len > (255 * dsize))
-		return -2;
+		return -1;
+
+	FSYMBOL(hmac_sha3_init)(&ctx, salt, salt_len, type);
+	FSYMBOL(hmac_sha3_process)(&ctx, ikm, ikm_len);
+	FSYMBOL(hmac_sha3_finish)(&ctx);
+	XSYMBOL(memcpy)(prk, &(HMAC_SHA3_STATE(&ctx, 0)), dsize);
 
 	uint32 n = (len + dsize - 1) / dsize;
 	for (uint32 i = 1; i <= n; i++) {
@@ -52,8 +61,8 @@ int32 FSYMBOL(hkdf_sha3)(const uint8 *prk, int32 type, const uint8 *info,
 		tmp_len = dsize;
 
 		XSYMBOL(memcpy)(tmp, &(HMAC_SHA3_STATE(&ctx, 0)), dsize);
-		XSYMBOL(memcpy)(okm + f, tmp, dsize
-			- (((f + dsize) % len) % dsize));
+		XSYMBOL(memcpy)(okm + f, tmp, ((f + dsize) > len) ?
+			(len % dsize) : dsize);
 		f += dsize;
 	}
 

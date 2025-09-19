@@ -116,6 +116,8 @@ void FSYMBOL(bn_u8193_mul)(bn_8193_t r,
 	bn_8193_t rr;
 	int32 asize, bsize;
 
+	/* TODO: NTT/FFT optimize */
+
 	asize = FSYMBOL(bn_8193_bits)(a);
 	bsize = FSYMBOL(bn_8193_bits)(b);
 	if (!asize || !bsize) {

@@ -1,0 +1,11 @@
+PASS: 'password'
+SALT: 'salt'
+C: 1
+
+KEYLEN: 20
+SHA256:
+	120fb6cffcf8b32c43e7225256c4f837a86548c9
+
+KEYLEN: 20
+SHA224:
+	3c198cbdb9464b7857966bd05b7bc92bc1cc4e6e

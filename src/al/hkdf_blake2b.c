@@ -8,21 +8,30 @@
 
 
 /* @func: hkdf_blake2b - hkdf-blake2b key derivation function
-* @param1: const uint8 * # hmac-blake2b digest
-* @param2: const uint8 * # info (optional)
-* @param3: uint32        # info length
-* @param4: uint8 *       # output key
-* @param5: uint32        # key length
+* @param1: const uint8 * # ikm
+* @param2: uint32        # ikm length
+* @param3: const uint8 * # salt
+* @param4: uint32        # salt length
+* @param5: const uint8 * # info
+* @param6: uint32        # info length
+* @param7: uint8 *       # output key
+* @param8: uint32        # key length
 * @return: int32         # 0: no error, -1: key length error
 */
-int32 FSYMBOL(hkdf_blake2b)(const uint8 *prk, const uint8 *info, uint32 info_len,
-		uint8 *okm, uint32 len) {
+int32 FSYMBOL(hkdf_blake2b)(const uint8 *ikm, uint32 ikm_len,
+		const uint8 *salt, uint32 salt_len, const uint8 *info,
+		uint32 info_len, uint8 *okm, uint32 len) {
 	HMAC_BLAKE2B_NEW(ctx);
-	uint8 tmp[BLAKE2B_512_LEN];
+	uint8 tmp[BLAKE2B_512_LEN], prk[BLAKE2B_512_LEN];
 	uint32 f = 0, tmp_len = 0;
 
 	if (len < 1 || len > (255 * BLAKE2B_512_LEN))
 		return -1;
+
+	FSYMBOL(hmac_blake2b_init)(&ctx, salt, salt_len);
+	FSYMBOL(hmac_blake2b_process)(&ctx, ikm, ikm_len);
+	FSYMBOL(hmac_blake2b_finish)(&ctx);
+	XSYMBOL(memcpy)(prk, &(HMAC_BLAKE2B_STATE(&ctx, 0)), BLAKE2B_512_LEN);
 
 	uint32 n = (len + BLAKE2B_512_LEN - 1) / BLAKE2B_512_LEN;
 	for (uint32 i = 1; i <= n; i++) {
@@ -35,8 +44,8 @@ int32 FSYMBOL(hkdf_blake2b)(const uint8 *prk, const uint8 *info, uint32 info_len
 
 		XSYMBOL(memcpy)(tmp, &(HMAC_BLAKE2B_STATE(&ctx, 0)),
 			BLAKE2B_512_LEN);
-		XSYMBOL(memcpy)(okm + f, tmp, BLAKE2B_512_LEN
-			- (((f + BLAKE2B_512_LEN) % len) % BLAKE2B_512_LEN));
+		XSYMBOL(memcpy)(okm + f, tmp, ((f + BLAKE2B_512_LEN) > len) ?
+			(len % BLAKE2B_512_LEN) : BLAKE2B_512_LEN);
 		f += BLAKE2B_512_LEN;
 	}
 

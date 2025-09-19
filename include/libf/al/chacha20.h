@@ -4,7 +4,6 @@
 #define LIBF_AL_CHACHA20_H
 
 #include <libf/config.h>
-#include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
 
 

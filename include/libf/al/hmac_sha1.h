@@ -4,7 +4,6 @@
 #define LIBF_AL_HMAC_SHA1_H
 
 #include <libf/config.h>
-#include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
 #include <libf/al/sha1.h>
 

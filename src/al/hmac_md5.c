@@ -1,7 +1,6 @@
 /* hmac_md5.c - hash message authentication code (md5) implementations */
 
 #include <libf/config.h>
-#include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
 #include <libf/sl/xstring.h>
 #include <libf/al/hmac_md5.h>

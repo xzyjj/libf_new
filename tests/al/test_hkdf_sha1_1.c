@@ -2,23 +2,27 @@
 #include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
 #include <libf/sl/xstring.h>
-#include <libf/al/hmac_sha1.h>
 #include <libf/al/hkdf_sha1.h>
 
 
 int main(void) {
-	uint8 buf[SHA1_LEN * 256];
-	char *s = "123456";
-	uint32 len = XSYMBOL(strlen)(s);
+	uint8 buf[42];
+	uint8 ikm[] = {
+		0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
+		0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,
+		0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b
+		};
+	uint8 salt[] = {
+		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+		0x08, 0x09, 0x0a, 0x0b, 0x0c
+		};
+	uint8 info[] = {
+		0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7,
+		0xf8, 0xf9
+		};
 
-	HMAC_SHA1_NEW(ctx);
-	FSYMBOL(hmac_sha1_init)(&ctx, (uint8 *)s, len);
-	FSYMBOL(hmac_sha1_process)(&ctx, (uint8 *)s, len);
-	FSYMBOL(hmac_sha1_finish)(&ctx, len);
-	FSYMBOL(hkdf_sha1)(&(HMAC_SHA1_STATE(&ctx, 0)), (uint8 *)s, len,
-		buf, 35);
-
-	for (int32 i = 0; i < 35; i++)
+	FSYMBOL(hkdf_sha1)(ikm, 22, salt, 13, info, 10, buf, 42);
+	for (int32 i = 0; i < 42; i++)
 		printf("%02x", buf[i]);
 	printf("\n");
 

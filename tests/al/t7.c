@@ -405,15 +405,15 @@ uint32 bit_buf_len = 0;
 struct bits_add_ctx add_ctx;
 
 void send_bits(uint32 v, uint32 len) {
-	if (FSYMBOL(bits_add)(&add_ctx, v, len)) {
+	while (FSYMBOL(bits_add)(&add_ctx, v, len)) {
 		XSYMBOL(memcpy)(bit_buf + bit_buf_len,
 			BITS_ADD_BUF(&add_ctx),
 			BITS_ADD_BUFSIZE);
 		bit_buf_len += BITS_ADD_BUFSIZE;
 		BITS_ADD_FLUSH(&add_ctx);
 
-		if (BITS_ADD_BREM(&add_ctx))
-			FSYMBOL(bits_add)(&add_ctx, v, len);
+	/*	if (BITS_ADD_BREM(&add_ctx))
+			FSYMBOL(bits_add)(&add_ctx, v, len);*/
 	}
 }
 
@@ -442,7 +442,7 @@ uint32 adler32(uint32 adler, const uint8 *data, uint32 len) {
 	return (s2 << 16) | s1;
 }
 
-#if 0
+#if 1
 
 void lz77_to_huffman(const uint8 *s, uint32 len) {
 	uint32 pos = 0, t_pos = 0, t = 0, code, dist;
@@ -517,24 +517,39 @@ struct dyntree_ctx {
 	uint16 heap[DEFLATE_HEAP_SIZE];
 	/* node depth (use when the freq are same) */
 	uint8 depth[DEFLATE_HEAP_SIZE];
-	int32 size;
-	int32 size_max;
+	int32 size;     /* heap elems number */
+	int32 size_max; /* heap-back pos */
 };
 
 struct dyntree_desc {
-	struct deflate_ctdata *tree;
-	int32 elems;
-	int32 bitlen_max;
-	int32 code_max;
+	const struct deflate_ctdata *stree; /* static tree */
+	struct deflate_ctdata *tree;        /* dynamic tree */
+	int32 elems;      /* codes number */
+	int32 bitlen_max; /* max codes bits */
+	int32 code_max;   /* max codes */
+	int32 opt_slen;   /* static codes len */
+	int32 opt_dlen;   /* dynamic codes len */
 };
 
-struct dyntree_ctx dyn_ctx;
+#undef DYNTREE_NEW
+#define DYNTREE_NEW(name) struct dyntree_ctx name
+
+#undef DYNTREE_DESC_NEW
+#define DYNTREE_DESC_NEW(name, _stree, _tree, _elems, _bits) \
+	struct dyntree_desc name = { \
+		.stree = _stree, .tree = _tree, \
+		.elems = _elems, \
+		.bitlen_max = _bits, \
+		.code_max = 0, \
+		.opt_slen = 0, .opt_dlen = 0 \
+		}
 
 struct deflate_ctdata ltree[DEFLATE_L_SIZE];
 struct deflate_ctdata dtree[DEFLATE_D_SIZE];
 
-struct dyntree_desc desc_ltree = { ltree, DEFLATE_L_CODES, DEFLATE_BITS_MAX, 0 };
-struct dyntree_desc desc_dtree = { dtree, DEFLATE_D_CODES, 5, 0 };
+DYNTREE_NEW(dyn_ctx);
+DYNTREE_DESC_NEW(desc_ltree, static_ltree, ltree, DEFLATE_L_CODES, DEFLATE_BITS_MAX);
+DYNTREE_DESC_NEW(desc_dtree, static_dtree, dtree, DEFLATE_D_CODES, 5);
 
 
 static uint16 _bit_reverse(uint16 c, uint16 len) {
@@ -573,7 +588,6 @@ static void _gen_bitlen(struct dyntree_ctx *ctx, struct dyntree_desc *desc) {
 	int32 n, m, len, overflow = 0;
 
 	tree[ctx->heap[ctx->size_max]].dl.len = 0; /* root */
-
 	for (int32 i = ctx->size_max + 1; i < DEFLATE_HEAP_SIZE; i++) {
 		n = ctx->heap[i];
 		len = tree[tree[n].dl.dad].dl.len + 1;
@@ -648,12 +662,16 @@ static void _pqdown(struct dyntree_ctx *ctx, struct deflate_ctdata *tree,
 }
 
 static void _build_tree(struct dyntree_ctx *ctx, struct dyntree_desc *desc) {
+	const struct deflate_ctdata *stree = desc->stree;
 	struct deflate_ctdata *tree = desc->tree;
 	int32 elems = desc->elems, code_max = -1;
 	int32 n, m, node;
 	ctx->size = 0;
 	ctx->size_max = DEFLATE_HEAP_SIZE;
+	desc->opt_slen = 0;
+	desc->opt_dlen = 0;
 
+	/* non-zero freq add to the heap */
 	for (int32 i = 0; i < elems; i++) {
 		if (tree[i].fc.freq) {
 			ctx->heap[++(ctx->size)] = i;
@@ -674,9 +692,6 @@ static void _build_tree(struct dyntree_ctx *ctx, struct dyntree_desc *desc) {
 
 	for (int32 k = ctx->size / 2; k > 0; k--)
 		_pqdown(ctx, tree, k);
-
-#undef MAX
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
 	/*
 	* Standardized Huffman coding, generating a coding
@@ -712,6 +727,9 @@ static void _build_tree(struct dyntree_ctx *ctx, struct dyntree_desc *desc) {
 	*   'D'(68): 2
 	*/
 
+#undef MAX
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+
 	node = elems;
 	do {
 		n = ctx->heap[1];
@@ -729,13 +747,23 @@ static void _build_tree(struct dyntree_ctx *ctx, struct dyntree_desc *desc) {
 		ctx->heap[1] = node++;
 		_pqdown(ctx, tree, 1);
 	} while (ctx->size > 1);
-
-	ctx->heap[--(ctx->size_max)] = ctx->heap[1];
+	ctx->heap[--(ctx->size_max)] = ctx->heap[1]; /* root */
 
 	for (int32 i = 0; i <= DEFLATE_BITS_MAX; i++)
 		ctx->bitlen_count[i] = 0;
 
 	_gen_bitlen(ctx, desc);
+
+	/* statistical the static and dynamic size */
+	for (int32 i = 0; i < elems; i++) {
+		int32 f = tree[i].fc.freq;
+		if (f) {
+			if (stree)
+				desc->opt_slen += f * stree[i].dl.len;
+			desc->opt_dlen += f * tree[i].dl.len;
+		}
+	}
+
 	_gen_codes(tree, ctx->bitlen_count, desc->code_max + 1);
 }
 
@@ -824,6 +852,8 @@ void lz77_to_huffman(const uint8 *s, uint32 len) {
 		bit_buf_len, pos, 100 - ((bit_buf_len * 100) / pos),
 		bit_buf_len, t_pos, 100 - ((bit_buf_len * 100) / t_pos)
 		);
+
+	printf("%d %d\n", desc_ltree.opt_slen, desc_ltree.opt_dlen);
 }
 
 #endif

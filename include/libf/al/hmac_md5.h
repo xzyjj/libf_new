@@ -4,7 +4,6 @@
 #define LIBF_AL_HMAC_MD5_H
 
 #include <libf/config.h>
-#include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
 #include <libf/al/md5.h>
 

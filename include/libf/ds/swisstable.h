@@ -21,7 +21,7 @@ struct swisstable_head {
 	uint64 wsize; /* size of each bucket */
 	uint64 size;
 	uint64 total_size;
-	/* input buf, length */
+	/* input key, length */
 	uint64L (*call_hash)(const void *, uint64);
 	/* bucket, input key, length */
 	int32 (*call_cmp)(void *, const void *, uint64);

@@ -1,7 +1,6 @@
 /* hmac_blake2b.c - hash message authentication code (blake2b) implementations */
 
 #include <libf/config.h>
-#include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
 #include <libf/sl/xstring.h>
 #include <libf/al/hmac_blake2b.h>

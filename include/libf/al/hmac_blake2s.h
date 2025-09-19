@@ -4,7 +4,6 @@
 #define LIBF_AL_HMAC_BLAKE2S_H
 
 #include <libf/config.h>
-#include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
 #include <libf/al/blake2s.h>
 

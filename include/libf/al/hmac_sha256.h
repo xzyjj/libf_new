@@ -4,7 +4,6 @@
 #define LIBF_AL_HMAC_SHA256_H
 
 #include <libf/config.h>
-#include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
 #include <libf/al/sha256.h>
 

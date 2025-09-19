@@ -338,7 +338,7 @@ static void _ed25519_pow(uint32 r[8],
 
 /* @func: _ed25519_iszero (static) - check if a number is zero
 * @param1: const uint32 [8] # number
-* @return: int32            # 0: non-zero, 1: is zero
+* @return: uint32           # 0: non-zero, 1: is zero
 */
 static uint32 _ed25519_iszero(const uint32 a[8]) {
 	uint32 r = 0;

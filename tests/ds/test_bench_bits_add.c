@@ -11,8 +11,10 @@ int main(void) {
 
 	start = clock();
 	for (int32 i = 0; i < 10000000; i++) {
-		while (FSYMBOL(bits_add)(&ctx, 1, (i & 11) + 1))
+		if (FSYMBOL(bits_add)(&ctx, 1, (i & 11) + 1)) {
 			BITS_ADD_FLUSH(&ctx);
+			FSYMBOL(bits_add)(&ctx, 1, (i & 11) + 1);
+		}
 	}
 	end = clock();
 	time = (double)(end - start) / CLOCKS_PER_SEC;

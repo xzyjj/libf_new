@@ -418,11 +418,9 @@ e:
 				} else if (ctx->flags & FG_LONG_LONG) {
 					ctx->va._i64L = va_arg(ap, int64L);
 				} else if (ctx->flags & FG_SHORT) {
-					ctx->va._i64L =
-						(int16)va_arg(ap, int32);
+					ctx->va._i64L = (int16)va_arg(ap, int32);
 				} else if (ctx->flags & FG_CHAR) {
-					ctx->va._i64L =
-						(int8)va_arg(ap, int32);
+					ctx->va._i64L = (int8)va_arg(ap, int32);
 				} else {
 					ctx->va._i64L = va_arg(ap, int32);
 				}
@@ -437,11 +435,9 @@ e:
 				} else if (ctx->flags & FG_LONG_LONG) {
 					ctx->va._u64L = va_arg(ap, uint64L);
 				} else if (ctx->flags & FG_SHORT) {
-					ctx->va._u64L =
-						(uint16)va_arg(ap, uint32);
+					ctx->va._u64L = (uint16)va_arg(ap, uint32);
 				} else if (ctx->flags & FG_CHAR) {
-					ctx->va._u64L =
-						(uint8)va_arg(ap, uint32);
+					ctx->va._u64L = (uint8)va_arg(ap, uint32);
 				} else {
 					ctx->va._u64L = va_arg(ap, uint32);
 				}

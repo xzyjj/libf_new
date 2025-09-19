@@ -94,7 +94,7 @@ int main(void) {
 	/* search */
 	start = clock();
 	for (int i = 0; i < NODE_SIZE; i++) {
-		FSYMBOL(avl_search_wrap)(&root, &T[i].node, _search_cmp);
+		FSYMBOL(avl_search_wrap)(&root, &T[i].key, _search_cmp);
 	}
 	end = clock();
 	time = (float64)(end - start) / CLOCKS_PER_SEC;

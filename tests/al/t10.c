@@ -103,6 +103,8 @@ static void _gen_bitlen(struct dyntree_ctx *ctx, struct dyntree_desc *desc) {
 	if (!overflow)
 		return;
 
+	printf("overflow: %d\n", overflow);
+
 	do {
 		n = bitlen_max - 1;
 		while (!ctx->bitlen_count[n])
@@ -262,7 +264,7 @@ int main(void) {
 	for (int32 i = 0; i < DEFLATE_L_CODES; i++)
 		__tree[i].fc.freq = 0;
 
-#if 0
+#if 1
 
 	for (int32 i = 0; i < DEFLATE_L_CODES; i++)
 		__tree[i].fc.freq = ((1300 * (i + 1)) + (i & 7)) & 1800;
@@ -276,9 +278,9 @@ int main(void) {
 
 #endif
 
-
 	_build_tree(&ctx, &desc);
-#if 0
+
+#if 1
 
 	for (int32 i = 0; i < DEFLATE_L_CODES; i++)
 		printf("%d: %u %u\n", i,

@@ -1,7 +1,6 @@
 /* hmac_sha3.c - hash message authentication code (sha3) implementations */
 
 #include <libf/config.h>
-#include <libf/sl/xstddef.h>
 #include <libf/sl/xstdint.h>
 #include <libf/sl/xstring.h>
 #include <libf/al/hmac_sha3.h>
